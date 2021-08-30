@@ -33,9 +33,12 @@ int main()
 	BmpFont32.ImageData = (UWORD *)BmpFont32P;
 	BmpWork.ImageData = (UWORD *)BmpWorkP;
 	InitImagePlanes(&BmpWork);
+	BmpCookie.ImageData = (UWORD *)BmpCookieP;
+	InitImagePlanes(&BmpCookie);
+	BmpCookieMask.ImageData = (UWORD *)BmpCookieMaskP;
+	InitImagePlanes(&BmpCookieMask);
 
 	TakeSystem();
-	
 
 	WaitVbl();
 	SetupCopper(copPtr);
@@ -50,7 +53,7 @@ int main()
 	//custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB);
 	custom->intreq = 1 << INTB_VERTB; //reset vbl req
 	//try init music
-	if(p61Init(module) != 0)
+	if (p61Init(module) != 0)
 		KPrintF("p61Init failed!\n");
 	// MAIN LOOP
 	MainLoop();
@@ -69,6 +72,8 @@ int main()
 
 void MainLoop()
 {
+	Point2D ps = {0, 0};
+	SimpleBlit(BmpCookie, BmpLogo, ps, ps, 32, 32);
 	while (!MouseLeft())
 	{
 		WaitVbl();
@@ -245,21 +250,6 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 	custom->bltamod = bmpFont.Bpl - charW / 8;
 	custom->bltdmod = bmpDest.Bpl - charW / 8;
 	custom->bltsize = ((charH * bmpFont.Bpls) << 6) + (charW / 16);
-}
-
-void BltClearArea()
-{
-	WaitBlit();
-
-	custom->bltcon0 = 0x0900;
-	custom->bltcon1 = 0x0000;
-	custom->bltafwm = 0xffff;
-	custom->bltalwm = 0xffff;
-	custom->bltapt = (UBYTE *)BmpFont32P;
-	custom->bltdpt = BmpWorkP + Screen.Bpl;
-	custom->bltamod = BmpFont32.Bpl - 32 / 8;
-	custom->bltdmod = BmpWork.Bpl - 32 / 8;
-	custom->bltsize = ((40 * BmpFont32.Bpls) << 6) + (32 / 16);
 }
 
 static APTR GetVBR()
@@ -545,28 +535,43 @@ void GetCookieMask(UBYTE planes, UBYTE **bmp, UBYTE *destMask, USHORT height, US
 
 void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
 {
-	UBYTE *src = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bpl) + (startA.X / 8);
-	UBYTE *dest = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bpl) + (startD.X / 8);
-
 	custom->bltcon0 = 0x09f0;
 	custom->bltcon1 = 0x0000;
 	custom->bltafwm = 0xffff;
 	custom->bltalwm = 0xffff;
 	custom->bltamod = imgA.Bpl - (width / 8);
 	custom->bltdmod = imgD.Bpl - (width / 8);
-
-	for (int b = 0; b < imgA.Bpls; b++)
-	{
-		WaitBlt();
-		custom->bltapt = src;
-		custom->bltdpt = dest;
-		custom->bltsize = ((height) << 6) + (width / 16);
-
-		src += imgA.Width / 8 * imgA.Height;
-		dest += imgD.Width / 8 * imgD.Height;
-	}
+	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
+	custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+	WaitBlt();
+	custom->bltsize = ((height*imgA.Bpls) << 6) + (width / 16);
 }
 
+void BlitObject(BmpDescriptor bobs, BmpDescriptor background, UBYTE *maskData, int tilex, int tiley, int dstx, int dsty, int height, int width)
+{
+	// set blitter registers
+	// first and last mask words
+	// custom->bltafwm = 0xffff;
+	// custom->bltalwm = alwm;
+	// cookie cut enable channels B, C and D, LF => D = AB + ~AC => 0xca
+	// A = Mask sheet
+	// B = Tile sheet
+	// C = Background
+	// D = Background
+	// custom->bltcon0 = 0x0fca | (dst_shift << 12);
+	// custom->bltcon1 = dst_shift << 12; // shift in B
+	// custom->bltamod = srcmod;
+	// custom->bltbmod = srcmod;
+	// custom->bltcmod = mskmod;
+	// custom->bltdmod = dstmod;
+	// custom->bltapt = mask;
+	// custom->bltbpt = src;
+	// custom->bltcpt = dst;
+	// custom->bltdpt = dst;
+	// do the blit
+	// WaitBlit();
+	// custom->bltsize = bltsize;
+}
 
 int p61Init(const void *module)
 { // returns 0 if success, non-zero otherwise
@@ -610,4 +615,3 @@ void p61End()
 		:
 		: "cc", "memory");
 }
-

@@ -46,7 +46,7 @@ void* doynaxdepack(const void* input, void* output) { // returns end of output d
 }
 
 #define Abs(a) (a < 0 ? a * -1 : a)
-
+#define SHIFT_PADDING (16)
 
 /// <summary>
 /// USHORT Width   - Width
@@ -61,10 +61,14 @@ void* doynaxdepack(const void* input, void* output) { // returns end of output d
 
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/320x256x3_32x32_font.raw") // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie.raw");
+INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookieMask.raw");
 BmpDescriptor Screen = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
 BmpDescriptor BmpWork = {320 + 32, 256, 3, 8, (320 + 32) / 8, (320 + 32) / 8 * 3, (320 + 32) / 8 * 256, (320 + 32) / 8 * 256 * 3, NULL, NULL};
 BmpDescriptor BmpLogo = {256, 130, 3, 8, 256 / 8, 256 / 8 * 3, 256 / 8 * 130, 256 / 8 * 130 * 3, NULL, NULL};
 BmpDescriptor BmpFont32 = {320, 256, 3, 16, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
+BmpDescriptor BmpCookie = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
+BmpDescriptor BmpCookieMask = {320 + 32, 256, 1, 8, (320 + 32) / 8, (320 + 32) / 8 * 1, (320 + 32) / 8 * 256, (320 + 32) / 8 * 256 * 1, NULL, NULL};
 
 UWORD LogoPaletteRGB4[8] =
     {
@@ -72,6 +76,10 @@ UWORD LogoPaletteRGB4[8] =
 UWORD FontPaletteRGB4[8] =
     {
         0x0000, 0x0017, 0x0259, 0x036A, 0x048B, 0x05BD, 0x06DE, 0x08FF};
+UWORD CookiePaletteRGB4[8] =
+{
+	0x00CC,0x0FFF,0x0A20,0x0B40,0x0C70,0x0D90,0x0EB0,0x0080
+};
 //libs
 struct ExecBase *
     SysBase;
@@ -111,16 +119,12 @@ OK SCROLLER I'LL TRY TO HELP US OUT - BUT THAT MAY TAKE A WHILE. DON'T BOTHER WE
 FLY!a!!          OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!       THAT WAS THE LEAST I COULD DO.   \
 BUT? STILL NOT HAPPY?   LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!  \
 OK, OK... I'LL TRY MY BEST AND ....          bYES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
-IS THERE ANYTHING ELSE I CAN DO FOR YOU MY LORD?   LOOK AROUND ME. PRETTY BORING, DON'T YOU THINK?    \
-...HMMMM - PRETTY DARK IT IS. WE CAN CHANGE THIS IF YOU WANT. WELL THEN GO ON. MAYBEE SOME BACKGROUND COLORS?\
-WHAT ABOUT SOME FRESH GREEN?     c  ET'VOILA!  NOT BAD FOR A FIRST TRY. BUT YOU CAN DO BETTER, RIGHT?\
-HOW DO YOU LIKE GRADIENTS? c\
 SEE YOU MY FRIENDS.               ab\
 \0";
 
 // DEMO - INCBIN
 INCBIN(player, "Art/music/player610.6.no_cia.bin")
-INCBIN_CHIP(module, "Art/music/testmod.p61")
+INCBIN_CHIP(module, "Art/music/chipper.p61")
 
 //proto
 inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
@@ -267,11 +271,14 @@ void WaitVbl(void);
 inline void WaitBlt();
 void TakeSystem(void);
 void FreeSystem(void);
+
 void SetupCopper(USHORT *copPtr);
 void BounceScroller(USHORT pos);
 void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed);
 void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBYTE *bmpDestP, USHORT plotY, USHORT charW, USHORT charH);
-void BltClearArea();
+void ClearBitmap(BmpDescriptor bmpD);
+void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
+void BlitObject(BmpDescriptor bobs, BmpDescriptor background, UBYTE *maskData, int tilex, int tiley, int dstx, int dsty, int height, int width);
 void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
 int p61Init(const void *module);
