@@ -54,7 +54,7 @@ struct _point2D
 typedef struct _point2D Point2D;
 typedef struct _point2D Vector2D;
 
-inline Vector2D Vect2DGetVector(Point2D va, Point2D vb)
+Vector2D Vect2DGetVector(Point2D va, Point2D vb)
 {
     Vector2D vr;
 
@@ -63,44 +63,38 @@ inline Vector2D Vect2DGetVector(Point2D va, Point2D vb)
 
     return vr;
 }
-
-inline Vector2D Vect2DAdd(Vector2D va, Vector2D vb)
+Vector2D Vect2DAdd(Vector2D va, Vector2D vb)
 {
     Vector2D vr;
     vr.X = va.X + vb.X;
     vr.Y = va.Y + vb.Y;
     return vr;
 }
-
-inline Vector2D Vect2DSub(Vector2D va, Vector2D vb)
+Vector2D Vect2DSub(Vector2D va, Vector2D vb)
 {
     Vector2D vr;
     vr.X = va.X - vb.X;
     vr.Y = va.Y - vb.Y;
     return vr;
 }
-
-inline Vector2D Vect2DMul(Vector2D va, int scalar)
+Vector2D Vect2DMul(Vector2D va, int scalar)
 {
     Vector2D vr;
     vr.X = va.X * scalar;
     vr.Y = va.Y * scalar;
     return vr;
 }
-
-inline int Vect2DSkal(Vector2D va, Vector2D vb)
+int Vect2DSkal(Vector2D va, Vector2D vb)
 {
     return va.X * vb.X + va.Y * vb.Y;
 }
-
-inline Vector2D Vector2DVec(Vector2D va, Vector2D vb)
+Vector2D Vector2DVec(Vector2D va, Vector2D vb)
 {
     Vector2D vr;
 
     return vr;
 }
-
-inline Point2D Point2DTrans(Point2D pa, Point2D m)
+Point2D Point2DTrans(Point2D pa, Point2D m)
 {
     Point2D pr;
     
@@ -109,16 +103,14 @@ inline Point2D Point2DTrans(Point2D pa, Point2D m)
     
     return pr;
 }
-
-inline void Points2DTrans(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D m)
+void Points2DTrans(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D m)
 {
     for (int i = 0; i < length; i++)
     {
         pointsB[i] = Point2DTrans(pointsA[i], m);
     }
 }
-
-inline Point2D Point2DScale(Point2D pa, Point2D fixpoint, int mx, int my)
+Point2D Point2DScale(Point2D pa, Point2D fixpoint, int mx, int my)
 {
     Point2D pr;
 
@@ -131,16 +123,14 @@ inline Point2D Point2DScale(Point2D pa, Point2D fixpoint, int mx, int my)
 
     return pr;
 }
-
-inline void Points2DScale(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int mx, int my)
+void Points2DScale(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int mx, int my)
 {
     for (int i = 0; i < length; i++)
     {
         pointsB[i] = Point2DScale(pointsA[i], origin, mx, my);
     }
 }
-
-inline Point2D Point2DRotate(Point2D pa, Point2D fixpoint, int alpha)
+Point2D Point2DRotate(Point2D pa, Point2D fixpoint, int alpha)
 {
     Point2D pr;
 
@@ -153,5 +143,5 @@ inline Point2D Point2DRotate(Point2D pa, Point2D fixpoint, int alpha)
 
     return pr;
 }
-
+void Points2DRotate(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int alpha);
 #endif // VECTOR

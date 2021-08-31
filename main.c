@@ -24,6 +24,15 @@ int main()
 
 	Write(Output(), (APTR) "Hello console!\n", 15);
 
+	BitmapInit(&Screen, 320, 256, 3);
+	BitmapInit(&BmpLogo, 256, 130, 3);
+	BitmapInit(&BmpUpperPart_PF1, 320, 130, 3);
+	BitmapInit(&BmpUpperPart_PF2, 320, 130, 3);
+	BitmapInit(&BmpScroller, 320 + 32, 166, 3);
+	BitmapInit(&BmpFont32, 320, 256, 3);
+	BitmapInit(&BmpCookie, 320, 256, 3);
+	BitmapInit(&BmpCookieMask, 320, 256, 1);
+
 	copPtr = AllocMem(1024, MEMF_CHIP);
 	BmpScroller.ImageData = (UWORD *)AllocMem(BmpScroller.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpUpperPart_PF1.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF1.Btot, MEMF_CHIP | MEMF_CLEAR);
@@ -53,7 +62,7 @@ int main()
 	SetInterruptHandler((APTR)interruptHandler);
 	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
 #ifdef MUSIC
-	custom->intena = INTF_SETCLR | INTF_EXTER; // ThePlayer needs INTF_EXTER
+	custom->intena = INTF_SETCLR | INTF_EXTER; // TheP61_Player needs INTF_EXTER
 #endif
 	custom->intreq = 1 << INTB_VERTB; //reset vbl req
 									  //try init music
@@ -83,26 +92,47 @@ void MainLoop()
 {
 	Point2D ps = {0, 0};
 	Point2D pd = {32, 0};
+	Point2D ps2 = {0, 32};
+	Point2D pd2 = {32, 0};
+	Point2D pd3 = {224, 0};
+	Point2D pd4 = {32, 16};
+	Point2D pd5 = {224, 16};
+	Point2D pd6 = {32, 32};
+	Point2D pd7 = {224, 32};
+	Point2D pd8 = {32, 48};
+	Point2D pd9 = {224, 48};
 
 	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd2, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd3, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd4, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd5, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd6, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd7, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd8, 32, 32);
+	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd9, 32, 32);
 	while (!MouseLeft())
 	{
 		WaitVbl();
 
 		if (BounceEnabled)
 		{
-			if(ScrollerDir > 0)
+			if (ScrollerDir > 0)
 			{
-				ScrollerDir = (ScrollerMax - ScrollerY)*1000/12000;
-				if(ScrollerDir > 6) ScrollerDir = 6;
-				if(ScrollerDir < 1) ScrollerDir =1;
+				ScrollerDir = (ScrollerMax - ScrollerY) * 1000 / 12000;
+				if (ScrollerDir > 6)
+					ScrollerDir = 6;
+				if (ScrollerDir < 1)
+					ScrollerDir = 1;
 			}
 			else
 			{
 				ScrollerDir -= 1;
 
-				if(ScrollerDir < -4) ScrollerDir = -4;
-				if(ScrollerDir > -1) ScrollerDir = -1;
+				if (ScrollerDir < -4)
+					ScrollerDir = -4;
+				if (ScrollerDir > -1)
+					ScrollerDir = -1;
 			}
 			ScrollerY += ScrollerDir;
 		}
@@ -143,18 +173,18 @@ void SetupCopper(USHORT *copPtr)
 	// set logo colors
 	for (int a = 0; a < 8; a++)
 	{
-		copPtr = copSetColor(copPtr, a, LogoPaletteRGB4[a]);
+		copPtr = copSetColor(copPtr, a, CookiePaletteRGB4[a]);
 	}
 	for (int a = 8; a < 16; a++)
 	{
-		copPtr = copSetColor(copPtr, a, CookiePaletteRGB4[a - 8]);
+		copPtr = copSetColor(copPtr, a, LogoPaletteRGB4[a - 8]);
 	}
 	// set logo bitplane pointers
-	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
-	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, TRUE);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, FALSE);
 	// enable bitplanes
 	*copPtr++ = BPLCON0;
-	*copPtr++ = ((BmpLogo.Bpls*2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
+	*copPtr++ = ((BmpLogo.Bpls * 2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
 
 	// wait till below logo
 	copPtr = copWaitY(copPtr, 0x2c + BmpUpperPart_PF1.Height);
@@ -232,7 +262,8 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 	{
 		if (BounceEnabled)
 		{
-			ScrollerY = 0;
+			ScrollerY = ScrollerMax;
+			ScrollerDir = -1;
 		}
 		BounceEnabled = !BounceEnabled;
 
@@ -577,30 +608,22 @@ void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D 
 	custom->bltsize = ((height * imgA.Bpls) << 6) + (width / 16);
 }
 
-void BlitObject(BmpDescriptor bobs, BmpDescriptor background, UBYTE *maskData, int tilex, int tiley, int dstx, int dsty, int height, int width)
+void BetterBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
 {
-	// set blitter registers
-	// first and last mask words
-	// custom->bltafwm = 0xffff;
-	// custom->bltalwm = alwm;
-	// cookie cut enable channels B, C and D, LF => D = AB + ~AC => 0xca
-	// A = Mask sheet
-	// B = Tile sheet
-	// C = Background
-	// D = Background
-	// custom->bltcon0 = 0x0fca | (dst_shift << 12);
-	// custom->bltcon1 = dst_shift << 12; // shift in B
-	// custom->bltamod = srcmod;
-	// custom->bltbmod = srcmod;
-	// custom->bltcmod = mskmod;
-	// custom->bltdmod = dstmod;
-	// custom->bltapt = mask;
-	// custom->bltbpt = src;
-	// custom->bltcpt = dst;
-	// custom->bltdpt = dst;
-	// do the blit
-	// WaitBlit();
-	// custom->bltsize = bltsize;
+	UBYTE x = 0;//startD.X % 16;
+
+	WaitBlt();
+	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | x << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
+	custom->bltcon1 = x << BSHIFTSHIFT;
+	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
+	custom->bltamod = imgA.Bpl - (width / 8);
+	custom->bltbpt = (UBYTE *)BmpCookieMask.ImageData + (startA.Y * BmpCookieMask.Bpl) + (startA.X / 8);
+	custom->bltbmod = BmpCookieMask.Bpl - (width / 8);
+	custom->bltcpt = custom->bltdpt =  (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+	custom->bltcmod = custom->bltdmod = imgD.Bpl - (width / 8);
+	custom->bltafwm = 0xffff;
+	custom->bltalwm = 0xffff;
+	custom->bltsize = ((height * imgA.Bpls) << HSIZEBITS) | (width / 16);
 }
 
 int p61Init(const void *module)
@@ -608,7 +631,7 @@ int p61Init(const void *module)
 	register volatile const void *_a0 ASM("a0") = module;
 	register volatile const void *_a1 ASM("a1") = NULL;
 	register volatile const void *_a2 ASM("a2") = NULL;
-	register volatile const void *_a3 ASM("a3") = player;
+	register volatile const void *_a3 ASM("a3") = P61_Player;
 	register int _d0 ASM("d0"); // return value
 	__asm volatile(
 		"movem.l %%d1-%%d7/%%a4-%%a6,-(%%sp)\n"
@@ -622,7 +645,7 @@ int p61Init(const void *module)
 
 void p61Music()
 {
-	register volatile const void *_a3 ASM("a3") = player;
+	register volatile const void *_a3 ASM("a3") = P61_Player;
 	register volatile const void *_a6 ASM("a6") = (void *)0xdff000;
 	__asm volatile(
 		"movem.l %%d0-%%d7/%%a0-%%a2/%%a4-%%a5,-(%%sp)\n"
@@ -635,7 +658,7 @@ void p61Music()
 
 void p61End()
 {
-	register volatile const void *_a3 ASM("a3") = player;
+	register volatile const void *_a3 ASM("a3") = P61_Player;
 	register volatile const void *_a6 ASM("a6") = (void *)0xdff000;
 	__asm volatile(
 		"movem.l %%d0-%%d1/%%a0-%%a1,-(%%sp)\n"

@@ -21,5 +21,5 @@ and more information found at [Coppershade.org](http://coppershade.org)
 for his nice tutorials on [youtube](https://www.youtube.com/channel/UC1lfCoAuwbQ22H-KoImEygg)
 
 ## We are all standing on the shoulder of giants. 
-# So I give credit to all the unsung heroes who dedicated their time to get this stuff up and going. 
-# Thank you all. 
+## So I give credit to all the unsung heroes who dedicated their time to get this stuff up and going. 
+## Thank you all. 
