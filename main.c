@@ -25,17 +25,19 @@ int main()
 	Write(Output(), (APTR) "Hello console!\n", 15);
 
 	copPtr = AllocMem(1024, MEMF_CHIP);
-	BmpWorkP = AllocMem(BmpWork.Btot, MEMF_CHIP | MEMF_CLEAR);
-
-	//HANK
+	BmpScroller.ImageData = (UWORD *)AllocMem(BmpScroller.Btot, MEMF_CHIP | MEMF_CLEAR);
+	BmpUpperPart_PF1.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF1.Btot, MEMF_CHIP | MEMF_CLEAR);
+	BmpUpperPart_PF2.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF2.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpLogo.ImageData = (UWORD *)BmpLogoP;
-	InitImagePlanes(&BmpLogo);
 	BmpFont32.ImageData = (UWORD *)BmpFont32P;
-	BmpWork.ImageData = (UWORD *)BmpWorkP;
-	InitImagePlanes(&BmpWork);
 	BmpCookie.ImageData = (UWORD *)BmpCookieP;
-	InitImagePlanes(&BmpCookie);
 	BmpCookieMask.ImageData = (UWORD *)BmpCookieMaskP;
+
+	InitImagePlanes(&BmpUpperPart_PF1);
+	InitImagePlanes(&BmpUpperPart_PF2);
+	InitImagePlanes(&BmpScroller);
+	InitImagePlanes(&BmpFont32);
+	InitImagePlanes(&BmpCookie);
 	InitImagePlanes(&BmpCookieMask);
 
 	TakeSystem();
@@ -49,18 +51,25 @@ int main()
 	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER;
 	// DEMO
 	SetInterruptHandler((APTR)interruptHandler);
+	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
+#ifdef MUSIC
 	custom->intena = INTF_SETCLR | INTF_EXTER; // ThePlayer needs INTF_EXTER
-	//custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB);
+#endif
 	custom->intreq = 1 << INTB_VERTB; //reset vbl req
-	//try init music
+									  //try init music
+
+#ifdef MUSIC
 	if (p61Init(module) != 0)
 		KPrintF("p61Init failed!\n");
+#endif
 	// MAIN LOOP
 	MainLoop();
 	// CLEANUP
+#ifdef MUSIC
 	p61End();
+#endif
 	FreeMem(copPtr, 1024);
-	FreeMem((UBYTE *)BmpWorkP, BmpWork.Btot);
+	FreeMem((UBYTE *)BmpScroller.ImageData, BmpScroller.Btot);
 	// FREE SYSTEM
 	FreeSystem();
 	// CLOSE SYSTEM-LIBS
@@ -73,29 +82,44 @@ int main()
 void MainLoop()
 {
 	Point2D ps = {0, 0};
-	SimpleBlit(BmpCookie, BmpLogo, ps, ps, 32, 32);
+	Point2D pd = {32, 0};
+
+	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
 	while (!MouseLeft())
 	{
 		WaitVbl();
 
 		if (BounceEnabled)
 		{
+			if(ScrollerDir > 0)
+			{
+				ScrollerDir = (ScrollerMax - ScrollerY)*1000/12000;
+				if(ScrollerDir > 6) ScrollerDir = 6;
+				if(ScrollerDir < 1) ScrollerDir =1;
+			}
+			else
+			{
+				ScrollerDir -= 1;
+
+				if(ScrollerDir < -4) ScrollerDir = -4;
+				if(ScrollerDir > -1) ScrollerDir = -1;
+			}
 			ScrollerY += ScrollerDir;
 		}
-		if (ScrollerY >= ScollerMax)
+		if (ScrollerY >= ScrollerMax)
 		{
-			ScrollerY = ScollerMax;
-			ScrollerDir = -2;
+			ScrollerY = ScrollerMax;
+			ScrollerDir = -1;
 		}
-		else if (ScrollerY <= ScollerMin)
+		else if (ScrollerY <= ScrollerMin)
 		{
-			ScrollerY = ScollerMin;
-			ScrollerDir = 2;
+			ScrollerY = ScrollerMin;
+			ScrollerDir = 1;
 		}
 		// make scroller scroll
-		Scrollit(BmpWork, (UBYTE *)BmpWork.ImageData, 40, 32, 4);
+		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
 		// make scroller bounce
-		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpWork.ImageData, BmpWork.Bpls, BmpWork.Bpl, ScrollerY);
+		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
 	}
 }
 
@@ -107,10 +131,10 @@ void SetupCopper(USHORT *copPtr)
 	*copPtr++ = DIWSTOP;
 	*copPtr++ = 0x2cc1;
 	*copPtr++ = DDFSTRT;
-	*copPtr++ = 0x38 + ((Screen.Width - BmpLogo.Width) / 4);
+	*copPtr++ = 0x38; // + ((Screen.Width - BmpLogo.Width) / 4);
 	*copPtr++ = DDFSTOP;
-	*copPtr++ = 0xd0 - ((Screen.Width - BmpLogo.Width) / 4);
-	copPtr = copSetBplMod(0, copPtr, (BmpLogo.Bplt - BmpLogo.Bpl), (BmpLogo.Bplt - BmpLogo.Bpl));
+	*copPtr++ = 0xd0; // - ((Screen.Width - BmpLogo.Width) / 4);
+	copPtr = copSetBplMod(0, copPtr, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl);
 	*copPtr++ = BPLCON1; //scrolling
 	*copPtr++ = 0;
 	*copPtr++ = BPLCON2; //playfied priority
@@ -118,27 +142,33 @@ void SetupCopper(USHORT *copPtr)
 
 	// set logo colors
 	for (int a = 0; a < 8; a++)
+	{
 		copPtr = copSetColor(copPtr, a, LogoPaletteRGB4[a]);
+	}
+	for (int a = 8; a < 16; a++)
+	{
+		copPtr = copSetColor(copPtr, a, CookiePaletteRGB4[a - 8]);
+	}
 	// set logo bitplane pointers
-	copPtr = copSetPlanesInterleafed(0, copPtr, (UBYTE *)BmpLogo.ImageData, BmpLogo.Bpls, BmpLogo.Bpl, 0);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
 	// enable bitplanes
 	*copPtr++ = BPLCON0;
-	*copPtr++ = ((BmpLogo.Bpls) << 12) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
+	*copPtr++ = ((BmpLogo.Bpls*2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
 
 	// wait till below logo
-	copPtr = copWaitY(copPtr, 0x2c + BmpLogo.Height);
+	copPtr = copWaitY(copPtr, 0x2c + BmpUpperPart_PF1.Height);
 	//set dma-fetch start/stop to standard size
-	*copPtr++ = DDFSTRT;
-	*copPtr++ = 0x38;
-	*copPtr++ = DDFSTOP;
-	*copPtr++ = 0xd0;
 	copPtr = copSetBplMod(0, copPtr,
-						  BmpWork.Bplt - Screen.Bpl,
-						  BmpWork.Bplt - Screen.Bpl);
+						  BmpScroller.Bplt - Screen.Bpl,
+						  BmpScroller.Bplt - Screen.Bpl);
 
 	// set bitplane pointers
 	copScrollerBmpP = copPtr; // remember this adress to manipulate later
-	copPtr = copSetPlanesInterleafed(0, copPtr, (UBYTE *)BmpWork.ImageData, BmpWork.Bpls, BmpWork.Bpl, 0);
+	copPtr = copSetPlanesInterleafed(0, copPtr, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, 0);
+	*copPtr++ = BPLCON0;
+	*copPtr++ = ((BmpLogo.Bpls) << 12) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
+
 	for (int a = 0; a < 8; a++)
 		copPtr = copSetColor(copPtr, a, FontPaletteRGB4[a]);
 
@@ -156,15 +186,15 @@ void SetupCopper(USHORT *copPtr)
 void EnableMirrorEffect()
 {
 	copSetBplMod(0, copMirrorBmpP,
-				 (BmpWork.Bplt - Screen.Bpl) - (BmpWork.Bplt * 2),
-				 (BmpWork.Bplt - Screen.Bpl) - (BmpWork.Bplt * 2));
+				 (BmpScroller.Bplt - Screen.Bpl) - (BmpScroller.Bplt * 2),
+				 (BmpScroller.Bplt - Screen.Bpl) - (BmpScroller.Bplt * 2));
 }
 
 void DisableMirrorEffect()
 {
 	copSetBplMod(0, copMirrorBmpP,
-				 BmpWork.Bplt - Screen.Bpl,
-				 BmpWork.Bplt - Screen.Bpl);
+				 BmpScroller.Bplt - Screen.Bpl,
+				 BmpScroller.Bplt - Screen.Bpl);
 }
 
 void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed)
@@ -182,13 +212,13 @@ void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT hei
 	custom->bltdpt = theBitmap + BltOffs + Brcorner;
 	custom->bltamod = 0;
 	custom->bltdmod = 0;
-	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpWork.Width / 16;
+	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
 
 	ScrollCnt += speed;
 	if (ScrollCnt >= 32)
 	{
 		ScrollCnt = 0;
-		PlotChar(BmpFont32, (UBYTE *)BmpFont32P, BmpWork, (UBYTE *)BmpWork.ImageData, startY, 32, 32);
+		PlotChar(BmpFont32, (UBYTE *)BmpFont32P, BmpScroller, (UBYTE *)BmpScroller.ImageData, startY, 32, 32);
 	}
 }
 
@@ -198,7 +228,7 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 	ULONG source, dest;
 	ULONG row, col;
 
-	if (chr == 'a')
+	if (chr == 'b')
 	{
 		if (BounceEnabled)
 		{
@@ -208,7 +238,7 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 
 		chr = Scrolltext[ScrolltextCnt++];
 	}
-	if (chr == 'b')
+	if (chr == 'm')
 	{
 		if (MirrorEnabled)
 		{
@@ -535,6 +565,7 @@ void GetCookieMask(UBYTE planes, UBYTE **bmp, UBYTE *destMask, USHORT height, US
 
 void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
 {
+	WaitBlt();
 	custom->bltcon0 = 0x09f0;
 	custom->bltcon1 = 0x0000;
 	custom->bltafwm = 0xffff;
@@ -543,8 +574,7 @@ void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D 
 	custom->bltdmod = imgD.Bpl - (width / 8);
 	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
 	custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
-	WaitBlt();
-	custom->bltsize = ((height*imgA.Bpls) << 6) + (width / 16);
+	custom->bltsize = ((height * imgA.Bpls) << 6) + (width / 16);
 }
 
 void BlitObject(BmpDescriptor bobs, BmpDescriptor background, UBYTE *maskData, int tilex, int tiley, int dstx, int dsty, int height, int width)
@@ -614,4 +644,15 @@ void p61End()
 		: "+rf"(_a3), "+rf"(_a6)
 		:
 		: "cc", "memory");
+}
+
+void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls)
+{
+
+	bmp->Width = w;
+	bmp->Height = h;
+	bmp->Bpls = bpls;
+	bmp->Bpl = w / 8;
+	bmp->Bplt = w / 8 * bpls;
+	bmp->Btot = w / 8 * h * bpls;
 }

@@ -22,5 +22,17 @@ struct _bmpDescriptor
     UWORD *ImageData;
     UBYTE *Planes[8];
 };
+/// <summary>
+/// USHORT Width     - Width
+/// USHORT Height    - Height
+/// USHORT Bpls      - No of bitplanes
+/// USHORT NoCols    - No of Colors (2**Bpls)
+/// USHORT Bpl       - Bytes per Line
+/// USHORT Bplt      - Bytes per Line total
+/// USHORT Bpp       - Bytes per bitplane
+/// USHORT Btot      - Bytes per bitmap
+/// UWORD *ImageData - Pointer to bitmap data
+/// UBYTE *Planes    - Pointers to bitplanes
+/// </summary>
 typedef struct _bmpDescriptor BmpDescriptor;
 

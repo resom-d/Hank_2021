@@ -1,6 +1,8 @@
 #if !defined(HANK_2021)
 #define HANK_2021
 
+#define MUSIC
+
 #include "../support/gcc8_c_support.h"
 #include "custom_defines.h"
 #include "vector.h"
@@ -15,7 +17,9 @@
 #include <hardware/custom.h>
 #include <hardware/dmabits.h>
 #include <hardware/intbits.h>
-
+#include <utility/tagitem.h>
+#include <proto/utility.h>
+#include <clib/intuition_protos.h>
 #ifdef __cplusplus
 class TestClass
 {
@@ -32,54 +36,27 @@ public:
 TestClass staticClass(4);
 #endif
 
-void* doynaxdepack(const void* input, void* output) { // returns end of output data, input needs to be 16-bit aligned!
-	register volatile const void* _a0 ASM("a0") = input;
-	register volatile       void* _a1 ASM("a1") = output;
-	__asm volatile (
-		"movem.l %%d0-%%d7/%%a2-%%a6,-(%%sp)\n"
-		"jsr _doynaxdepack_asm\n"
-		"movem.l (%%sp)+,%%d0-%%d7/%%a2-%%a6"
-	: "+rf"(_a0), "+rf"(_a1)
-	:
-	: "cc", "memory");
-	return (void*)_a1;
+void *doynaxdepack(const void *input, void *output)
+{ // returns end of output data, input needs to be 16-bit aligned!
+    register volatile const void *_a0 ASM("a0") = input;
+    register volatile void *_a1 ASM("a1") = output;
+    __asm volatile(
+        "movem.l %%d0-%%d7/%%a2-%%a6,-(%%sp)\n"
+        "jsr _doynaxdepack_asm\n"
+        "movem.l (%%sp)+,%%d0-%%d7/%%a2-%%a6"
+        : "+rf"(_a0), "+rf"(_a1)
+        :
+        : "cc", "memory");
+    return (void *)_a1;
 }
 
 #define Abs(a) (a < 0 ? a * -1 : a)
 #define SHIFT_PADDING (16)
 
-/// <summary>
-/// USHORT Width   - Width
-/// USHORT Height  - Height
-/// USHORT Bpls    - No of bitplanes
-/// USHORT NoCols  - No of Colors (2**Bpls)
-/// USHORT Bpl     - Bytes per Line
-/// USHORT Bplt    - Bytes per Line total
-/// USHORT Bpp     - Bytes per bitplane
-/// USHORT Btot    - Bytes per bitmap total
-/// </summary>
+#define BMP_WIDTH (1)
+#define BMP_HEIGHT (2)
+#define BMP_BPLS (3)
 
-INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
-INCBIN_CHIP(BmpFont32P, "Art/grfx/320x256x3_32x32_font.raw") // load image into chipmem so we can use it without copying
-INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie.raw");
-INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookieMask.raw");
-BmpDescriptor Screen = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
-BmpDescriptor BmpWork = {320 + 32, 256, 3, 8, (320 + 32) / 8, (320 + 32) / 8 * 3, (320 + 32) / 8 * 256, (320 + 32) / 8 * 256 * 3, NULL, NULL};
-BmpDescriptor BmpLogo = {256, 130, 3, 8, 256 / 8, 256 / 8 * 3, 256 / 8 * 130, 256 / 8 * 130 * 3, NULL, NULL};
-BmpDescriptor BmpFont32 = {320, 256, 3, 16, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
-BmpDescriptor BmpCookie = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
-BmpDescriptor BmpCookieMask = {320 + 32, 256, 1, 8, (320 + 32) / 8, (320 + 32) / 8 * 1, (320 + 32) / 8 * 256, (320 + 32) / 8 * 256 * 1, NULL, NULL};
-
-UWORD LogoPaletteRGB4[8] =
-    {
-        0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
-UWORD FontPaletteRGB4[8] =
-    {
-        0x0000, 0x0017, 0x0259, 0x036A, 0x048B, 0x05BD, 0x06DE, 0x08FF};
-UWORD CookiePaletteRGB4[8] =
-{
-	0x00CC,0x0FFF,0x0A20,0x0B40,0x0C70,0x0D90,0x0EB0,0x0080
-};
 //libs
 struct ExecBase *
     SysBase;
@@ -92,16 +69,38 @@ volatile short frameCounter = 0;
 static UWORD SystemInts;
 static UWORD SystemDMA;
 static UWORD SystemADKCON;
-static volatile  APTR VBR = 0;
+static volatile APTR VBR = 0;
 static APTR SystemIrq;
 // active view
 struct View *ActiView;
 USHORT *copPtr;
-// Pointers to bitmaps
-UWORD *BmpWorkP;
+
+INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpFont32P, "Art/grfx/320x256x3_32x32_font.raw") // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie.raw");
+INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookieMask.raw");
+BmpDescriptor Screen = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
+BmpDescriptor BmpUpperPart_PF1 = {320, 130, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 130, 320 / 8 * 130 * 3, NULL, NULL};
+BmpDescriptor BmpUpperPart_PF2 = {320, 130, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 130, 320 / 8 * 130 * 3, NULL, NULL};
+BmpDescriptor BmpLogo = {256, 130, 3, 8, 256 / 8, 256 / 8 * 3, 256 / 8 * 130, 256 / 8 * 130 * 3, NULL, NULL};
+BmpDescriptor BmpScroller = {352, 166, 3, 8, 352 / 8, 352 / 8 * 3, 352 / 8 * 166, 352 / 8 * 166 * 3, NULL, NULL};
+BmpDescriptor BmpFont32 = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
+BmpDescriptor BmpCookie = {320, 256, 3, 8, 320 / 8, 320 / 8 * 3, 320 / 8 * 256, 320 / 8 * 256 * 3, NULL, NULL};
+BmpDescriptor BmpCookieMask = {320, 256, 1, 8, 320 / 8, 320 / 8 * 1, 320 / 8 * 256, 320 / 8 * 256 * 1, NULL, NULL};
+
+UWORD LogoPaletteRGB4[8] =
+    {
+        0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
+UWORD FontPaletteRGB4[8] =
+    {
+        0x0000, 0x0017, 0x0259, 0x036A, 0x048B, 0x05BD, 0x06DE, 0x08FF};
+UWORD CookiePaletteRGB4[8] =
+    {
+        0x00CC, 0x0FFF, 0x0A20, 0x0B40, 0x0C70, 0x0D90, 0x0EB0, 0x0080};
+
 // Scrolltext-stuff
-USHORT ScollerMin = 0;
-USHORT ScollerMax = 30;
+USHORT ScrollerMin = 0;
+USHORT ScrollerMax = 38;
 SHORT ScrollerY = 0;
 BYTE ScrollerDir = 2;
 USHORT ScrollCnt;
@@ -114,12 +113,12 @@ USHORT *copMirrorBmpP;
 
 CONST char Scrolltext[] = "\
 HANK VAN BASTARD PRESENTS: THE HANK VAN BASTARD SHOW           \
-HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME.         \
-OK SCROLLER I'LL TRY TO HELP US OUT - BUT THAT MAY TAKE A WHILE. DON'T BOTHER WE WILL FIND A WAY TO           \
-FLY!a!!          OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!       THAT WAS THE LEAST I COULD DO.   \
+HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME. \
+OH, POOR SCROLLER I'LL TRY TO HELP US OUT - WE WILL FIND A WAY TO           \
+FLbY!!!          OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!  THAT WAS THE LEAST I COULD DO. \
 BUT? STILL NOT HAPPY?   LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!  \
-OK, OK... I'LL TRY MY BEST AND ....          bYES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
-SEE YOU MY FRIENDS.               ab\
+OK, OK... I'LL TRY MY BEST TO CLEAN IT UP ....          mYES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
+SEE YOU MY FRIENDS.               bm\
 \0";
 
 // DEMO - INCBIN
@@ -192,19 +191,18 @@ inline USHORT *copSetPlanesInterleafed(UBYTE bplPtrStart, USHORT *copListEnd, co
 inline USHORT *copSetPlanesInterleafedOddEven(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *bitmap, int numPlanes, int Bpl, int offsY, BOOL odd)
 {
     ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-    UBYTE po = odd ? 1: 0;
+    BYTE plane = odd ? 1 : 0;
     for (USHORT i = 0; i < numPlanes; i++)
     {
-        *copListEnd++ = offsetof(struct Custom, bplpt[po + bplPtrStart]);
+        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]);
         *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-        *copListEnd++ = offsetof(struct Custom, bplpt[po + bplPtrStart]) + 2;
+        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]) + 2;
         *copListEnd++ = (UWORD)addr; // high-word of adress
         addr += Bpl;
-        po +=2;
+        plane += 2;
     }
     return copListEnd;
 }
-
 
 inline USHORT *copSetBplMod(UBYTE bplPtrStart, USHORT *copListEnd, USHORT modOdd, USHORT modEven)
 {
@@ -284,17 +282,18 @@ void DisableMirrorEffect(void);
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
+void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
+static __attribute__((interrupt)) void interruptHandler()
+{
 
-static __attribute__((interrupt)) void interruptHandler() {
+    custom->intreq = (1 << INTB_VERTB);
+    custom->intreq = (1 << INTB_VERTB); //reset vbl req. twice for a4000 bug.
 
-	custom->intreq=(1<<INTB_VERTB); 
-	custom->intreq=(1<<INTB_VERTB); //reset vbl req. twice for a4000 bug.
+    // DEMO - ThePlayer
+    p61Music();
 
-	// DEMO - ThePlayer
-	p61Music();
-
-	// DEMO - increment frameCounter
-	frameCounter++;
+    // DEMO - increment frameCounter
+    frameCounter++;
 }
 
 #endif // HANK_2021
