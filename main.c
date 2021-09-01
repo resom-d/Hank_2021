@@ -28,15 +28,17 @@ int main()
 	BitmapInit(&BmpLogo, 256, 130, 3);
 	BitmapInit(&BmpUpperPart_PF1, 320, 130, 3);
 	BitmapInit(&BmpUpperPart_PF2, 320, 130, 3);
+	BitmapInit(&BmpUpperPart_Buf1, 320, 130, 3);
 	BitmapInit(&BmpScroller, 320 + 32, 166, 3);
 	BitmapInit(&BmpFont32, 320, 256, 3);
 	BitmapInit(&BmpCookie, 320, 256, 3);
-	BitmapInit(&BmpCookieMask, 320, 256, 1);
+	BitmapInit(&BmpCookieMask, 320, 256, 3);
 
 	copPtr = AllocMem(1024, MEMF_CHIP);
 	BmpScroller.ImageData = (UWORD *)AllocMem(BmpScroller.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpUpperPart_PF1.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF1.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpUpperPart_PF2.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF2.Btot, MEMF_CHIP | MEMF_CLEAR);
+	BmpUpperPart_Buf1.ImageData = (UWORD *)AllocMem(BmpUpperPart_Buf1.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpLogo.ImageData = (UWORD *)BmpLogoP;
 	BmpFont32.ImageData = (UWORD *)BmpFont32P;
 	BmpCookie.ImageData = (UWORD *)BmpCookieP;
@@ -44,6 +46,7 @@ int main()
 
 	InitImagePlanes(&BmpUpperPart_PF1);
 	InitImagePlanes(&BmpUpperPart_PF2);
+	InitImagePlanes(&BmpUpperPart_Buf1);
 	InitImagePlanes(&BmpScroller);
 	InitImagePlanes(&BmpFont32);
 	InitImagePlanes(&BmpCookie);
@@ -57,7 +60,7 @@ int main()
 	custom->cop1lc = (ULONG)copPtr;
 	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
 	custom->copjmp1 = 0x7fff;	   //start coppper
-	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER;
+	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG;
 	// DEMO
 	SetInterruptHandler((APTR)interruptHandler);
 	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
@@ -79,6 +82,8 @@ int main()
 #endif
 	FreeMem(copPtr, 1024);
 	FreeMem((UBYTE *)BmpScroller.ImageData, BmpScroller.Btot);
+	FreeMem((UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Btot);
+	FreeMem((UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Btot);
 	// FREE SYSTEM
 	FreeSystem();
 	// CLOSE SYSTEM-LIBS
@@ -90,30 +95,52 @@ int main()
 
 void MainLoop()
 {
+
 	Point2D ps = {0, 0};
 	Point2D pd = {32, 0};
-	Point2D ps2 = {0, 32};
-	Point2D pd2 = {32, 0};
-	Point2D pd3 = {224, 0};
-	Point2D pd4 = {32, 16};
-	Point2D pd5 = {224, 16};
-	Point2D pd6 = {32, 32};
-	Point2D pd7 = {224, 32};
-	Point2D pd8 = {32, 48};
-	Point2D pd9 = {224, 48};
+	Point2D ps2 = {0, 0};
+	Point2D pdb[6] = {
+		{0, 0},
+		{20, 10},
+		{70, 30},
+		{90, 70},
+		{160, 50},
+		{28, 90}};
 
+	short incX[6] = {4, 5, 6, 7, 8, 9};
+	short incY[6] = {3, 3, 2, 2, 5, 3};
 	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd2, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd3, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd4, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd5, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd6, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd7, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd8, 32, 32);
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd9, 32, 32);
+
 	while (!MouseLeft())
 	{
 		WaitVbl();
+		CopyBitmap(BmpUpperPart_Buf1, BmpUpperPart_PF2);
+
+		for (int b = 0; b < 6; b++)
+		{
+			pdb[b].X += incX[b];
+			pdb[b].Y += incY[b];
+			if (pdb[b].X >= 320 - 32)
+			{
+				pdb[b].X = 320 - 32;
+				incX[b] *= -1;
+			}
+			if (pdb[b].X <= 0)
+			{
+				pdb[b].X = 0;
+				incX[b] *= -1;
+			}
+			if (pdb[b].Y >= 130 - 32)
+			{
+				pdb[b].Y = 130 - 32;
+				incY[b] *= -1;
+			}
+			if (pdb[b].Y <= 0)
+			{
+				pdb[b].Y = 0;
+				incY[b] *= -1;
+			}
+		}
 
 		if (BounceEnabled)
 		{
@@ -150,7 +177,35 @@ void MainLoop()
 		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
 		// make scroller bounce
 		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
+		// start preparing for next vblank
+		ClearBitmap(BmpUpperPart_Buf1, 130);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[0], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[1], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[2], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[3], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[4], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[5], 32, 32);
 	}
+}
+
+void BetterBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
+{
+	WaitBlt();
+	BYTE shift = startD.X % 16;
+	if (shift)
+		width += 16;
+
+	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | (shift) << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
+	custom->bltcon1 = (shift) << BSHIFTSHIFT;
+	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
+	custom->bltamod = imgA.Bpl - (width / 8);
+	custom->bltbpt = (UBYTE *)BmpCookieMask.ImageData + (startA.Y * BmpCookieMask.Bpl) + (startA.X / 8);
+	custom->bltbmod = BmpCookieMask.Bpl - (width / 8);
+	custom->bltcpt = custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+	custom->bltcmod = custom->bltdmod = imgD.Bpl - (width / 8);
+	custom->bltafwm = 0xffff;
+	custom->bltalwm = shift ? 0xffff << (15 - shift) : 0xffff;
+	custom->bltsize = ((height * imgA.Bpls) << HSIZEBITS) | (width / 16);
 }
 
 void SetupCopper(USHORT *copPtr)
@@ -559,8 +614,8 @@ void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD)
 
 	custom->bltcon0 = 0x09f0;
 	custom->bltcon1 = 0x0000;
-	custom->bltapt = bmpS.ImageData;
-	custom->bltdpt = bmpD.ImageData;
+	custom->bltapt = (UBYTE *)bmpS.ImageData;
+	custom->bltdpt = (UBYTE *)bmpD.ImageData;
 	custom->bltafwm = 0xffff;
 	custom->bltalwm = 0xffff;
 	custom->bltamod = 0;
@@ -568,19 +623,20 @@ void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD)
 	custom->bltsize = ((bmpS.Height * bmpS.Bpls) << 6) + (bmpS.Bpl / 2);
 }
 
-void ClearBitmap(BmpDescriptor bmpD)
+void ClearBitmap(BmpDescriptor bmpD, USHORT lines)
 {
 	WaitBlt();
 
 	custom->bltcon0 = 0x0900;
 	custom->bltcon1 = 0x0000;
-	custom->bltapt = bmpD.ImageData;
-	custom->bltdpt = bmpD.ImageData;
+	custom->bltapt = (UBYTE *)bmpD.ImageData;
+	;
+	custom->bltdpt = (UBYTE *)bmpD.ImageData;
 	custom->bltafwm = 0xffff;
 	custom->bltalwm = 0xffff;
 	custom->bltamod = 0;
 	custom->bltdmod = 0;
-	custom->bltsize = ((bmpD.Height * bmpD.Bpls) << 6) + (bmpD.Bpl / 2);
+	custom->bltsize = ((lines * bmpD.Bpls) << 6) + (bmpD.Width / 16);
 }
 
 void GetCookieMask(UBYTE planes, UBYTE **bmp, UBYTE *destMask, USHORT height, USHORT width)
@@ -606,24 +662,6 @@ void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D 
 	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
 	custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
 	custom->bltsize = ((height * imgA.Bpls) << 6) + (width / 16);
-}
-
-void BetterBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
-{
-	UBYTE x = 0;//startD.X % 16;
-
-	WaitBlt();
-	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | x << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
-	custom->bltcon1 = x << BSHIFTSHIFT;
-	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
-	custom->bltamod = imgA.Bpl - (width / 8);
-	custom->bltbpt = (UBYTE *)BmpCookieMask.ImageData + (startA.Y * BmpCookieMask.Bpl) + (startA.X / 8);
-	custom->bltbmod = BmpCookieMask.Bpl - (width / 8);
-	custom->bltcpt = custom->bltdpt =  (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
-	custom->bltcmod = custom->bltdmod = imgD.Bpl - (width / 8);
-	custom->bltafwm = 0xffff;
-	custom->bltalwm = 0xffff;
-	custom->bltsize = ((height * imgA.Bpls) << HSIZEBITS) | (width / 16);
 }
 
 int p61Init(const void *module)

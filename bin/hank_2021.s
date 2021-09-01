@@ -17,12 +17,12 @@ __attribute__((used)) __attribute__((section(".text.unlikely"))) void _start() {
 	unsigned long i;
 
 	count = __preinit_array_end - __preinit_array_start;
-       4:	move.l #21931,d3
-       a:	subi.l #21931,d3
+       4:	move.l #16384,d3
+       a:	subi.l #16384,d3
       10:	asr.l #2,d3
 	for (i = 0; i < count; i++)
       12:	beq.s 26 <_start+0x26>
-      14:	lea 55ab <__fini_array_end>,a2
+      14:	lea 4000 <ScrollerY>,a2
       1a:	moveq #0,d2
 		__preinit_array_start[i]();
       1c:	movea.l (a2)+,a0
@@ -33,12 +33,12 @@ __attribute__((used)) __attribute__((section(".text.unlikely"))) void _start() {
       24:	bne.s 1c <_start+0x1c>
 
 	count = __init_array_end - __init_array_start;
-      26:	move.l #21931,d3
-      2c:	subi.l #21931,d3
+      26:	move.l #16384,d3
+      2c:	subi.l #16384,d3
       32:	asr.l #2,d3
 	for (i = 0; i < count; i++)
       34:	beq.s 48 <_start+0x48>
-      36:	lea 55ab <__fini_array_end>,a2
+      36:	lea 4000 <ScrollerY>,a2
       3c:	moveq #0,d2
 		__init_array_start[i]();
       3e:	movea.l (a2)+,a0
@@ -53,12 +53,12 @@ __attribute__((used)) __attribute__((section(".text.unlikely"))) void _start() {
 
 	// call dtors
 	count = __fini_array_end - __fini_array_start;
-      4e:	move.l #21931,d2
-      54:	subi.l #21931,d2
+      4e:	move.l #16384,d2
+      54:	subi.l #16384,d2
       5a:	asr.l #2,d2
 	for (i = count; i > 0; i--)
       5c:	beq.s 6e <_start+0x6e>
-      5e:	lea 55ab <__fini_array_end>,a2
+      5e:	lea 4000 <ScrollerY>,a2
 		__fini_array_start[i - 1]();
       64:	subq.l #1,d2
       66:	movea.l -(a2),a0
@@ -75,2788 +75,3246 @@ __attribute__((used)) __attribute__((section(".text.unlikely"))) void _start() {
 
 int main()
 {
-      74:	lea -12(sp),sp
+      74:	lea -136(sp),sp
       78:	movem.l d2-d7/a2-a6,-(sp)
 
 	SysBase = *((struct ExecBase **)4UL);
       7c:	movea.l 4 <_start+0x4>,a6
-      80:	move.l a6,1db4c <SysBase>
+      80:	move.l a6,215d2 <SysBase>
 	custom = (struct Custom *)0xdff000;
-      86:	move.l #14675968,1db52 <custom>
+      86:	move.l #14675968,215d8 <custom>
 
 	// We will use the graphics library only to locate and restore the system copper list once we are through.
 	GfxBase = (struct GfxBase *)OpenLibrary((CONST_STRPTR) "graphics.library", 0);
-      90:	lea 3301 <incbin_P61_Player_end+0x1>,a1
+      90:	lea 389d <incbin_P61_Player_end+0x1>,a1
       96:	moveq #0,d0
       98:	jsr -552(a6)
-      9c:	move.l d0,1db48 <GfxBase>
+      9c:	move.l d0,215ce <GfxBase>
 	if (!GfxBase)
-      a2:	beq.w 1358 <main+0x12e4>
+      a2:	beq.w 1898 <main+0x1824>
 		Exit(0);
 
 	// used for printing
 	DOSBase = (struct DosLibrary *)OpenLibrary((CONST_STRPTR) "dos.library", 0);
-      a6:	movea.l 1db4c <SysBase>,a6
-      ac:	lea 3312 <incbin_P61_Player_end+0x12>,a1
+      a6:	movea.l 215d2 <SysBase>,a6
+      ac:	lea 38ae <incbin_P61_Player_end+0x12>,a1
       b2:	moveq #0,d0
       b4:	jsr -552(a6)
-      b8:	move.l d0,1db44 <DOSBase>
+      b8:	move.l d0,215ca <DOSBase>
 	if (!DOSBase)
-      be:	beq.w 134c <main+0x12d8>
+      be:	beq.w 188c <main+0x1818>
 		Exit(0);
 
 #ifdef __cplusplus
 	KPrintF("Hello debugger from Amiga: %ld!\n", staticClass.i);
 #else
 	KPrintF("Hello debugger from Amiga!\n");
-      c2:	pea 331e <incbin_P61_Player_end+0x1e>
-      c8:	lea 142c <KPrintF>,a5
-      ce:	jsr (a5)
+      c2:	pea 38ba <incbin_P61_Player_end+0x1e>
+      c8:	jsr 196c <KPrintF>
 #endif
 
 	Write(Output(), (APTR) "Hello console!\n", 15);
-      d0:	movea.l 1db44 <DOSBase>,a6
-      d6:	jsr -60(a6)
-      da:	movea.l 1db44 <DOSBase>,a6
-      e0:	move.l d0,d1
-      e2:	move.l #13114,d2
-      e8:	moveq #15,d3
-      ea:	jsr -48(a6)
+      ce:	movea.l 215ca <DOSBase>,a6
+      d4:	jsr -60(a6)
+      d8:	movea.l 215ca <DOSBase>,a6
+      de:	move.l d0,d1
+      e0:	move.l #14550,d2
+      e6:	moveq #15,d3
+      e8:	jsr -48(a6)
 }
 
 void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls)
 {
 
 	bmp->Width = w;
-      ee:	move.l #20971776,1db10 <Screen>
+      ec:	move.l #20971776,21598 <Screen>
+      f6:	move.l #196648,2159c <Screen+0x4>
 	bmp->Height = h;
 	bmp->Bpls = bpls;
-      f8:	move.w #3,1db14 <Screen+0x4>
 	bmp->Bpl = w / 8;
-     100:	move.l #2621560,1db18 <Screen+0x8>
 	bmp->Bplt = w / 8 * bpls;
+     100:	move.w #120,215a0 <Screen+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     10a:	move.w #30720,1db1e <Screen+0xe>
+     108:	move.w #30720,215a4 <Screen+0xc>
 	bmp->Width = w;
-     112:	move.l #16777346,1dadc <BmpLogo>
-	bmp->Bpls = bpls;
-     11c:	move.w #3,1dae0 <BmpLogo+0x4>
-	bmp->Bpl = w / 8;
-     124:	move.l #2097248,1dae4 <BmpLogo+0x8>
+     110:	move.l #16777346,21564 <BmpLogo>
+     11a:	move.l #196640,21568 <BmpLogo+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     124:	move.w #96,2156c <BmpLogo+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     12e:	move.w #12480,1daea <BmpLogo+0xe>
+     12c:	move.w #12480,21570 <BmpLogo+0xc>
 	bmp->Width = w;
-     136:	move.l #20971650,1daa8 <BmpUpperPart_PF1>
-	bmp->Bpls = bpls;
-     140:	move.w #3,1daac <BmpUpperPart_PF1+0x4>
-	bmp->Bpl = w / 8;
-     148:	move.l #2621560,1dab0 <BmpUpperPart_PF1+0x8>
+     134:	move.l #20971650,21530 <BmpUpperPart_PF1>
+     13e:	move.l #196648,21534 <BmpUpperPart_PF1+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     148:	move.w #120,21538 <BmpUpperPart_PF1+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     152:	move.w #15600,1dab6 <BmpUpperPart_PF1+0xe>
+     150:	move.w #15600,2153c <BmpUpperPart_PF1+0xc>
 	bmp->Width = w;
-     15a:	move.l #20971650,1da74 <BmpUpperPart_PF2>
-	bmp->Bpls = bpls;
-     164:	move.w #3,1da78 <BmpUpperPart_PF2+0x4>
-	bmp->Bpl = w / 8;
-     16c:	move.l #2621560,1da7c <BmpUpperPart_PF2+0x8>
+     158:	move.l #20971650,214fc <BmpUpperPart_PF2>
+     162:	move.l #196648,21500 <BmpUpperPart_PF2+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     16c:	move.w #120,21504 <BmpUpperPart_PF2+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     176:	move.w #15600,1da82 <BmpUpperPart_PF2+0xe>
+     174:	move.w #15600,21508 <BmpUpperPart_PF2+0xc>
 	bmp->Width = w;
-     17e:	move.l #23068838,1da40 <BmpScroller>
-	bmp->Bpls = bpls;
-     188:	move.w #3,1da44 <BmpScroller+0x4>
-	bmp->Bpl = w / 8;
-     190:	move.l #2883716,1da48 <BmpScroller+0x8>
+     17c:	move.l #20971650,214c8 <BmpUpperPart_Buf1>
+     186:	move.l #196648,214cc <BmpUpperPart_Buf1+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     190:	move.w #120,214d0 <BmpUpperPart_Buf1+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     19a:	move.w #21912,1da4e <BmpScroller+0xe>
+     198:	move.w #15600,214d4 <BmpUpperPart_Buf1+0xc>
 	bmp->Width = w;
-     1a2:	move.l #20971776,1da0c <BmpFont32>
-	bmp->Bpls = bpls;
-     1ac:	move.w #3,1da10 <BmpFont32+0x4>
-	bmp->Bpl = w / 8;
-     1b4:	move.l #2621560,1da14 <BmpFont32+0x8>
+     1a0:	move.l #23068838,21494 <BmpScroller>
+     1aa:	move.l #196652,21498 <BmpScroller+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     1b4:	move.w #132,2149c <BmpScroller+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     1be:	move.w #30720,1da1a <BmpFont32+0xe>
+     1bc:	move.w #21912,214a0 <BmpScroller+0xc>
 	bmp->Width = w;
-     1c6:	move.l #20971776,1d9d8 <BmpCookie>
-	bmp->Bpls = bpls;
-     1d0:	move.w #3,1d9dc <BmpCookie+0x4>
-	bmp->Bpl = w / 8;
-     1d8:	move.l #2621560,1d9e0 <BmpCookie+0x8>
+     1c4:	move.l #20971776,21460 <BmpFont32>
+     1ce:	move.l #196648,21464 <BmpFont32+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     1d8:	move.w #120,21468 <BmpFont32+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     1e2:	move.w #30720,1d9e6 <BmpCookie+0xe>
+     1e0:	move.w #30720,2146c <BmpFont32+0xc>
 	bmp->Width = w;
-     1ea:	move.l #20971776,1d9a4 <BmpCookieMask>
-	bmp->Bpls = bpls;
-     1f4:	move.w #1,1d9a8 <BmpCookieMask+0x4>
-	bmp->Bpl = w / 8;
-     1fc:	move.l #2621480,1d9ac <BmpCookieMask+0x8>
+     1e8:	move.l #20971776,2142c <BmpCookie>
+     1f2:	move.l #196648,21430 <BmpCookie+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     1fc:	move.w #120,21434 <BmpCookie+0x8>
 	bmp->Btot = w / 8 * h * bpls;
-     206:	move.w #10240,1d9b2 <BmpCookieMask+0xe>
+     204:	move.w #30720,21438 <BmpCookie+0xc>
+	bmp->Width = w;
+     20c:	move.l #20971776,213f8 <BmpCookieMask>
+     216:	move.l #196648,213fc <BmpCookieMask+0x4>
+	bmp->Bplt = w / 8 * bpls;
+     220:	move.w #120,21400 <BmpCookieMask+0x8>
+	bmp->Btot = w / 8 * h * bpls;
+     228:	move.w #30720,21404 <BmpCookieMask+0xc>
 	copPtr = AllocMem(1024, MEMF_CHIP);
-     20e:	movea.l 1db4c <SysBase>,a6
-     214:	move.l #1024,d0
-     21a:	moveq #2,d1
-     21c:	jsr -198(a6)
-     220:	move.l d0,1d99e <copPtr>
+     230:	movea.l 215d2 <SysBase>,a6
+     236:	move.l #1024,d0
+     23c:	moveq #2,d1
+     23e:	jsr -198(a6)
+     242:	move.l d0,213f2 <copPtr>
 	BmpScroller.ImageData = (UWORD *)AllocMem(BmpScroller.Btot, MEMF_CHIP | MEMF_CLEAR);
-     226:	movea.l 1db4c <SysBase>,a6
-     22c:	moveq #0,d0
-     22e:	move.w 1da4e <BmpScroller+0xe>,d0
-     234:	move.l #65538,d1
-     23a:	jsr -198(a6)
-     23e:	move.l d0,1da50 <BmpScroller+0x10>
+     248:	movea.l 215d2 <SysBase>,a6
+     24e:	moveq #0,d0
+     250:	move.w 214a0 <BmpScroller+0xc>,d0
+     256:	move.l #65538,d1
+     25c:	jsr -198(a6)
+     260:	move.l d0,214a2 <BmpScroller+0xe>
 	BmpUpperPart_PF1.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF1.Btot, MEMF_CHIP | MEMF_CLEAR);
-     244:	movea.l 1db4c <SysBase>,a6
-     24a:	moveq #0,d0
-     24c:	move.w 1dab6 <BmpUpperPart_PF1+0xe>,d0
-     252:	move.l #65538,d1
-     258:	jsr -198(a6)
-     25c:	move.l d0,1dab8 <BmpUpperPart_PF1+0x10>
+     266:	movea.l 215d2 <SysBase>,a6
+     26c:	moveq #0,d0
+     26e:	move.w 2153c <BmpUpperPart_PF1+0xc>,d0
+     274:	move.l #65538,d1
+     27a:	jsr -198(a6)
+     27e:	move.l d0,2153e <BmpUpperPart_PF1+0xe>
 	BmpUpperPart_PF2.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF2.Btot, MEMF_CHIP | MEMF_CLEAR);
-     262:	movea.l 1db4c <SysBase>,a6
-     268:	moveq #0,d0
-     26a:	move.w 1da82 <BmpUpperPart_PF2+0xe>,d0
-     270:	move.l #65538,d1
-     276:	jsr -198(a6)
-     27a:	move.l d0,1da84 <BmpUpperPart_PF2+0x10>
+     284:	movea.l 215d2 <SysBase>,a6
+     28a:	moveq #0,d0
+     28c:	move.w 21508 <BmpUpperPart_PF2+0xc>,d0
+     292:	move.l #65538,d1
+     298:	jsr -198(a6)
+     29c:	move.l d0,2150a <BmpUpperPart_PF2+0xe>
+	BmpUpperPart_Buf1.ImageData = (UWORD *)AllocMem(BmpUpperPart_Buf1.Btot, MEMF_CHIP | MEMF_CLEAR);
+     2a2:	movea.l 215d2 <SysBase>,a6
+     2a8:	moveq #0,d0
+     2aa:	move.w 214d4 <BmpUpperPart_Buf1+0xc>,d0
+     2b0:	move.l #65538,d1
+     2b6:	jsr -198(a6)
+     2ba:	move.l d0,214d6 <BmpUpperPart_Buf1+0xe>
 	BmpLogo.ImageData = (UWORD *)BmpLogoP;
-     280:	move.l #21936,1daec <BmpLogo+0x10>
+     2c0:	move.l #16388,21572 <BmpLogo+0xe>
 	BmpFont32.ImageData = (UWORD *)BmpFont32P;
-     28a:	move.l #34418,1da1c <BmpFont32+0x10>
+     2ca:	move.l #28870,2146e <BmpFont32+0xe>
 	BmpCookie.ImageData = (UWORD *)BmpCookieP;
-     294:	move.l #65140,1d9e8 <BmpCookie+0x10>
+     2d4:	move.l #59592,2143a <BmpCookie+0xe>
 	BmpCookieMask.ImageData = (UWORD *)BmpCookieMaskP;
-     29e:	move.l #95862,1d9b4 <BmpCookieMask+0x10>
+     2de:	move.l #90314,21406 <BmpCookieMask+0xe>
 	for (int p = 0; p < img->Bpls; p++)
-     2a8:	moveq #0,d2
-     2aa:	move.w 1daac <BmpUpperPart_PF1+0x4>,d2
-     2b0:	addq.l #4,sp
-     2b2:	tst.l d2
-     2b4:	beq.w 346 <main+0x2d2>
+     2e8:	moveq #0,d2
+     2ea:	move.w 21534 <BmpUpperPart_PF1+0x4>,d2
+     2f0:	addq.l #4,sp
+     2f2:	tst.l d2
+     2f4:	beq.w 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     2b8:	movea.l 1dab8 <BmpUpperPart_PF1+0x10>,a0
-     2be:	moveq #0,d3
-     2c0:	move.w 1dab0 <BmpUpperPart_PF1+0x8>,d3
-     2c6:	move.l a0,1dabc <BmpUpperPart_PF1+0x14>
+     2f8:	movea.l 2153e <BmpUpperPart_PF1+0xe>,a0
+     2fe:	moveq #0,d3
+     300:	move.w 21536 <BmpUpperPart_PF1+0x6>,d3
+     306:	move.l a0,21542 <BmpUpperPart_PF1+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     2cc:	moveq #1,d1
-     2ce:	cmp.l d2,d1
-     2d0:	beq.s 346 <main+0x2d2>
+     30c:	moveq #1,d1
+     30e:	cmp.l d2,d1
+     310:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     2d2:	lea (0,a0,d3.l),a1
-     2d6:	move.l a1,1dac0 <BmpUpperPart_PF1+0x18>
+     312:	lea (0,a0,d3.l),a1
+     316:	move.l a1,21546 <BmpUpperPart_PF1+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     2dc:	moveq #2,d1
-     2de:	cmp.l d2,d1
-     2e0:	beq.s 346 <main+0x2d2>
+     31c:	moveq #2,d1
+     31e:	cmp.l d2,d1
+     320:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     2e2:	move.l d3,d1
-     2e4:	add.l d3,d1
-     2e6:	lea (0,a0,d1.l),a1
-     2ea:	move.l a1,1dac4 <BmpUpperPart_PF1+0x1c>
+     322:	move.l d3,d1
+     324:	add.l d3,d1
+     326:	lea (0,a0,d1.l),a1
+     32a:	move.l a1,2154a <BmpUpperPart_PF1+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     2f0:	moveq #3,d4
-     2f2:	cmp.l d2,d4
-     2f4:	beq.s 346 <main+0x2d2>
+     330:	moveq #3,d4
+     332:	cmp.l d2,d4
+     334:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     2f6:	add.l d3,d1
-     2f8:	lea (0,a0,d1.l),a1
-     2fc:	move.l a1,1dac8 <BmpUpperPart_PF1+0x20>
+     336:	add.l d3,d1
+     338:	lea (0,a0,d1.l),a1
+     33c:	move.l a1,2154e <BmpUpperPart_PF1+0x1e>
 	for (int p = 0; p < img->Bpls; p++)
-     302:	moveq #4,d4
-     304:	cmp.l d2,d4
-     306:	beq.s 346 <main+0x2d2>
+     342:	moveq #4,d4
+     344:	cmp.l d2,d4
+     346:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     308:	add.l d3,d1
-     30a:	lea (0,a0,d1.l),a1
-     30e:	move.l a1,1dacc <BmpUpperPart_PF1+0x24>
+     348:	add.l d3,d1
+     34a:	lea (0,a0,d1.l),a1
+     34e:	move.l a1,21552 <BmpUpperPart_PF1+0x22>
 	for (int p = 0; p < img->Bpls; p++)
-     314:	moveq #5,d4
-     316:	cmp.l d2,d4
-     318:	beq.s 346 <main+0x2d2>
+     354:	moveq #5,d4
+     356:	cmp.l d2,d4
+     358:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     31a:	add.l d3,d1
-     31c:	lea (0,a0,d1.l),a1
-     320:	move.l a1,1dad0 <BmpUpperPart_PF1+0x28>
+     35a:	add.l d3,d1
+     35c:	lea (0,a0,d1.l),a1
+     360:	move.l a1,21556 <BmpUpperPart_PF1+0x26>
 	for (int p = 0; p < img->Bpls; p++)
-     326:	moveq #6,d4
-     328:	cmp.l d2,d4
-     32a:	beq.s 346 <main+0x2d2>
+     366:	moveq #6,d4
+     368:	cmp.l d2,d4
+     36a:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     32c:	add.l d3,d1
-     32e:	lea (0,a0,d1.l),a1
-     332:	move.l a1,1dad4 <BmpUpperPart_PF1+0x2c>
+     36c:	add.l d3,d1
+     36e:	lea (0,a0,d1.l),a1
+     372:	move.l a1,2155a <BmpUpperPart_PF1+0x2a>
 	for (int p = 0; p < img->Bpls; p++)
-     338:	subq.l #7,d2
-     33a:	beq.s 346 <main+0x2d2>
+     378:	subq.l #7,d2
+     37a:	beq.s 386 <main+0x312>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     33c:	add.l d3,d1
-     33e:	add.l a0,d1
-     340:	move.l d1,1dad8 <BmpUpperPart_PF1+0x30>
+     37c:	add.l d3,d1
+     37e:	add.l a0,d1
+     380:	move.l d1,2155e <BmpUpperPart_PF1+0x2e>
 	for (int p = 0; p < img->Bpls; p++)
-     346:	moveq #0,d2
-     348:	move.w 1da78 <BmpUpperPart_PF2+0x4>,d2
-     34e:	tst.l d2
-     350:	beq.w 3dc <main+0x368>
+     386:	moveq #0,d2
+     388:	move.w 21500 <BmpUpperPart_PF2+0x4>,d2
+     38e:	tst.l d2
+     390:	beq.w 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     354:	moveq #0,d3
-     356:	move.w 1da7c <BmpUpperPart_PF2+0x8>,d3
-     35c:	move.l d0,1da88 <BmpUpperPart_PF2+0x14>
+     394:	movea.l 2150a <BmpUpperPart_PF2+0xe>,a0
+     39a:	moveq #0,d3
+     39c:	move.w 21502 <BmpUpperPart_PF2+0x6>,d3
+     3a2:	move.l a0,2150e <BmpUpperPart_PF2+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     362:	moveq #1,d1
-     364:	cmp.l d2,d1
-     366:	beq.s 3dc <main+0x368>
+     3a8:	moveq #1,d1
+     3aa:	cmp.l d2,d1
+     3ac:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     368:	move.l d0,d4
-     36a:	add.l d3,d4
-     36c:	move.l d4,1da8c <BmpUpperPart_PF2+0x18>
+     3ae:	lea (0,a0,d3.l),a1
+     3b2:	move.l a1,21512 <BmpUpperPart_PF2+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     372:	moveq #2,d1
-     374:	cmp.l d2,d1
-     376:	beq.s 3dc <main+0x368>
+     3b8:	moveq #2,d1
+     3ba:	cmp.l d2,d1
+     3bc:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     378:	move.l d3,d1
-     37a:	add.l d3,d1
-     37c:	move.l d0,d4
-     37e:	add.l d1,d4
-     380:	move.l d4,1da90 <BmpUpperPart_PF2+0x1c>
+     3be:	move.l d3,d1
+     3c0:	add.l d3,d1
+     3c2:	lea (0,a0,d1.l),a1
+     3c6:	move.l a1,21516 <BmpUpperPart_PF2+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     386:	moveq #3,d4
-     388:	cmp.l d2,d4
-     38a:	beq.s 3dc <main+0x368>
-		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     38c:	add.l d3,d1
-     38e:	move.l d0,d4
-     390:	add.l d1,d4
-     392:	move.l d4,1da94 <BmpUpperPart_PF2+0x20>
-	for (int p = 0; p < img->Bpls; p++)
-     398:	moveq #4,d4
-     39a:	cmp.l d2,d4
-     39c:	beq.s 3dc <main+0x368>
-		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     39e:	add.l d3,d1
-     3a0:	move.l d0,d4
-     3a2:	add.l d1,d4
-     3a4:	move.l d4,1da98 <BmpUpperPart_PF2+0x24>
-	for (int p = 0; p < img->Bpls; p++)
-     3aa:	moveq #5,d4
-     3ac:	cmp.l d2,d4
-     3ae:	beq.s 3dc <main+0x368>
-		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     3b0:	add.l d3,d1
-     3b2:	move.l d0,d4
-     3b4:	add.l d1,d4
-     3b6:	move.l d4,1da9c <BmpUpperPart_PF2+0x28>
-	for (int p = 0; p < img->Bpls; p++)
-     3bc:	moveq #6,d4
-     3be:	cmp.l d2,d4
-     3c0:	beq.s 3dc <main+0x368>
-		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     3c2:	add.l d3,d1
-     3c4:	move.l d0,d4
-     3c6:	add.l d1,d4
-     3c8:	move.l d4,1daa0 <BmpUpperPart_PF2+0x2c>
-	for (int p = 0; p < img->Bpls; p++)
-     3ce:	subq.l #7,d2
-     3d0:	beq.s 3dc <main+0x368>
+     3cc:	moveq #3,d4
+     3ce:	cmp.l d2,d4
+     3d0:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
      3d2:	add.l d3,d1
-     3d4:	add.l d1,d0
-     3d6:	move.l d0,1daa4 <BmpUpperPart_PF2+0x30>
+     3d4:	lea (0,a0,d1.l),a1
+     3d8:	move.l a1,2151a <BmpUpperPart_PF2+0x1e>
 	for (int p = 0; p < img->Bpls; p++)
-     3dc:	moveq #0,d1
-     3de:	move.w 1da44 <BmpScroller+0x4>,d1
-     3e4:	tst.l d1
-     3e6:	beq.w 478 <main+0x404>
+     3de:	moveq #4,d4
+     3e0:	cmp.l d2,d4
+     3e2:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     3ea:	movea.l 1da50 <BmpScroller+0x10>,a0
-     3f0:	moveq #0,d2
-     3f2:	move.w 1da48 <BmpScroller+0x8>,d2
-     3f8:	move.l a0,1da54 <BmpScroller+0x14>
+     3e4:	add.l d3,d1
+     3e6:	lea (0,a0,d1.l),a1
+     3ea:	move.l a1,2151e <BmpUpperPart_PF2+0x22>
 	for (int p = 0; p < img->Bpls; p++)
-     3fe:	moveq #1,d0
-     400:	cmp.l d1,d0
-     402:	beq.s 478 <main+0x404>
+     3f0:	moveq #5,d4
+     3f2:	cmp.l d2,d4
+     3f4:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     404:	lea (0,a0,d2.l),a1
-     408:	move.l a1,1da58 <BmpScroller+0x18>
+     3f6:	add.l d3,d1
+     3f8:	lea (0,a0,d1.l),a1
+     3fc:	move.l a1,21522 <BmpUpperPart_PF2+0x26>
 	for (int p = 0; p < img->Bpls; p++)
-     40e:	moveq #2,d0
-     410:	cmp.l d1,d0
-     412:	beq.s 478 <main+0x404>
+     402:	moveq #6,d4
+     404:	cmp.l d2,d4
+     406:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     414:	move.l d2,d0
-     416:	add.l d2,d0
-     418:	lea (0,a0,d0.l),a1
-     41c:	move.l a1,1da5c <BmpScroller+0x1c>
+     408:	add.l d3,d1
+     40a:	lea (0,a0,d1.l),a1
+     40e:	move.l a1,21526 <BmpUpperPart_PF2+0x2a>
 	for (int p = 0; p < img->Bpls; p++)
-     422:	moveq #3,d3
-     424:	cmp.l d1,d3
-     426:	beq.s 478 <main+0x404>
+     414:	subq.l #7,d2
+     416:	beq.s 422 <main+0x3ae>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     428:	add.l d2,d0
-     42a:	lea (0,a0,d0.l),a1
-     42e:	move.l a1,1da60 <BmpScroller+0x20>
+     418:	add.l d3,d1
+     41a:	add.l a0,d1
+     41c:	move.l d1,2152a <BmpUpperPart_PF2+0x2e>
 	for (int p = 0; p < img->Bpls; p++)
-     434:	moveq #4,d3
-     436:	cmp.l d1,d3
-     438:	beq.s 478 <main+0x404>
+     422:	moveq #0,d2
+     424:	move.w 214cc <BmpUpperPart_Buf1+0x4>,d2
+     42a:	tst.l d2
+     42c:	beq.w 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     43a:	add.l d2,d0
-     43c:	lea (0,a0,d0.l),a1
-     440:	move.l a1,1da64 <BmpScroller+0x24>
+     430:	moveq #0,d3
+     432:	move.w 214ce <BmpUpperPart_Buf1+0x6>,d3
+     438:	move.l d0,214da <BmpUpperPart_Buf1+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     446:	moveq #5,d3
-     448:	cmp.l d1,d3
-     44a:	beq.s 478 <main+0x404>
+     43e:	moveq #1,d1
+     440:	cmp.l d2,d1
+     442:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     44c:	add.l d2,d0
-     44e:	lea (0,a0,d0.l),a1
-     452:	move.l a1,1da68 <BmpScroller+0x28>
+     444:	move.l d0,d4
+     446:	add.l d3,d4
+     448:	move.l d4,214de <BmpUpperPart_Buf1+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     458:	moveq #6,d3
-     45a:	cmp.l d1,d3
-     45c:	beq.s 478 <main+0x404>
+     44e:	moveq #2,d1
+     450:	cmp.l d2,d1
+     452:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     45e:	add.l d2,d0
-     460:	lea (0,a0,d0.l),a1
-     464:	move.l a1,1da6c <BmpScroller+0x2c>
+     454:	move.l d3,d1
+     456:	add.l d3,d1
+     458:	move.l d0,d4
+     45a:	add.l d1,d4
+     45c:	move.l d4,214e2 <BmpUpperPart_Buf1+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     46a:	subq.l #7,d1
-     46c:	beq.s 478 <main+0x404>
+     462:	moveq #3,d4
+     464:	cmp.l d2,d4
+     466:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     46e:	add.l d2,d0
-     470:	add.l a0,d0
-     472:	move.l d0,1da70 <BmpScroller+0x30>
+     468:	add.l d3,d1
+     46a:	move.l d0,d4
+     46c:	add.l d1,d4
+     46e:	move.l d4,214e6 <BmpUpperPart_Buf1+0x1e>
 	for (int p = 0; p < img->Bpls; p++)
-     478:	moveq #0,d1
-     47a:	move.w 1da10 <BmpFont32+0x4>,d1
-     480:	tst.l d1
-     482:	beq.w 530 <main+0x4bc>
+     474:	moveq #4,d4
+     476:	cmp.l d2,d4
+     478:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     486:	moveq #0,d2
-     488:	move.w 1da14 <BmpFont32+0x8>,d2
-     48e:	move.l #34418,1da20 <BmpFont32+0x14>
+     47a:	add.l d3,d1
+     47c:	move.l d0,d4
+     47e:	add.l d1,d4
+     480:	move.l d4,214ea <BmpUpperPart_Buf1+0x22>
 	for (int p = 0; p < img->Bpls; p++)
-     498:	moveq #1,d4
-     49a:	cmp.l d1,d4
-     49c:	beq.w 530 <main+0x4bc>
+     486:	moveq #5,d4
+     488:	cmp.l d2,d4
+     48a:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     4a0:	move.l d2,d0
-     4a2:	addi.l #34418,d0
-     4a8:	move.l d0,1da24 <BmpFont32+0x18>
+     48c:	add.l d3,d1
+     48e:	move.l d0,d4
+     490:	add.l d1,d4
+     492:	move.l d4,214ee <BmpUpperPart_Buf1+0x26>
 	for (int p = 0; p < img->Bpls; p++)
-     4ae:	moveq #2,d3
-     4b0:	cmp.l d1,d3
-     4b2:	beq.s 530 <main+0x4bc>
+     498:	moveq #6,d4
+     49a:	cmp.l d2,d4
+     49c:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     4b4:	move.l d2,d0
-     4b6:	add.l d2,d0
-     4b8:	move.l d0,d4
-     4ba:	addi.l #34418,d4
-     4c0:	move.l d4,1da28 <BmpFont32+0x1c>
+     49e:	add.l d3,d1
+     4a0:	move.l d0,d4
+     4a2:	add.l d1,d4
+     4a4:	move.l d4,214f2 <BmpUpperPart_Buf1+0x2a>
 	for (int p = 0; p < img->Bpls; p++)
-     4c6:	moveq #3,d3
-     4c8:	cmp.l d1,d3
-     4ca:	beq.s 530 <main+0x4bc>
+     4aa:	subq.l #7,d2
+     4ac:	beq.s 4b8 <main+0x444>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     4cc:	add.l d2,d0
-     4ce:	move.l d0,d4
-     4d0:	addi.l #34418,d4
-     4d6:	move.l d4,1da2c <BmpFont32+0x20>
+     4ae:	add.l d3,d1
+     4b0:	add.l d1,d0
+     4b2:	move.l d0,214f6 <BmpUpperPart_Buf1+0x2e>
 	for (int p = 0; p < img->Bpls; p++)
-     4dc:	moveq #4,d3
-     4de:	cmp.l d1,d3
-     4e0:	beq.s 530 <main+0x4bc>
+     4b8:	moveq #0,d1
+     4ba:	move.w 21498 <BmpScroller+0x4>,d1
+     4c0:	tst.l d1
+     4c2:	beq.w 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     4e2:	add.l d2,d0
-     4e4:	move.l d0,d4
-     4e6:	addi.l #34418,d4
-     4ec:	move.l d4,1da30 <BmpFont32+0x24>
+     4c6:	movea.l 214a2 <BmpScroller+0xe>,a0
+     4cc:	moveq #0,d2
+     4ce:	move.w 2149a <BmpScroller+0x6>,d2
+     4d4:	move.l a0,214a6 <BmpScroller+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     4f2:	moveq #5,d3
-     4f4:	cmp.l d1,d3
-     4f6:	beq.s 530 <main+0x4bc>
+     4da:	moveq #1,d0
+     4dc:	cmp.l d1,d0
+     4de:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     4f8:	add.l d2,d0
-     4fa:	move.l d0,d4
-     4fc:	addi.l #34418,d4
-     502:	move.l d4,1da34 <BmpFont32+0x28>
+     4e0:	lea (0,a0,d2.l),a1
+     4e4:	move.l a1,214aa <BmpScroller+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     508:	moveq #6,d3
-     50a:	cmp.l d1,d3
-     50c:	beq.s 530 <main+0x4bc>
+     4ea:	moveq #2,d0
+     4ec:	cmp.l d1,d0
+     4ee:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     50e:	add.l d2,d0
-     510:	move.l d0,d4
-     512:	addi.l #34418,d4
-     518:	move.l d4,1da38 <BmpFont32+0x2c>
+     4f0:	move.l d2,d0
+     4f2:	add.l d2,d0
+     4f4:	lea (0,a0,d0.l),a1
+     4f8:	move.l a1,214ae <BmpScroller+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     51e:	subq.l #7,d1
-     520:	beq.s 530 <main+0x4bc>
+     4fe:	moveq #3,d3
+     500:	cmp.l d1,d3
+     502:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     522:	add.l d2,d0
-     524:	addi.l #34418,d0
-     52a:	move.l d0,1da3c <BmpFont32+0x30>
+     504:	add.l d2,d0
+     506:	lea (0,a0,d0.l),a1
+     50a:	move.l a1,214b2 <BmpScroller+0x1e>
 	for (int p = 0; p < img->Bpls; p++)
-     530:	moveq #0,d1
-     532:	move.w 1d9dc <BmpCookie+0x4>,d1
-     538:	tst.l d1
-     53a:	beq.w 5e8 <main+0x574>
+     510:	moveq #4,d3
+     512:	cmp.l d1,d3
+     514:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     53e:	moveq #0,d2
-     540:	move.w 1d9e0 <BmpCookie+0x8>,d2
-     546:	move.l #65140,1d9ec <BmpCookie+0x14>
+     516:	add.l d2,d0
+     518:	lea (0,a0,d0.l),a1
+     51c:	move.l a1,214b6 <BmpScroller+0x22>
 	for (int p = 0; p < img->Bpls; p++)
-     550:	moveq #1,d4
-     552:	cmp.l d1,d4
-     554:	beq.w 5e8 <main+0x574>
+     522:	moveq #5,d3
+     524:	cmp.l d1,d3
+     526:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     558:	move.l d2,d0
-     55a:	addi.l #65140,d0
-     560:	move.l d0,1d9f0 <BmpCookie+0x18>
+     528:	add.l d2,d0
+     52a:	lea (0,a0,d0.l),a1
+     52e:	move.l a1,214ba <BmpScroller+0x26>
 	for (int p = 0; p < img->Bpls; p++)
-     566:	moveq #2,d3
-     568:	cmp.l d1,d3
-     56a:	beq.s 5e8 <main+0x574>
+     534:	moveq #6,d3
+     536:	cmp.l d1,d3
+     538:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     56c:	move.l d2,d0
-     56e:	add.l d2,d0
-     570:	move.l d0,d4
-     572:	addi.l #65140,d4
-     578:	move.l d4,1d9f4 <BmpCookie+0x1c>
+     53a:	add.l d2,d0
+     53c:	lea (0,a0,d0.l),a1
+     540:	move.l a1,214be <BmpScroller+0x2a>
 	for (int p = 0; p < img->Bpls; p++)
-     57e:	moveq #3,d3
-     580:	cmp.l d1,d3
-     582:	beq.s 5e8 <main+0x574>
+     546:	subq.l #7,d1
+     548:	beq.s 554 <main+0x4e0>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     584:	add.l d2,d0
-     586:	move.l d0,d4
-     588:	addi.l #65140,d4
-     58e:	move.l d4,1d9f8 <BmpCookie+0x20>
+     54a:	add.l d2,d0
+     54c:	add.l a0,d0
+     54e:	move.l d0,214c2 <BmpScroller+0x2e>
 	for (int p = 0; p < img->Bpls; p++)
-     594:	moveq #4,d3
-     596:	cmp.l d1,d3
-     598:	beq.s 5e8 <main+0x574>
+     554:	moveq #0,d1
+     556:	move.w 21464 <BmpFont32+0x4>,d1
+     55c:	tst.l d1
+     55e:	beq.w 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     59a:	add.l d2,d0
-     59c:	move.l d0,d4
-     59e:	addi.l #65140,d4
-     5a4:	move.l d4,1d9fc <BmpCookie+0x24>
+     562:	moveq #0,d2
+     564:	move.w 21466 <BmpFont32+0x6>,d2
+     56a:	move.l #28870,21472 <BmpFont32+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     5aa:	moveq #5,d3
-     5ac:	cmp.l d1,d3
-     5ae:	beq.s 5e8 <main+0x574>
+     574:	moveq #1,d4
+     576:	cmp.l d1,d4
+     578:	beq.w 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     5b0:	add.l d2,d0
-     5b2:	move.l d0,d4
-     5b4:	addi.l #65140,d4
-     5ba:	move.l d4,1da00 <BmpCookie+0x28>
+     57c:	move.l d2,d0
+     57e:	addi.l #28870,d0
+     584:	move.l d0,21476 <BmpFont32+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     5c0:	moveq #6,d3
-     5c2:	cmp.l d1,d3
-     5c4:	beq.s 5e8 <main+0x574>
+     58a:	moveq #2,d3
+     58c:	cmp.l d1,d3
+     58e:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     5c6:	add.l d2,d0
-     5c8:	move.l d0,d4
-     5ca:	addi.l #65140,d4
-     5d0:	move.l d4,1da04 <BmpCookie+0x2c>
+     590:	move.l d2,d0
+     592:	add.l d2,d0
+     594:	move.l d0,d4
+     596:	addi.l #28870,d4
+     59c:	move.l d4,2147a <BmpFont32+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     5d6:	subq.l #7,d1
-     5d8:	beq.s 5e8 <main+0x574>
+     5a2:	moveq #3,d3
+     5a4:	cmp.l d1,d3
+     5a6:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     5da:	add.l d2,d0
-     5dc:	addi.l #65140,d0
-     5e2:	move.l d0,1da08 <BmpCookie+0x30>
+     5a8:	add.l d2,d0
+     5aa:	move.l d0,d4
+     5ac:	addi.l #28870,d4
+     5b2:	move.l d4,2147e <BmpFont32+0x1e>
 	for (int p = 0; p < img->Bpls; p++)
-     5e8:	moveq #0,d1
-     5ea:	move.w 1d9a8 <BmpCookieMask+0x4>,d1
-     5f0:	tst.l d1
-     5f2:	beq.w 6a0 <main+0x62c>
+     5b8:	moveq #4,d3
+     5ba:	cmp.l d1,d3
+     5bc:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     5f6:	moveq #0,d2
-     5f8:	move.w 1d9ac <BmpCookieMask+0x8>,d2
-     5fe:	move.l #95862,1d9b8 <BmpCookieMask+0x14>
+     5be:	add.l d2,d0
+     5c0:	move.l d0,d4
+     5c2:	addi.l #28870,d4
+     5c8:	move.l d4,21482 <BmpFont32+0x22>
 	for (int p = 0; p < img->Bpls; p++)
-     608:	moveq #1,d4
-     60a:	cmp.l d1,d4
-     60c:	beq.w 6a0 <main+0x62c>
+     5ce:	moveq #5,d3
+     5d0:	cmp.l d1,d3
+     5d2:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     610:	move.l d2,d0
-     612:	addi.l #95862,d0
-     618:	move.l d0,1d9bc <BmpCookieMask+0x18>
+     5d4:	add.l d2,d0
+     5d6:	move.l d0,d4
+     5d8:	addi.l #28870,d4
+     5de:	move.l d4,21486 <BmpFont32+0x26>
 	for (int p = 0; p < img->Bpls; p++)
-     61e:	moveq #2,d3
-     620:	cmp.l d1,d3
-     622:	beq.s 6a0 <main+0x62c>
+     5e4:	moveq #6,d3
+     5e6:	cmp.l d1,d3
+     5e8:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     624:	move.l d2,d0
-     626:	add.l d2,d0
-     628:	move.l d0,d4
-     62a:	addi.l #95862,d4
-     630:	move.l d4,1d9c0 <BmpCookieMask+0x1c>
+     5ea:	add.l d2,d0
+     5ec:	move.l d0,d4
+     5ee:	addi.l #28870,d4
+     5f4:	move.l d4,2148a <BmpFont32+0x2a>
 	for (int p = 0; p < img->Bpls; p++)
-     636:	moveq #3,d3
-     638:	cmp.l d1,d3
-     63a:	beq.s 6a0 <main+0x62c>
+     5fa:	subq.l #7,d1
+     5fc:	beq.s 60c <main+0x598>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     63c:	add.l d2,d0
-     63e:	move.l d0,d4
-     640:	addi.l #95862,d4
-     646:	move.l d4,1d9c4 <BmpCookieMask+0x20>
+     5fe:	add.l d2,d0
+     600:	addi.l #28870,d0
+     606:	move.l d0,2148e <BmpFont32+0x2e>
 	for (int p = 0; p < img->Bpls; p++)
-     64c:	moveq #4,d3
-     64e:	cmp.l d1,d3
-     650:	beq.s 6a0 <main+0x62c>
+     60c:	moveq #0,d1
+     60e:	move.w 21430 <BmpCookie+0x4>,d1
+     614:	tst.l d1
+     616:	beq.w 6c4 <main+0x650>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     652:	add.l d2,d0
-     654:	move.l d0,d4
-     656:	addi.l #95862,d4
-     65c:	move.l d4,1d9c8 <BmpCookieMask+0x24>
+     61a:	moveq #0,d2
+     61c:	move.w 21432 <BmpCookie+0x6>,d2
+     622:	move.l #59592,2143e <BmpCookie+0x12>
 	for (int p = 0; p < img->Bpls; p++)
-     662:	moveq #5,d3
-     664:	cmp.l d1,d3
-     666:	beq.s 6a0 <main+0x62c>
+     62c:	moveq #1,d4
+     62e:	cmp.l d1,d4
+     630:	beq.w 6c4 <main+0x650>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     668:	add.l d2,d0
-     66a:	move.l d0,d4
-     66c:	addi.l #95862,d4
-     672:	move.l d4,1d9cc <BmpCookieMask+0x28>
+     634:	move.l d2,d0
+     636:	addi.l #59592,d0
+     63c:	move.l d0,21442 <BmpCookie+0x16>
 	for (int p = 0; p < img->Bpls; p++)
-     678:	moveq #6,d3
-     67a:	cmp.l d1,d3
-     67c:	beq.s 6a0 <main+0x62c>
+     642:	moveq #2,d3
+     644:	cmp.l d1,d3
+     646:	beq.s 6c4 <main+0x650>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     67e:	add.l d2,d0
-     680:	move.l d0,d4
-     682:	addi.l #95862,d4
-     688:	move.l d4,1d9d0 <BmpCookieMask+0x2c>
+     648:	move.l d2,d0
+     64a:	add.l d2,d0
+     64c:	move.l d0,d4
+     64e:	addi.l #59592,d4
+     654:	move.l d4,21446 <BmpCookie+0x1a>
 	for (int p = 0; p < img->Bpls; p++)
-     68e:	subq.l #7,d1
-     690:	beq.s 6a0 <main+0x62c>
+     65a:	moveq #3,d3
+     65c:	cmp.l d1,d3
+     65e:	beq.s 6c4 <main+0x650>
 		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
-     692:	add.l d2,d0
-     694:	addi.l #95862,d0
-     69a:	move.l d0,1d9d4 <BmpCookieMask+0x30>
+     660:	add.l d2,d0
+     662:	move.l d0,d4
+     664:	addi.l #59592,d4
+     66a:	move.l d4,2144a <BmpCookie+0x1e>
+	for (int p = 0; p < img->Bpls; p++)
+     670:	moveq #4,d3
+     672:	cmp.l d1,d3
+     674:	beq.s 6c4 <main+0x650>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     676:	add.l d2,d0
+     678:	move.l d0,d4
+     67a:	addi.l #59592,d4
+     680:	move.l d4,2144e <BmpCookie+0x22>
+	for (int p = 0; p < img->Bpls; p++)
+     686:	moveq #5,d3
+     688:	cmp.l d1,d3
+     68a:	beq.s 6c4 <main+0x650>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     68c:	add.l d2,d0
+     68e:	move.l d0,d4
+     690:	addi.l #59592,d4
+     696:	move.l d4,21452 <BmpCookie+0x26>
+	for (int p = 0; p < img->Bpls; p++)
+     69c:	moveq #6,d3
+     69e:	cmp.l d1,d3
+     6a0:	beq.s 6c4 <main+0x650>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     6a2:	add.l d2,d0
+     6a4:	move.l d0,d4
+     6a6:	addi.l #59592,d4
+     6ac:	move.l d4,21456 <BmpCookie+0x2a>
+	for (int p = 0; p < img->Bpls; p++)
+     6b2:	subq.l #7,d1
+     6b4:	beq.s 6c4 <main+0x650>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     6b6:	add.l d2,d0
+     6b8:	addi.l #59592,d0
+     6be:	move.l d0,2145a <BmpCookie+0x2e>
+	for (int p = 0; p < img->Bpls; p++)
+     6c4:	moveq #0,d1
+     6c6:	move.w 213fc <BmpCookieMask+0x4>,d1
+     6cc:	tst.l d1
+     6ce:	beq.w 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     6d2:	moveq #0,d2
+     6d4:	move.w 213fe <BmpCookieMask+0x6>,d2
+     6da:	move.l #90314,2140a <BmpCookieMask+0x12>
+	for (int p = 0; p < img->Bpls; p++)
+     6e4:	moveq #1,d4
+     6e6:	cmp.l d1,d4
+     6e8:	beq.w 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     6ec:	move.l d2,d0
+     6ee:	addi.l #90314,d0
+     6f4:	move.l d0,2140e <BmpCookieMask+0x16>
+	for (int p = 0; p < img->Bpls; p++)
+     6fa:	moveq #2,d3
+     6fc:	cmp.l d1,d3
+     6fe:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     700:	move.l d2,d0
+     702:	add.l d2,d0
+     704:	move.l d0,d4
+     706:	addi.l #90314,d4
+     70c:	move.l d4,21412 <BmpCookieMask+0x1a>
+	for (int p = 0; p < img->Bpls; p++)
+     712:	moveq #3,d3
+     714:	cmp.l d1,d3
+     716:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     718:	add.l d2,d0
+     71a:	move.l d0,d4
+     71c:	addi.l #90314,d4
+     722:	move.l d4,21416 <BmpCookieMask+0x1e>
+	for (int p = 0; p < img->Bpls; p++)
+     728:	moveq #4,d3
+     72a:	cmp.l d1,d3
+     72c:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     72e:	add.l d2,d0
+     730:	move.l d0,d4
+     732:	addi.l #90314,d4
+     738:	move.l d4,2141a <BmpCookieMask+0x22>
+	for (int p = 0; p < img->Bpls; p++)
+     73e:	moveq #5,d3
+     740:	cmp.l d1,d3
+     742:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     744:	add.l d2,d0
+     746:	move.l d0,d4
+     748:	addi.l #90314,d4
+     74e:	move.l d4,2141e <BmpCookieMask+0x26>
+	for (int p = 0; p < img->Bpls; p++)
+     754:	moveq #6,d3
+     756:	cmp.l d1,d3
+     758:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     75a:	add.l d2,d0
+     75c:	move.l d0,d4
+     75e:	addi.l #90314,d4
+     764:	move.l d4,21422 <BmpCookieMask+0x2a>
+	for (int p = 0; p < img->Bpls; p++)
+     76a:	subq.l #7,d1
+     76c:	beq.s 77c <main+0x708>
+		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+     76e:	add.l d2,d0
+     770:	addi.l #90314,d0
+     776:	move.l d0,21426 <BmpCookieMask+0x2e>
 	ActiView = GfxBase->ActiView; //store current view
-     6a0:	movea.l 1db48 <GfxBase>,a6
-     6a6:	move.l 34(a6),1d98c <ActiView>
+     77c:	movea.l 215ce <GfxBase>,a6
+     782:	move.l 34(a6),213e0 <ActiView>
 	OwnBlitter();
-     6ae:	jsr -456(a6)
+     78a:	jsr -456(a6)
 	WaitBlit();
-     6b2:	movea.l 1db48 <GfxBase>,a6
-     6b8:	jsr -228(a6)
+     78e:	movea.l 215ce <GfxBase>,a6
+     794:	jsr -228(a6)
 	Disable();
-     6bc:	movea.l 1db4c <SysBase>,a6
-     6c2:	jsr -120(a6)
+     798:	movea.l 215d2 <SysBase>,a6
+     79e:	jsr -120(a6)
 	SystemADKCON = custom->adkconr;
-     6c6:	movea.l 1db52 <custom>,a2
-     6cc:	move.w 16(a2),d0
-     6d0:	move.w d0,1d990 <SystemADKCON>
+     7a2:	movea.l 215d8 <custom>,a2
+     7a8:	move.w 16(a2),d0
+     7ac:	move.w d0,213e4 <SystemADKCON>
 	SystemInts = custom->intenar;
-     6d6:	move.w 28(a2),d0
-     6da:	move.w d0,1d994 <SystemInts>
+     7b2:	move.w 28(a2),d0
+     7b6:	move.w d0,213e8 <SystemInts>
 	SystemDMA = custom->dmaconr;
-     6e0:	move.w 2(a2),d0
-     6e4:	move.w d0,1d992 <SystemDMA>
+     7bc:	move.w 2(a2),d0
+     7c0:	move.w d0,213e6 <SystemDMA>
 	custom->intena = 0x7fff; //disable all interrupts
-     6ea:	move.w #32767,154(a2)
+     7c6:	move.w #32767,154(a2)
 	custom->intreq = 0x7fff; //Clear any interrupts that were pending
-     6f0:	move.w #32767,156(a2)
+     7cc:	move.w #32767,156(a2)
 	WaitVbl();
-     6f6:	lea 13e6 <WaitVbl>,a4
-     6fc:	jsr (a4)
+     7d2:	jsr 1926 <WaitVbl>
 	WaitVbl();
-     6fe:	jsr (a4)
+     7d8:	jsr 1926 <WaitVbl>
 	custom->dmacon = 0x7fff; //Clear all DMA channels
-     700:	move.w #32767,150(a2)
+     7de:	move.w #32767,150(a2)
 	for (int a = 0; a < 32; a++)
-     706:	moveq #0,d1
+     7e4:	moveq #0,d1
 		custom->color[a] = 0;
-     708:	move.l d1,d0
-     70a:	addi.l #192,d0
-     710:	add.l d0,d0
-     712:	move.w #0,(0,a2,d0.l)
+     7e6:	move.l d1,d0
+     7e8:	addi.l #192,d0
+     7ee:	add.l d0,d0
+     7f0:	move.w #0,(0,a2,d0.l)
 	for (int a = 0; a < 32; a++)
-     718:	addq.l #1,d1
-     71a:	moveq #32,d4
-     71c:	cmp.l d1,d4
-     71e:	bne.s 708 <main+0x694>
+     7f6:	addq.l #1,d1
+     7f8:	moveq #32,d4
+     7fa:	cmp.l d1,d4
+     7fc:	bne.s 7e6 <main+0x772>
 	LoadView(0);
-     720:	movea.l 1db48 <GfxBase>,a6
-     726:	suba.l a1,a1
-     728:	jsr -222(a6)
+     7fe:	movea.l 215ce <GfxBase>,a6
+     804:	suba.l a1,a1
+     806:	jsr -222(a6)
 	WaitTOF();
-     72c:	movea.l 1db48 <GfxBase>,a6
-     732:	jsr -270(a6)
+     80a:	movea.l 215ce <GfxBase>,a6
+     810:	jsr -270(a6)
 	WaitTOF();
-     736:	movea.l 1db48 <GfxBase>,a6
-     73c:	jsr -270(a6)
+     814:	movea.l 215ce <GfxBase>,a6
+     81a:	jsr -270(a6)
 	WaitVbl();
-     740:	jsr (a4)
+     81e:	jsr 1926 <WaitVbl>
 	WaitVbl();
-     742:	jsr (a4)
+     824:	jsr 1926 <WaitVbl>
 	UWORD getvbr[] = {0x4e7a, 0x0801, 0x4e73}; // MOVEC.L VBR,D0 RTE
-     744:	move.w #20090,50(sp)
-     74a:	move.w #2049,52(sp)
-     750:	move.w #20083,54(sp)
+     82a:	move.w #20090,132(sp)
+     830:	move.w #2049,134(sp)
+     836:	move.w #20083,136(sp)
 	if (SysBase->AttnFlags & AFF_68010)
-     756:	movea.l 1db4c <SysBase>,a6
-     75c:	btst #0,297(a6)
-     762:	beq.w 1382 <main+0x130e>
+     83c:	movea.l 215d2 <SysBase>,a6
+     842:	btst #0,297(a6)
+     848:	beq.w 18c2 <main+0x184e>
 		vbr = (APTR)Supervisor((ULONG(*)())getvbr);
-     766:	moveq #50,d7
-     768:	add.l sp,d7
-     76a:	exg d7,a5
-     76c:	jsr -30(a6)
-     770:	exg d7,a5
+     84c:	move.l sp,d7
+     84e:	addi.l #132,d7
+     854:	exg d7,a5
+     856:	jsr -30(a6)
+     85a:	exg d7,a5
 	VBR = GetVBR();
-     772:	move.l d0,1d99a <VBR>
+     85c:	move.l d0,213ee <VBR>
 	return *(volatile APTR *)(((UBYTE *)VBR) + 0x6c);
-     778:	movea.l 1d99a <VBR>,a0
-     77e:	move.l 108(a0),d0
+     862:	movea.l 213ee <VBR>,a0
+     868:	move.l 108(a0),d0
 	SystemIrq = GetInterruptHandler(); //store interrupt register
-     782:	move.l d0,1d996 <SystemIrq>
+     86c:	move.l d0,213ea <SystemIrq>
 	WaitVbl();
-     788:	jsr (a4)
+     872:	jsr 1926 <WaitVbl>
 	SetupCopper(copPtr);
-     78a:	movea.l 1d99e <copPtr>,a2
+     878:	movea.l 213f2 <copPtr>,a1
 	*copPtr++ = DIWSTRT;
-     790:	move.w #142,(a2)
+     87e:	move.w #142,(a1)
 	*copPtr++ = 0x2c81;
-     794:	move.w #11393,2(a2)
+     882:	move.w #11393,2(a1)
 	*copPtr++ = DIWSTOP;
-     79a:	move.w #144,4(a2)
+     888:	move.w #144,4(a1)
 	*copPtr++ = 0x2cc1;
-     7a0:	move.w #11457,6(a2)
+     88e:	move.w #11457,6(a1)
 	*copPtr++ = DDFSTRT;
-     7a6:	move.w #146,8(a2)
+     894:	move.w #146,8(a1)
 	*copPtr++ = 0x38; // + ((Screen.Width - BmpLogo.Width) / 4);
-     7ac:	move.w #56,10(a2)
+     89a:	move.w #56,10(a1)
 	*copPtr++ = DDFSTOP;
-     7b2:	move.w #148,12(a2)
+     8a0:	move.w #148,12(a1)
 	*copPtr++ = 0xd0; // - ((Screen.Width - BmpLogo.Width) / 4);
-     7b8:	move.w #208,14(a2)
+     8a6:	move.w #208,14(a1)
 	copPtr = copSetBplMod(0, copPtr, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl);
-     7be:	move.w 1dab0 <BmpUpperPart_PF1+0x8>,d5
-     7c4:	move.w 1dab2 <BmpUpperPart_PF1+0xa>,d0
-     7ca:	sub.w d5,d0
+     8ac:	move.w 21536 <BmpUpperPart_PF1+0x6>,d5
+     8b2:	move.w 21538 <BmpUpperPart_PF1+0x8>,d0
+     8b8:	sub.w d5,d0
     return copListEnd;
 }
 inline USHORT *copSetBplMod(UBYTE bplPtrStart, USHORT *copListEnd, USHORT modOdd, USHORT modEven)
 {
     //set bitplane modulo
     *copListEnd++ = BPL1MOD; //odd planes   1,3,5
-     7cc:	move.w #264,16(a2)
+     8ba:	move.w #264,16(a1)
     *copListEnd++ = modOdd;
-     7d2:	move.w d0,18(a2)
+     8c0:	move.w d0,18(a1)
     *copListEnd++ = BPL2MOD; //even  planes 2,4
-     7d6:	move.w #266,20(a2)
+     8c4:	move.w #266,20(a1)
     *copListEnd++ = modEven;
-     7dc:	move.w d0,22(a2)
+     8ca:	move.w d0,22(a1)
 	*copPtr++ = BPLCON1; //scrolling
-     7e0:	move.w #258,24(a2)
+     8ce:	move.w #258,24(a1)
 	*copPtr++ = 0;
-     7e6:	clr.w 26(a2)
+     8d4:	clr.w 26(a1)
 	*copPtr++ = BPLCON2; //playfied priority
-     7ea:	move.w #260,28(a2)
+     8d8:	move.w #260,28(a1)
 	*copPtr++ = 1 << 6;	 //0x24;  Sprites have priority over playfields
-     7f0:	move.w #64,30(a2)
+     8de:	move.w #64,30(a1)
     *copListEnd++ = COP_WAIT;
     return copListEnd;
 }
 inline USHORT *copSetColor(USHORT *copListCurrent, USHORT index, USHORT color)
 {
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     7f6:	move.w #384,32(a2)
+     8e4:	move.w #384,32(a1)
     *copListCurrent++ = color;
-     7fc:	clr.w 34(a2)
+     8ea:	clr.w 34(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     800:	move.w #386,36(a2)
+     8ee:	move.w #386,36(a1)
     *copListCurrent++ = color;
-     806:	move.w #4095,38(a2)
+     8f4:	move.w #2080,38(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     80c:	move.w #388,40(a2)
+     8fa:	move.w #388,40(a1)
     *copListCurrent++ = color;
-     812:	move.w #2592,42(a2)
+     900:	move.w #2368,42(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     818:	move.w #390,44(a2)
+     906:	move.w #390,44(a1)
     *copListCurrent++ = color;
-     81e:	move.w #2880,46(a2)
+     90c:	move.w #2656,46(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     824:	move.w #392,48(a2)
+     912:	move.w #392,48(a1)
     *copListCurrent++ = color;
-     82a:	move.w #3184,50(a2)
+     918:	move.w #3184,50(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     830:	move.w #394,52(a2)
+     91e:	move.w #394,52(a1)
     *copListCurrent++ = color;
-     836:	move.w #3472,54(a2)
+     924:	move.w #3472,54(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     83c:	move.w #396,56(a2)
+     92a:	move.w #396,56(a1)
     *copListCurrent++ = color;
-     842:	move.w #3760,58(a2)
+     930:	move.w #3760,58(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     848:	move.w #398,60(a2)
+     936:	move.w #398,60(a1)
     *copListCurrent++ = color;
-     84e:	move.w #128,62(a2)
+     93c:	move.w #3760,62(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     854:	move.w #400,64(a2)
+     942:	move.w #400,64(a1)
     *copListCurrent++ = color;
-     85a:	clr.w 66(a2)
+     948:	clr.w 66(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     85e:	move.w #402,68(a2)
+     94c:	move.w #402,68(a1)
     *copListCurrent++ = color;
-     864:	move.w #1366,70(a2)
+     952:	move.w #1366,70(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     86a:	move.w #404,72(a2)
+     958:	move.w #404,72(a1)
     *copListCurrent++ = color;
-     870:	move.w #3221,74(a2)
+     95e:	move.w #3221,74(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     876:	move.w #406,76(a2)
+     964:	move.w #406,76(a1)
     *copListCurrent++ = color;
-     87c:	move.w #3750,78(a2)
+     96a:	move.w #3750,78(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     882:	move.w #408,80(a2)
+     970:	move.w #408,80(a1)
     *copListCurrent++ = color;
-     888:	move.w #1074,82(a2)
+     976:	move.w #1074,82(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     88e:	move.w #410,84(a2)
+     97c:	move.w #410,84(a1)
     *copListCurrent++ = color;
-     894:	move.w #1329,86(a2)
+     982:	move.w #1329,86(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     89a:	move.w #412,88(a2)
+     988:	move.w #412,88(a1)
     *copListCurrent++ = color;
-     8a0:	move.w #530,90(a2)
+     98e:	move.w #530,90(a1)
     *copListCurrent++ = offsetof(struct Custom, color[index]);
-     8a6:	move.w #414,92(a2)
+     994:	move.w #414,92(a1)
     *copListCurrent++ = color;
-     8ac:	lea 96(a2),a0
-     8b0:	move.w #2177,94(a2)
+     99a:	lea 96(a1),a2
+     99e:	move.w #2177,94(a1)
 	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, TRUE);
-     8b6:	move.w 1daac <BmpUpperPart_PF1+0x4>,d6
+     9a4:	movea.w 21534 <BmpUpperPart_PF1+0x4>,a3
+     9aa:	move.l 2153e <BmpUpperPart_PF1+0xe>,d6
     ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-     8bc:	move.l 1dab8 <BmpUpperPart_PF1+0x10>,d1
+     9b0:	move.l d6,d1
     for (USHORT i = 0; i < numPlanes; i++)
-     8c2:	tst.w d6
-     8c4:	beq.s 916 <main+0x8a2>
+     9b2:	clr.w d0
+     9b4:	cmp.w a3,d0
+     9b6:	beq.s a04 <main+0x990>
         addr += Bpl;
-     8c6:	andi.l #65535,d5
-     8cc:	move.w d6,d4
-     8ce:	subq.w #1,d4
-     8d0:	andi.l #65535,d4
-     8d6:	moveq #13,d0
-     8d8:	add.l d0,d4
-     8da:	lsl.l #3,d4
-     8dc:	add.l a2,d4
+     9b8:	moveq #0,d7
+     9ba:	move.w d5,d7
+     9bc:	move.w a3,d4
+     9be:	subq.w #1,d4
+     9c0:	andi.l #65535,d4
+     9c6:	moveq #13,d3
+     9c8:	add.l d3,d4
+     9ca:	lsl.l #3,d4
+     9cc:	add.l a1,d4
     *copListCurrent++ = color;
-     8de:	movea.l a0,a1
+     9ce:	movea.l a2,a0
     BYTE plane = odd ? 1 : 0;
-     8e0:	moveq #1,d2
+     9d0:	moveq #1,d2
         *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]);
-     8e2:	move.b d2,d0
-     8e4:	ext.w d0
-     8e6:	lsl.w #2,d0
-     8e8:	addi.w #224,d0
-     8ec:	move.w d0,(a1)
+     9d2:	move.b d2,d0
+     9d4:	ext.w d0
+     9d6:	lsl.w #2,d0
+     9d8:	addi.w #224,d0
+     9dc:	move.w d0,(a0)
         *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-     8ee:	move.l d1,d3
-     8f0:	clr.w d3
-     8f2:	swap d3
-     8f4:	move.w d3,2(a1)
+     9de:	move.l d1,d3
+     9e0:	clr.w d3
+     9e2:	swap d3
+     9e4:	move.w d3,2(a0)
         *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]) + 2;
-     8f8:	addq.w #2,d0
-     8fa:	move.w d0,4(a1)
+     9e8:	addq.w #2,d0
+     9ea:	move.w d0,4(a0)
         *copListEnd++ = (UWORD)addr; // high-word of adress
-     8fe:	addq.l #8,a1
-     900:	move.w d1,-2(a1)
+     9ee:	addq.l #8,a0
+     9f0:	move.w d1,-2(a0)
         addr += Bpl;
-     904:	add.l d5,d1
+     9f4:	add.l d7,d1
         plane += 2;
-     906:	addq.b #2,d2
+     9f6:	addq.b #2,d2
     for (USHORT i = 0; i < numPlanes; i++)
-     908:	cmpa.l d4,a1
-     90a:	bne.s 8e2 <main+0x86e>
+     9f8:	cmp.l a0,d4
+     9fa:	bne.s 9d2 <main+0x95e>
         *copListEnd++ = (UWORD)addr; // high-word of adress
-     90c:	andi.l #65535,d6
-     912:	lsl.l #3,d6
-     914:	adda.l d6,a0
+     9fc:	moveq #0,d0
+     9fe:	move.w a3,d0
+     a00:	lsl.l #3,d0
+     a02:	adda.l d0,a2
 	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, FALSE);
-     916:	move.w 1da7c <BmpUpperPart_PF2+0x8>,d4
-     91c:	move.w 1da78 <BmpUpperPart_PF2+0x4>,d0
+     a04:	move.w 21502 <BmpUpperPart_PF2+0x6>,d4
+     a0a:	move.w 21500 <BmpUpperPart_PF2+0x4>,d0
+     a10:	movea.l 2150a <BmpUpperPart_PF2+0xe>,a0
     ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-     922:	move.l 1da84 <BmpUpperPart_PF2+0x10>,d1
+     a16:	move.l a0,d1
     for (USHORT i = 0; i < numPlanes; i++)
-     928:	tst.w d0
-     92a:	beq.w 139c <main+0x1328>
+     a18:	tst.w d0
+     a1a:	beq.w 18dc <main+0x1868>
         addr += Bpl;
-     92e:	andi.l #65535,d4
-     934:	andi.l #65535,d0
-     93a:	lsl.l #3,d0
-     93c:	lea (0,a0,d0.l),a1
-    BYTE plane = odd ? 1 : 0;
-     940:	clr.b d2
-        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]);
-     942:	move.b d2,d0
-     944:	ext.w d0
-     946:	lsl.w #2,d0
-     948:	addi.w #224,d0
-     94c:	move.w d0,(a0)
-        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-     94e:	move.l d1,d3
-     950:	clr.w d3
-     952:	swap d3
-     954:	move.w d3,2(a0)
-        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]) + 2;
-     958:	addq.w #2,d0
-     95a:	move.w d0,4(a0)
-        *copListEnd++ = (UWORD)addr; // high-word of adress
-     95e:	addq.l #8,a0
-     960:	move.w d1,-2(a0)
-        addr += Bpl;
-     964:	add.l d4,d1
-        plane += 2;
-     966:	addq.b #2,d2
-    for (USHORT i = 0; i < numPlanes; i++)
-     968:	cmpa.l a0,a1
-     96a:	bne.s 942 <main+0x8ce>
-	*copPtr++ = BPLCON0;
-     96c:	move.w #256,(a1)
-	*copPtr++ = ((BmpLogo.Bpls * 2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
-     970:	moveq #0,d5
-     972:	move.w 1dae0 <BmpLogo+0x4>,d5
-     978:	move.l d5,d0
-     97a:	moveq #13,d1
-     97c:	lsl.l d1,d0
-     97e:	ori.w #1536,d0
-     982:	move.w d0,2(a1)
-	copPtr = copWaitY(copPtr, 0x2c + BmpUpperPart_PF1.Height);
-     986:	move.w 1daaa <BmpUpperPart_PF1+0x2>,d0
-     98c:	addi.w #44,d0
-    *copListEnd++ = (i << 8) | 4 | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
-     990:	lsl.w #8,d0
-     992:	ori.w #5,d0
-     996:	move.w d0,4(a1)
-    *copListEnd++ = COP_WAIT;
-     99a:	move.w #-2,6(a1)
-						  BmpScroller.Bplt - Screen.Bpl);
-     9a0:	move.w 1da4a <BmpScroller+0xa>,d0
-     9a6:	sub.w 1db18 <Screen+0x8>,d0
-    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
-     9ac:	move.w #264,8(a1)
-    *copListEnd++ = modOdd;
-     9b2:	move.w d0,10(a1)
-    *copListEnd++ = BPL2MOD; //even  planes 2,4
-     9b6:	move.w #266,12(a1)
-    *copListEnd++ = modEven;
-     9bc:	lea 16(a1),a3
-     9c0:	move.w d0,14(a1)
-	copScrollerBmpP = copPtr; // remember this adress to manipulate later
-     9c4:	move.l a3,1d986 <copScrollerBmpP>
-	copPtr = copSetPlanesInterleafed(0, copPtr, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, 0);
-     9ca:	move.w 1da48 <BmpScroller+0x8>,d3
-     9d0:	move.w 1da44 <BmpScroller+0x4>,d4
-    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-     9d6:	move.l 1da50 <BmpScroller+0x10>,d0
-    for (USHORT i = 0; i < numPlanes; i++)
-     9dc:	tst.w d4
-     9de:	beq.s a28 <main+0x9b4>
-        addr += Bpl;
-     9e0:	andi.l #65535,d3
-     9e6:	move.w d4,d1
-     9e8:	subq.w #1,d1
-     9ea:	andi.l #65535,d1
-     9f0:	addq.l #3,d1
-     9f2:	lsl.l #3,d1
-     9f4:	adda.l d1,a1
-     9f6:	movea.l a3,a0
-     9f8:	move.w #224,d1
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]);
-     9fc:	move.w d1,(a0)
-        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-     9fe:	move.l d0,d2
-     a00:	clr.w d2
-     a02:	swap d2
-     a04:	move.w d2,2(a0)
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]) + 2;
-     a08:	move.w d1,d2
-     a0a:	addq.w #2,d2
-     a0c:	move.w d2,4(a0)
-        *copListEnd++ = (UWORD)addr; // high-word of adress
-     a10:	addq.l #8,a0
-     a12:	move.w d0,-2(a0)
-        addr += Bpl;
-     a16:	add.l d3,d0
-    for (USHORT i = 0; i < numPlanes; i++)
-     a18:	addq.w #4,d1
-     a1a:	cmpa.l a0,a1
-     a1c:	bne.s 9fc <main+0x988>
-        *copListEnd++ = (UWORD)addr; // high-word of adress
      a1e:	andi.l #65535,d4
-     a24:	lsl.l #3,d4
-     a26:	adda.l d4,a3
-	*copPtr++ = BPLCON0;
-     a28:	move.w #256,(a3)
-	*copPtr++ = ((BmpLogo.Bpls) << 12) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
-     a2c:	moveq #12,d3
-     a2e:	lsl.l d3,d5
-     a30:	ori.w #512,d5
-     a34:	move.w d5,2(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a38:	move.w #384,4(a3)
-    *copListCurrent++ = color;
-     a3e:	clr.w 6(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a42:	move.w #386,8(a3)
-    *copListCurrent++ = color;
-     a48:	move.w #23,10(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a4e:	move.w #388,12(a3)
-    *copListCurrent++ = color;
-     a54:	move.w #601,14(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a5a:	move.w #390,16(a3)
-    *copListCurrent++ = color;
-     a60:	move.w #874,18(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a66:	move.w #392,20(a3)
-    *copListCurrent++ = color;
-     a6c:	move.w #1163,22(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a72:	move.w #394,24(a3)
-    *copListCurrent++ = color;
-     a78:	move.w #1469,26(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a7e:	move.w #396,28(a3)
-    *copListCurrent++ = color;
-     a84:	move.w #1758,30(a3)
-    *copListCurrent++ = offsetof(struct Custom, color[index]);
-     a8a:	move.w #398,32(a3)
-    *copListCurrent++ = color;
-     a90:	move.w #2303,34(a3)
-	copPtr = copWaitY(copPtr, 0x2c + BmpLogo.Height + 64);
-     a96:	move.w 1dade <BmpLogo+0x2>,d0
-     a9c:	addi.w #108,d0
-    *copListEnd++ = (i << 8) | 4 | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
-     aa0:	lsl.w #8,d0
-     aa2:	ori.w #5,d0
-     aa6:	move.w d0,36(a3)
-    *copListEnd++ = COP_WAIT;
-     aaa:	move.w #-2,38(a3)
-     ab0:	lea 40(a3),a0
-     ab4:	move.l a0,1d97c <copMirrorBmpP>
-						  (BmpLogo.Bplt - BmpLogo.Bpl));
-     aba:	move.w 1dae6 <BmpLogo+0xa>,d0
-     ac0:	sub.w 1dae4 <BmpLogo+0x8>,d0
-    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
-     ac6:	move.w #264,40(a3)
-    *copListEnd++ = modOdd;
-     acc:	move.w d0,42(a3)
-    *copListEnd++ = BPL2MOD; //even  planes 2,4
-     ad0:	move.w #266,44(a3)
-    *copListEnd++ = modEven;
-     ad6:	move.w d0,46(a3)
-    *copListEnd++ = (i << 8) | (x << 1) | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
-     ada:	move.w #-1,48(a3)
-    *copListEnd++ = COP_WAIT;
-     ae0:	move.w #-2,50(a3)
-	custom->cop1lc = (ULONG)copPtr;
-     ae6:	movea.l 1db52 <custom>,a0
-     aec:	move.l a2,128(a0)
-	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
-     af0:	move.w #64,150(a0)
-	custom->copjmp1 = 0x7fff;	   //start coppper
-     af6:	move.w #32767,136(a0)
-	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER;
-     afc:	move.w #-31808,150(a0)
-	*(volatile APTR *)(((UBYTE *)VBR) + 0x6c) = interrupt;
-     b02:	movea.l 1d99a <VBR>,a1
-     b08:	move.l #5028,108(a1)
-	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
-     b10:	move.w #-16352,154(a0)
-	custom->intena = INTF_SETCLR | INTF_EXTER; // TheP61_Player needs INTF_EXTER
-     b16:	move.w #-24576,154(a0)
-	custom->intreq = 1 << INTB_VERTB; //reset vbl req
-     b1c:	move.w #32,156(a0)
-	register volatile const void *_a0 ASM("a0") = module;
-     b22:	lea 19e78 <incbin_module_start>,a0
-	register volatile const void *_a1 ASM("a1") = NULL;
-     b28:	suba.l a1,a1
-	register volatile const void *_a2 ASM("a2") = NULL;
-     b2a:	suba.l a2,a2
-	register volatile const void *_a3 ASM("a3") = P61_Player;
-     b2c:	lea 199a <incbin_P61_Player_start>,a3
-	__asm volatile(
-     b32:	movem.l d1-d7/a4-a6,-(sp)
-     b36:	jsr (a3)
-     b38:	movem.l (sp)+,d1-d7/a4-a6
-	if (p61Init(module) != 0)
-     b3c:	tst.l d0
-     b3e:	bne.w 1312 <main+0x129e>
-	Point2D ps2 = {0, 32};
-     b42:	clr.l d2
-     b44:	moveq #32,d3
-	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
-     b46:	move.w 1dae0 <BmpLogo+0x4>,d5
-     b4c:	move.w 1dae4 <BmpLogo+0x8>,d4
-     b52:	move.l 1daec <BmpLogo+0x10>,d6
-     b58:	movea.w 1dab0 <BmpUpperPart_PF1+0x8>,a1
-     b5e:	move.l 1dab8 <BmpUpperPart_PF1+0x10>,d1
-	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
-     b64:	movea.l 1db52 <custom>,a0
-     b6a:	move.w 2(a0),d0
-	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
-     b6e:	move.w 2(a0),d0
-     b72:	btst #14,d0
-     b76:	bne.s b6e <main+0xafa>
-	custom->bltcon0 = 0x09f0;
-     b78:	move.w #2544,64(a0)
-	custom->bltcon1 = 0x0000;
-     b7e:	move.w #0,66(a0)
-	custom->bltafwm = 0xffff;
-     b84:	move.w #-1,68(a0)
-	custom->bltalwm = 0xffff;
-     b8a:	move.w #-1,70(a0)
-	custom->bltamod = imgA.Bpl - (width / 8);
-     b90:	addi.w #-32,d4
-     b94:	move.w d4,100(a0)
-	custom->bltdmod = imgD.Bpl - (width / 8);
-     b98:	lea -32(a1),a1
-     b9c:	move.w a1,102(a0)
-	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
-     ba0:	move.l d6,80(a0)
-	custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
-     ba4:	addq.l #4,d1
-     ba6:	move.l d1,84(a0)
-	custom->bltsize = ((height * imgA.Bpls) << 6) + (width / 16);
-     baa:	move.w d5,d0
-     bac:	lsl.w #6,d0
-     bae:	add.w d5,d0
-     bb0:	lsl.w #7,d0
-     bb2:	addi.w #16,d0
-     bb6:	move.w d0,88(a0)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd2, 32, 32);
-     bba:	move.w 1d9dc <BmpCookie+0x4>,d4
-     bc0:	move.w 1d9e0 <BmpCookie+0x8>,d5
-     bc6:	move.w 1d9e2 <BmpCookie+0xa>,d6
-     bcc:	move.l 1d9e8 <BmpCookie+0x10>,d7
-     bd2:	movea.w 1da7c <BmpUpperPart_PF2+0x8>,a3
-     bd8:	movea.w 1da7e <BmpUpperPart_PF2+0xa>,a5
-     bde:	movea.l 1da84 <BmpUpperPart_PF2+0x10>,a6
-     be4:	clr.l -(sp)
-     be6:	pea 20 <_start+0x20>
-     bea:	move.l d3,-(sp)
-     bec:	move.l d2,-(sp)
-     bee:	move.l a6,-(sp)
-     bf0:	move.l a5,-(sp)
-     bf2:	move.l a3,-(sp)
-     bf4:	move.l d7,-(sp)
-     bf6:	move.l d6,-(sp)
-     bf8:	move.l d5,-(sp)
-     bfa:	move.l d4,-(sp)
-     bfc:	lea 149e <BetterBlit.constprop.0.isra.0>,a2
-     c02:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd3, 32, 32);
-     c04:	lea 40(sp),sp
-     c08:	clr.l (sp)
-     c0a:	pea e0 <main+0x6c>
-     c0e:	move.l d3,-(sp)
-     c10:	move.l d2,-(sp)
-     c12:	move.l a6,-(sp)
-     c14:	move.l a5,-(sp)
-     c16:	move.l a3,-(sp)
-     c18:	move.l d7,-(sp)
-     c1a:	move.l d6,-(sp)
-     c1c:	move.l d5,-(sp)
-     c1e:	move.l d4,-(sp)
-     c20:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd4, 32, 32);
-     c22:	lea 44(sp),sp
-     c26:	pea 10 <_start+0x10>
-     c2a:	pea 20 <_start+0x20>
-     c2e:	move.l d3,-(sp)
-     c30:	move.l d2,-(sp)
-     c32:	move.l a6,-(sp)
-     c34:	move.l a5,-(sp)
-     c36:	move.l a3,-(sp)
-     c38:	move.l d7,-(sp)
-     c3a:	move.l d6,-(sp)
-     c3c:	move.l d5,-(sp)
-     c3e:	move.l d4,-(sp)
-     c40:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd5, 32, 32);
-     c42:	lea 44(sp),sp
-     c46:	pea 10 <_start+0x10>
-     c4a:	pea e0 <main+0x6c>
-     c4e:	move.l d3,-(sp)
-     c50:	move.l d2,-(sp)
-     c52:	move.l a6,-(sp)
-     c54:	move.l a5,-(sp)
-     c56:	move.l a3,-(sp)
-     c58:	move.l d7,-(sp)
-     c5a:	move.l d6,-(sp)
-     c5c:	move.l d5,-(sp)
-     c5e:	move.l d4,-(sp)
-     c60:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd6, 32, 32);
-     c62:	lea 44(sp),sp
-     c66:	pea 20 <_start+0x20>
-     c6a:	pea 20 <_start+0x20>
-     c6e:	move.l d3,-(sp)
-     c70:	move.l d2,-(sp)
-     c72:	move.l a6,-(sp)
-     c74:	move.l a5,-(sp)
-     c76:	move.l a3,-(sp)
-     c78:	move.l d7,-(sp)
-     c7a:	move.l d6,-(sp)
-     c7c:	move.l d5,-(sp)
-     c7e:	move.l d4,-(sp)
-     c80:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd7, 32, 32);
-     c82:	lea 44(sp),sp
-     c86:	pea 20 <_start+0x20>
-     c8a:	pea e0 <main+0x6c>
-     c8e:	move.l d3,-(sp)
-     c90:	move.l d2,-(sp)
-     c92:	move.l a6,-(sp)
-     c94:	move.l a5,-(sp)
-     c96:	move.l a3,-(sp)
-     c98:	move.l d7,-(sp)
-     c9a:	move.l d6,-(sp)
-     c9c:	move.l d5,-(sp)
-     c9e:	move.l d4,-(sp)
-     ca0:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd8, 32, 32);
-     ca2:	lea 44(sp),sp
-     ca6:	pea 30 <_start+0x30>
-     caa:	pea 20 <_start+0x20>
-     cae:	move.l d3,-(sp)
-     cb0:	move.l d2,-(sp)
-     cb2:	move.l a6,-(sp)
-     cb4:	move.l a5,-(sp)
-     cb6:	move.l a3,-(sp)
-     cb8:	move.l d7,-(sp)
-     cba:	move.l d6,-(sp)
-     cbc:	move.l d5,-(sp)
-     cbe:	move.l d4,-(sp)
-     cc0:	jsr (a2)
-	BetterBlit(BmpCookie, BmpUpperPart_PF2, ps2, pd9, 32, 32);
-     cc2:	lea 44(sp),sp
-     cc6:	pea 30 <_start+0x30>
-     cca:	pea e0 <main+0x6c>
-     cce:	move.l d3,-(sp)
-     cd0:	move.l d2,-(sp)
-     cd2:	move.l a6,-(sp)
-     cd4:	move.l a5,-(sp)
-     cd6:	move.l a3,-(sp)
-     cd8:	move.l d7,-(sp)
-     cda:	move.l d6,-(sp)
-     cdc:	move.l d5,-(sp)
-     cde:	move.l d4,-(sp)
-     ce0:	jsr (a2)
-inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
-     ce2:	move.b bfe001 <_end+0xbe04a9>,d0
-	while (!MouseLeft())
-     ce8:	lea 44(sp),sp
-     cec:	btst #6,d0
-     cf0:	beq.w eae <main+0xe3a>
-				ScrollerDir = (ScrollerMax - ScrollerY) * 1000 / 12000;
-     cf4:	move.w 55ac <ScrollerY>,d5
-		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
-     cfa:	move.l 1da50 <BmpScroller+0x10>,d3
-     d00:	move.w 1da44 <BmpScroller+0x4>,d4
-     d06:	lea 1da40 <BmpScroller>,a3
-     d0c:	lea 17bc <__mulsi3>,a2
-	UBYTE chr = Scrolltext[ScrolltextCnt++];
-     d12:	lea 335b <Scrolltext>,a5
-		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
-     d18:	move.l dff004 <_end+0xde14ac>,d0
-     d1e:	move.l d0,50(sp)
-		vpos &= 0x1ff00;
-     d22:	move.l 50(sp),d0
-     d26:	andi.l #130816,d0
-     d2c:	move.l d0,50(sp)
-		if (vpos != (311 << 8))
-     d30:	move.l 50(sp),d0
-     d34:	cmpi.l #79616,d0
-     d3a:	beq.s d18 <main+0xca4>
-		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
-     d3c:	move.l dff004 <_end+0xde14ac>,d0
-     d42:	move.l d0,46(sp)
-		vpos &= 0x1ff00;
-     d46:	move.l 46(sp),d0
-     d4a:	andi.l #130816,d0
-     d50:	move.l d0,46(sp)
-		if (vpos == (311 << 8))
-     d54:	move.l 46(sp),d0
-     d58:	cmpi.l #79616,d0
-     d5e:	bne.s d3c <main+0xcc8>
-		if (BounceEnabled)
-     d60:	tst.w 1d98a <BounceEnabled>
-     d66:	beq.s da0 <main+0xd2c>
-			if (ScrollerDir > 0)
-     d68:	move.b 55ae <ScrollerDir>,d0
-     d6e:	ble.w 1280 <main+0x120c>
-				ScrollerDir = (ScrollerMax - ScrollerY) * 1000 / 12000;
-     d72:	pea c <_start+0xc>
-     d76:	movea.w #40,a1
-     d7a:	suba.w d5,a1
-     d7c:	move.l a1,-(sp)
-     d7e:	jsr 183a <__divsi3>
-     d84:	addq.l #8,sp
-				if (ScrollerDir > 6)
-     d86:	cmpi.b #6,d0
-     d8a:	ble.w 129e <main+0x122a>
-					ScrollerDir = 6;
-     d8e:	move.b #6,55ae <ScrollerDir>
-     d96:	moveq #6,d0
-			ScrollerY += ScrollerDir;
-     d98:	add.w d0,d5
-     d9a:	move.w d5,55ac <ScrollerY>
-		if (ScrollerY >= ScrollerMax)
-     da0:	movea.w d5,a0
-     da2:	cmpi.w #39,d5
-     da6:	ble.w 11ec <main+0x1178>
-			ScrollerY = ScrollerMax;
-     daa:	move.w #40,55ac <ScrollerY>
-			ScrollerDir = -1;
-     db2:	st 55ae <ScrollerDir>
-		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
-     db8:	move.w 1da4a <BmpScroller+0xa>,d2
-	int BltOffs = startY * theDesc.Bplt;
-     dbe:	move.w d2,d5
-     dc0:	mulu.w #40,d5
-	int Brcorner = height * theDesc.Bplt - 2;
-     dc4:	andi.l #65535,d2
-     dca:	lsl.l #5,d2
-     dcc:	subq.l #2,d2
-	WaitBlit();
-     dce:	movea.l 1db48 <GfxBase>,a6
-     dd4:	jsr -228(a6)
-	custom->bltcon0 = ((UWORD)speed << 12) + 0x9f0;
-     dd8:	movea.l 1db52 <custom>,a0
-     dde:	move.w #18928,64(a0)
-	custom->bltcon1 = 0x0002;
-     de4:	move.w #2,66(a0)
-	custom->bltafwm = 0xffff;
-     dea:	move.w #-1,68(a0)
-	custom->bltalwm = 0xffff;
-     df0:	move.w #-1,70(a0)
-	custom->bltapt = theBitmap + BltOffs + Brcorner;
-     df6:	add.l d5,d2
-     df8:	add.l d2,d3
-     dfa:	move.l d3,80(a0)
-	custom->bltdpt = theBitmap + BltOffs + Brcorner;
-     dfe:	move.l d3,84(a0)
-	custom->bltamod = 0;
-     e02:	move.w #0,100(a0)
-	custom->bltdmod = 0;
-     e08:	move.w #0,102(a0)
-	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
-     e0e:	moveq #11,d0
-     e10:	lsl.w d0,d4
-     e12:	move.w (a3),d0
-     e14:	lsr.w #4,d0
-     e16:	add.w d0,d4
-     e18:	move.w d4,88(a0)
-	ScrollCnt += speed;
-     e1c:	move.w 1d984 <ScrollCnt>,d0
-     e22:	addq.w #4,d0
-     e24:	move.w d0,1d984 <ScrollCnt>
-	if (ScrollCnt >= 32)
-     e2a:	cmpi.w #31,d0
-     e2e:	bhi.w fd4 <main+0xf60>
-		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
-     e32:	move.w 1da48 <BmpScroller+0x8>,d2
-     e38:	move.l 1da50 <BmpScroller+0x10>,d3
-     e3e:	move.w 55ac <ScrollerY>,d5
-     e44:	move.w 1da44 <BmpScroller+0x4>,d4
-     e4a:	moveq #0,d6
-     e4c:	move.w d4,d6
-     e4e:	movea.l 1d986 <copScrollerBmpP>,a6
-     e54:	andi.l #65535,d2
-    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-     e5a:	move.l d2,-(sp)
-     e5c:	movea.w d5,a0
-     e5e:	move.l a0,-(sp)
-     e60:	jsr (a2)
-     e62:	addq.l #4,sp
-     e64:	move.l d6,(sp)
-     e66:	move.l d0,-(sp)
-     e68:	jsr (a2)
-     e6a:	addq.l #8,sp
-     e6c:	add.l d3,d0
-    for (USHORT i = 0; i < numPlanes; i++)
-     e6e:	tst.l d6
-     e70:	beq.s ea0 <main+0xe2c>
-     e72:	suba.l a0,a0
-        addr += Bpl;
-     e74:	move.w #224,d1
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]);
-     e78:	move.w d1,(a6)
+     a24:	andi.l #65535,d0
+     a2a:	lsl.l #3,d0
+     a2c:	lea (0,a2,d0.l),a6
+    BYTE plane = odd ? 1 : 0;
+     a30:	clr.b d2
+        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]);
+     a32:	move.b d2,d0
+     a34:	ext.w d0
+     a36:	lsl.w #2,d0
+     a38:	addi.w #224,d0
+     a3c:	move.w d0,(a2)
         *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-     e7a:	move.l d0,d7
-     e7c:	clr.w d7
-     e7e:	swap d7
-     e80:	move.w d7,2(a6)
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]) + 2;
-     e84:	movea.w d1,a1
-     e86:	addq.w #2,a1
-     e88:	move.w a1,4(a6)
+     a3e:	move.l d1,d3
+     a40:	clr.w d3
+     a42:	swap d3
+     a44:	move.w d3,2(a2)
+        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]) + 2;
+     a48:	addq.w #2,d0
+     a4a:	move.w d0,4(a2)
         *copListEnd++ = (UWORD)addr; // high-word of adress
-     e8c:	addq.l #8,a6
-     e8e:	move.w d0,-2(a6)
+     a4e:	addq.l #8,a2
+     a50:	move.w d1,-2(a2)
         addr += Bpl;
-     e92:	add.l d2,d0
+     a54:	add.l d4,d1
+        plane += 2;
+     a56:	addq.b #2,d2
     for (USHORT i = 0; i < numPlanes; i++)
-     e94:	addq.w #1,a0
-     e96:	addq.w #4,d1
-     e98:	moveq #0,d7
-     e9a:	move.w a0,d7
-     e9c:	cmp.l d6,d7
-     e9e:	blt.s e78 <main+0xe04>
-inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
-     ea0:	move.b bfe001 <_end+0xbe04a9>,d0
-	while (!MouseLeft())
-     ea6:	btst #6,d0
-     eaa:	bne.w d18 <main+0xca4>
-	register volatile const void *_a3 ASM("a3") = P61_Player;
-     eae:	lea 199a <incbin_P61_Player_start>,a3
-	register volatile const void *_a6 ASM("a6") = (void *)0xdff000;
-     eb4:	movea.l #14675968,a6
-	__asm volatile(
-     eba:	movem.l d0-d1/a0-a1,-(sp)
-     ebe:	jsr 8(a3)
-     ec2:	movem.l (sp)+,d0-d1/a0-a1
-	FreeMem(copPtr, 1024);
-     ec6:	movea.l 1db4c <SysBase>,a6
-     ecc:	movea.l 1d99e <copPtr>,a1
-     ed2:	move.l #1024,d0
-     ed8:	jsr -210(a6)
-	FreeMem((UBYTE *)BmpScroller.ImageData, BmpScroller.Btot);
-     edc:	movea.l 1db4c <SysBase>,a6
-     ee2:	movea.l 1da50 <BmpScroller+0x10>,a1
-     ee8:	moveq #0,d0
-     eea:	move.w 1da4e <BmpScroller+0xe>,d0
-     ef0:	jsr -210(a6)
-	WaitVbl();
-     ef4:	jsr (a4)
-	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
-     ef6:	movea.l 1db52 <custom>,a0
-     efc:	move.w 2(a0),d0
-	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
-     f00:	move.w 2(a0),d0
-     f04:	btst #14,d0
-     f08:	bne.s f00 <main+0xe8c>
-	custom->intena = 0x7fff; //disable all interrupts
-     f0a:	move.w #32767,154(a0)
-	custom->intreq = 0x7fff; //Clear any interrupts that were pending
-     f10:	move.w #32767,156(a0)
-	custom->dmacon = 0x7fff; //Clear all DMA channels
-     f16:	move.w #32767,150(a0)
+     a58:	cmpa.l a2,a6
+     a5a:	bne.s a32 <main+0x9be>
+	*copPtr++ = BPLCON0;
+     a5c:	move.w #256,(a6)
+	*copPtr++ = ((BmpLogo.Bpls * 2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
+     a60:	movea.w 21568 <BmpLogo+0x4>,a4
+     a66:	moveq #0,d4
+     a68:	move.w a4,d4
+     a6a:	movea.l d4,a5
+     a6c:	move.l a5,d0
+     a6e:	moveq #13,d1
+     a70:	lsl.l d1,d0
+     a72:	ori.w #1536,d0
+     a76:	move.w d0,2(a6)
+	copPtr = copWaitY(copPtr, 0x2c + BmpUpperPart_PF1.Height);
+     a7a:	move.w 21532 <BmpUpperPart_PF1+0x2>,d0
+     a80:	addi.w #44,d0
+    *copListEnd++ = (i << 8) | 4 | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
+     a84:	lsl.w #8,d0
+     a86:	ori.w #5,d0
+     a8a:	move.w d0,4(a6)
+    *copListEnd++ = COP_WAIT;
+     a8e:	move.w #-2,6(a6)
+						  BmpScroller.Bplt - Screen.Bpl);
+     a94:	move.w 2149c <BmpScroller+0x8>,d7
+     a9a:	move.w d7,d0
+     a9c:	sub.w 2159e <Screen+0x6>,d0
+    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
+     aa2:	move.w #264,8(a6)
+    *copListEnd++ = modOdd;
+     aa8:	move.w d0,10(a6)
+    *copListEnd++ = BPL2MOD; //even  planes 2,4
+     aac:	move.w #266,12(a6)
+    *copListEnd++ = modEven;
+     ab2:	lea 16(a6),a3
+     ab6:	move.w d0,14(a6)
+	copScrollerBmpP = copPtr; // remember this adress to manipulate later
+     aba:	move.l a3,213da <copScrollerBmpP>
+	copPtr = copSetPlanesInterleafed(0, copPtr, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, 0);
+     ac0:	move.w 2149a <BmpScroller+0x6>,d4
+     ac6:	move.w 21498 <BmpScroller+0x4>,98(sp)
+     ace:	move.l 214a2 <BmpScroller+0xe>,94(sp)
+    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
+     ad6:	move.l 94(sp),d1
+    for (USHORT i = 0; i < numPlanes; i++)
+     ada:	tst.w 98(sp)
+     ade:	beq.s b2a <main+0xab6>
+        addr += Bpl;
+     ae0:	andi.l #65535,d4
+     ae6:	move.w 98(sp),d0
+     aea:	subq.w #1,d0
+     aec:	andi.l #65535,d0
+     af2:	addq.l #3,d0
+     af4:	lsl.l #3,d0
+     af6:	add.l a6,d0
+     af8:	movea.l a3,a2
+     afa:	move.w #224,d2
+        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]);
+     afe:	move.w d2,(a2)
+        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
+     b00:	move.l d1,d3
+     b02:	clr.w d3
+     b04:	swap d3
+     b06:	move.w d3,2(a2)
+        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]) + 2;
+     b0a:	move.w d2,d3
+     b0c:	addq.w #2,d3
+     b0e:	move.w d3,4(a2)
+        *copListEnd++ = (UWORD)addr; // high-word of adress
+     b12:	addq.l #8,a2
+     b14:	move.w d1,-2(a2)
+        addr += Bpl;
+     b18:	add.l d4,d1
+    for (USHORT i = 0; i < numPlanes; i++)
+     b1a:	addq.w #4,d2
+     b1c:	cmp.l a2,d0
+     b1e:	bne.s afe <main+0xa8a>
+        *copListEnd++ = (UWORD)addr; // high-word of adress
+     b20:	moveq #0,d0
+     b22:	move.w 98(sp),d0
+     b26:	lsl.l #3,d0
+     b28:	adda.l d0,a3
+	*copPtr++ = BPLCON0;
+     b2a:	move.w #256,(a3)
+	*copPtr++ = ((BmpLogo.Bpls) << 12) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
+     b2e:	move.l a5,d0
+     b30:	moveq #12,d4
+     b32:	lsl.l d4,d0
+     b34:	ori.w #512,d0
+     b38:	move.w d0,2(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b3c:	move.w #384,4(a3)
+    *copListCurrent++ = color;
+     b42:	clr.w 6(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b46:	move.w #386,8(a3)
+    *copListCurrent++ = color;
+     b4c:	move.w #23,10(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b52:	move.w #388,12(a3)
+    *copListCurrent++ = color;
+     b58:	move.w #601,14(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b5e:	move.w #390,16(a3)
+    *copListCurrent++ = color;
+     b64:	move.w #874,18(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b6a:	move.w #392,20(a3)
+    *copListCurrent++ = color;
+     b70:	move.w #1163,22(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b76:	move.w #394,24(a3)
+    *copListCurrent++ = color;
+     b7c:	move.w #1469,26(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b82:	move.w #396,28(a3)
+    *copListCurrent++ = color;
+     b88:	move.w #1758,30(a3)
+    *copListCurrent++ = offsetof(struct Custom, color[index]);
+     b8e:	move.w #398,32(a3)
+    *copListCurrent++ = color;
+     b94:	move.w #2303,34(a3)
+	copPtr = copWaitY(copPtr, 0x2c + BmpLogo.Height + 64);
+     b9a:	move.w 21566 <BmpLogo+0x2>,d0
+     ba0:	addi.w #108,d0
+    *copListEnd++ = (i << 8) | 4 | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
+     ba4:	lsl.w #8,d0
+     ba6:	ori.w #5,d0
+     baa:	move.w d0,36(a3)
+    *copListEnd++ = COP_WAIT;
+     bae:	move.w #-2,38(a3)
+     bb4:	lea 40(a3),a2
+     bb8:	move.l a2,213d0 <copMirrorBmpP>
+						  (BmpLogo.Bplt - BmpLogo.Bpl));
+     bbe:	move.w 2156a <BmpLogo+0x6>,d1
+     bc4:	move.w 2156c <BmpLogo+0x8>,d0
+     bca:	sub.w d1,d0
+    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
+     bcc:	move.w #264,40(a3)
+    *copListEnd++ = modOdd;
+     bd2:	move.w d0,42(a3)
+    *copListEnd++ = BPL2MOD; //even  planes 2,4
+     bd6:	move.w #266,44(a3)
+    *copListEnd++ = modEven;
+     bdc:	move.w d0,46(a3)
+    *copListEnd++ = (i << 8) | (x << 1) | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
+     be0:	move.w #-1,48(a3)
+    *copListEnd++ = COP_WAIT;
+     be6:	move.w #-2,50(a3)
+	custom->cop1lc = (ULONG)copPtr;
+     bec:	movea.l 215d8 <custom>,a2
+     bf2:	move.l a1,128(a2)
+	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
+     bf6:	move.w #64,150(a2)
+	custom->copjmp1 = 0x7fff;	   //start coppper
+     bfc:	move.w #32767,136(a2)
+	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG;
+     c02:	move.w #-30784,150(a2)
 	*(volatile APTR *)(((UBYTE *)VBR) + 0x6c) = interrupt;
-     f1c:	movea.l 1d99a <VBR>,a1
-     f22:	move.l 1d996 <SystemIrq>,108(a1)
-	custom->cop1lc = (ULONG)GfxBase->copinit;
-     f2a:	movea.l 1db48 <GfxBase>,a6
-     f30:	move.l 38(a6),128(a0)
-	custom->cop2lc = (ULONG)GfxBase->LOFlist;
-     f36:	move.l 50(a6),132(a0)
-	custom->copjmp1 = 0x7fff; //start coppper
-     f3c:	move.w #32767,136(a0)
-	custom->intena = SystemInts | 0x8000;
-     f42:	move.w 1d994 <SystemInts>,d0
-     f48:	ori.w #-32768,d0
-     f4c:	move.w d0,154(a0)
-	custom->dmacon = SystemDMA | 0x8000;
-     f50:	move.w 1d992 <SystemDMA>,d0
-     f56:	ori.w #-32768,d0
-     f5a:	move.w d0,150(a0)
-	custom->adkcon = SystemADKCON | 0x8000;
-     f5e:	move.w 1d990 <SystemADKCON>,d0
-     f64:	ori.w #-32768,d0
-     f68:	move.w d0,158(a0)
-	LoadView(ActiView);
-     f6c:	movea.l 1d98c <ActiView>,a1
-     f72:	jsr -222(a6)
-	WaitTOF();
-     f76:	movea.l 1db48 <GfxBase>,a6
-     f7c:	jsr -270(a6)
-	WaitTOF();
-     f80:	movea.l 1db48 <GfxBase>,a6
-     f86:	jsr -270(a6)
-	WaitBlit();
-     f8a:	movea.l 1db48 <GfxBase>,a6
-     f90:	jsr -228(a6)
-	DisownBlitter();
-     f94:	movea.l 1db48 <GfxBase>,a6
-     f9a:	jsr -462(a6)
-	Enable();
-     f9e:	movea.l 1db4c <SysBase>,a6
-     fa4:	jsr -126(a6)
-	CloseLibrary((struct Library *)DOSBase);
-     fa8:	movea.l 1db4c <SysBase>,a6
-     fae:	movea.l 1db44 <DOSBase>,a1
-     fb4:	jsr -414(a6)
-	CloseLibrary((struct Library *)GfxBase);
-     fb8:	movea.l 1db4c <SysBase>,a6
-     fbe:	movea.l 1db48 <GfxBase>,a1
-     fc4:	jsr -414(a6)
-}
-     fc8:	moveq #0,d0
-     fca:	movem.l (sp)+,d2-d7/a2-a6
-     fce:	lea 12(sp),sp
-     fd2:	rts
-		ScrollCnt = 0;
-     fd4:	clr.w 1d984 <ScrollCnt>
-		PlotChar(BmpFont32, (UBYTE *)BmpFont32P, BmpScroller, (UBYTE *)BmpScroller.ImageData, startY, 32, 32);
-     fda:	move.l 1da50 <BmpScroller+0x10>,d3
-     fe0:	move.w 1da10 <BmpFont32+0x4>,d5
-     fe6:	move.w 1da14 <BmpFont32+0x8>,d6
-     fec:	movea.w 1da16 <BmpFont32+0xa>,a1
-     ff2:	move.w 1da48 <BmpScroller+0x8>,d2
-     ff8:	move.w 1da4a <BmpScroller+0xa>,d7
-	UBYTE chr = Scrolltext[ScrolltextCnt++];
-     ffe:	movea.w 1d982 <ScrolltextCnt>,a0
-    1004:	move.w a0,d1
-    1006:	addq.w #1,d1
-    1008:	move.w d1,1d982 <ScrolltextCnt>
-    100e:	moveq #0,d0
-    1010:	move.w a0,d0
-    1012:	move.b (0,a5,d0.l),d0
-	if (chr == 'b')
-    1016:	cmpi.b #98,d0
-    101a:	beq.w 11a8 <main+0x1134>
-	if (chr == 'm')
-    101e:	cmpi.b #109,d0
-    1022:	beq.w 10b2 <main+0x103e>
-	if (chr == 0)
-    1026:	tst.b d0
-    1028:	bne.w 1106 <main+0x1092>
-		chr = Scrolltext[ScrolltextCnt++];
-    102c:	move.w #1,1d982 <ScrolltextCnt>
-    1034:	moveq #0,d4
-    1036:	moveq #4,d1
-	source = (row * bmpFont.Bplt * charH) + (col << 2);
-    1038:	move.l d1,-(sp)
-    103a:	move.w a1,-(sp)
-    103c:	clr.w -(sp)
-    103e:	jsr (a2)
-    1040:	addq.l #8,sp
-    1042:	lsl.l #5,d0
-    1044:	add.l d0,d4
-	dest = (plotY * bmpDest.Bplt) + (Screen.Bpl);
-    1046:	mulu.w #40,d7
-    104a:	moveq #0,d0
-    104c:	move.w 1db18 <Screen+0x8>,d0
-    1052:	add.l d0,d7
-	WaitBlit();
-    1054:	movea.l 1db48 <GfxBase>,a6
-    105a:	jsr -228(a6)
-	custom->bltcon0 = 0x09f0;
-    105e:	movea.l 1db52 <custom>,a0
-    1064:	move.w #2544,64(a0)
-	custom->bltcon1 = 0x0000;
-    106a:	move.w #0,66(a0)
-	custom->bltafwm = 0xffff;
-    1070:	move.w #-1,68(a0)
-	custom->bltalwm = 0xffff;
-    1076:	move.w #-1,70(a0)
-	custom->bltapt = bmpFontP + source;
-    107c:	addi.l #34418,d4
-    1082:	move.l d4,80(a0)
-	custom->bltdpt = bmpDestP + dest;
-    1086:	add.l d7,d3
-    1088:	move.l d3,84(a0)
-	custom->bltamod = bmpFont.Bpl - charW / 8;
-    108c:	subq.w #4,d6
-    108e:	move.w d6,100(a0)
-	custom->bltdmod = bmpDest.Bpl - charW / 8;
-    1092:	subq.w #4,d2
-    1094:	move.w d2,102(a0)
-	custom->bltsize = ((charH * bmpFont.Bpls) << 6) + (charW / 16);
-    1098:	moveq #11,d0
-    109a:	lsl.w d0,d5
-    109c:	addq.w #2,d5
-    109e:	move.w d5,88(a0)
-		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
-    10a2:	move.w 1da48 <BmpScroller+0x8>,d2
-    10a8:	move.l 1da50 <BmpScroller+0x10>,d3
-    10ae:	bra.w e3e <main+0xdca>
-		if (MirrorEnabled)
-    10b2:	move.w 1d980 <MirrorEnabled>,d0
-				 BmpScroller.Bplt - Screen.Bpl);
-    10b8:	move.w d7,d4
-    10ba:	sub.w 1db18 <Screen+0x8>,d4
-	copSetBplMod(0, copMirrorBmpP,
-    10c0:	movea.l 1d97c <copMirrorBmpP>,a0
-		if (MirrorEnabled)
-    10c6:	tst.w d0
-    10c8:	beq.w 12d4 <main+0x1260>
-    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
-    10cc:	move.w #264,(a0)
-    *copListEnd++ = modOdd;
-    10d0:	move.w d4,2(a0)
-    *copListEnd++ = BPL2MOD; //even  planes 2,4
-    10d4:	move.w #266,4(a0)
-    *copListEnd++ = modEven;
-    10da:	move.w d4,6(a0)
-		MirrorEnabled = !MirrorEnabled;
-    10de:	tst.w d0
-    10e0:	seq d0
-    10e2:	ext.w d0
-    10e4:	neg.w d0
-    10e6:	move.w d0,1d980 <MirrorEnabled>
-		chr = Scrolltext[ScrolltextCnt++];
-    10ec:	move.w d1,d4
-    10ee:	addq.w #1,d4
-    10f0:	move.w d4,1d982 <ScrolltextCnt>
-    10f6:	andi.l #65535,d1
-    10fc:	move.b (0,a5,d1.l),d0
-	if (chr == 0)
-    1100:	tst.b d0
-    1102:	beq.w 102c <main+0xfb8>
-	if (chr < 32 || chr > (32 + 80))
-    1106:	addi.b #-32,d0
-    110a:	cmpi.b #80,d0
-    110e:	bhi.w e3e <main+0xdca>
-	row = chr / 10;
-    1112:	andi.w #255,d0
-    1116:	move.w d0,d4
-    1118:	mulu.w #-13107,d4
-    111c:	clr.w d4
-    111e:	swap d4
-    1120:	lsr.w #3,d4
-    1122:	moveq #0,d1
-    1124:	move.b d4,d1
-	col = chr % 10;
-    1126:	movea.w d4,a0
-    1128:	adda.w d4,a0
-    112a:	adda.w a0,a0
-    112c:	adda.w d4,a0
-    112e:	adda.w a0,a0
-    1130:	sub.w a0,d0
-    1132:	moveq #0,d4
-    1134:	move.b d0,d4
-	source = (row * bmpFont.Bplt * charH) + (col << 2);
-    1136:	add.l d4,d4
-    1138:	add.l d4,d4
-    113a:	move.l d1,-(sp)
-    113c:	move.w a1,-(sp)
-    113e:	clr.w -(sp)
-    1140:	jsr (a2)
-    1142:	addq.l #8,sp
-    1144:	lsl.l #5,d0
-    1146:	add.l d0,d4
-	dest = (plotY * bmpDest.Bplt) + (Screen.Bpl);
-    1148:	mulu.w #40,d7
-    114c:	moveq #0,d0
-    114e:	move.w 1db18 <Screen+0x8>,d0
-    1154:	add.l d0,d7
-	WaitBlit();
-    1156:	movea.l 1db48 <GfxBase>,a6
-    115c:	jsr -228(a6)
-	custom->bltcon0 = 0x09f0;
-    1160:	movea.l 1db52 <custom>,a0
-    1166:	move.w #2544,64(a0)
-	custom->bltcon1 = 0x0000;
-    116c:	move.w #0,66(a0)
-	custom->bltafwm = 0xffff;
-    1172:	move.w #-1,68(a0)
-	custom->bltalwm = 0xffff;
-    1178:	move.w #-1,70(a0)
-	custom->bltapt = bmpFontP + source;
-    117e:	addi.l #34418,d4
-    1184:	move.l d4,80(a0)
-	custom->bltdpt = bmpDestP + dest;
-    1188:	add.l d7,d3
-    118a:	move.l d3,84(a0)
-	custom->bltamod = bmpFont.Bpl - charW / 8;
-    118e:	subq.w #4,d6
-    1190:	move.w d6,100(a0)
-	custom->bltdmod = bmpDest.Bpl - charW / 8;
-    1194:	subq.w #4,d2
-    1196:	move.w d2,102(a0)
-	custom->bltsize = ((charH * bmpFont.Bpls) << 6) + (charW / 16);
-    119a:	moveq #11,d0
-    119c:	lsl.w d0,d5
-    119e:	addq.w #2,d5
-    11a0:	move.w d5,88(a0)
-    11a4:	bra.w 10a2 <main+0x102e>
-		if (BounceEnabled)
-    11a8:	move.w 1d98a <BounceEnabled>,d0
-    11ae:	beq.s 11be <main+0x114a>
-			ScrollerY = ScrollerMax;
-    11b0:	move.w #40,55ac <ScrollerY>
-			ScrollerDir = -1;
-    11b8:	st 55ae <ScrollerDir>
-		BounceEnabled = !BounceEnabled;
-    11be:	tst.w d0
-    11c0:	seq d0
-    11c2:	ext.w d0
-    11c4:	neg.w d0
-    11c6:	move.w d0,1d98a <BounceEnabled>
-		chr = Scrolltext[ScrolltextCnt++];
-    11cc:	addq.w #2,a0
-    11ce:	move.w a0,1d982 <ScrolltextCnt>
-    11d4:	andi.l #65535,d1
-    11da:	move.b (0,a5,d1.l),d0
-    11de:	move.w a0,d1
-	if (chr == 'm')
-    11e0:	cmpi.b #109,d0
-    11e4:	bne.w 1026 <main+0xfb2>
-    11e8:	bra.w 10b2 <main+0x103e>
-		else if (ScrollerY <= ScrollerMin)
-    11ec:	cmpa.w #0,a0
-    11f0:	bgt.w db8 <main+0xd44>
-			ScrollerY = ScrollerMin;
-    11f4:	clr.w 55ac <ScrollerY>
-			ScrollerDir = 1;
-    11fa:	move.b #1,55ae <ScrollerDir>
-		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
-    1202:	move.w 1da4a <BmpScroller+0xa>,d2
-	int BltOffs = startY * theDesc.Bplt;
-    1208:	move.w d2,d5
-    120a:	mulu.w #40,d5
-	int Brcorner = height * theDesc.Bplt - 2;
-    120e:	andi.l #65535,d2
-    1214:	lsl.l #5,d2
-    1216:	subq.l #2,d2
-	WaitBlit();
-    1218:	movea.l 1db48 <GfxBase>,a6
-    121e:	jsr -228(a6)
-	custom->bltcon0 = ((UWORD)speed << 12) + 0x9f0;
-    1222:	movea.l 1db52 <custom>,a0
-    1228:	move.w #18928,64(a0)
-	custom->bltcon1 = 0x0002;
-    122e:	move.w #2,66(a0)
-	custom->bltafwm = 0xffff;
-    1234:	move.w #-1,68(a0)
-	custom->bltalwm = 0xffff;
-    123a:	move.w #-1,70(a0)
-	custom->bltapt = theBitmap + BltOffs + Brcorner;
-    1240:	add.l d5,d2
-    1242:	add.l d2,d3
-    1244:	move.l d3,80(a0)
-	custom->bltdpt = theBitmap + BltOffs + Brcorner;
-    1248:	move.l d3,84(a0)
-	custom->bltamod = 0;
-    124c:	move.w #0,100(a0)
-	custom->bltdmod = 0;
-    1252:	move.w #0,102(a0)
-	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
-    1258:	moveq #11,d0
-    125a:	lsl.w d0,d4
-    125c:	move.w (a3),d0
-    125e:	lsr.w #4,d0
-    1260:	add.w d0,d4
-    1262:	move.w d4,88(a0)
-	ScrollCnt += speed;
-    1266:	move.w 1d984 <ScrollCnt>,d0
-    126c:	addq.w #4,d0
-    126e:	move.w d0,1d984 <ScrollCnt>
-	if (ScrollCnt >= 32)
-    1274:	cmpi.w #31,d0
-    1278:	bls.w e32 <main+0xdbe>
-    127c:	bra.w fd4 <main+0xf60>
-				ScrollerDir -= 1;
-    1280:	subq.b #1,d0
-				if (ScrollerDir < -4)
-    1282:	cmpi.b #-4,d0
-    1286:	bge.s 12ba <main+0x1246>
-					ScrollerDir = -4;
-    1288:	move.b #-4,55ae <ScrollerDir>
-    1290:	moveq #-4,d0
-			ScrollerY += ScrollerDir;
-    1292:	add.w d0,d5
-    1294:	move.w d5,55ac <ScrollerY>
-    129a:	bra.w da0 <main+0xd2c>
-				if (ScrollerDir < 1)
-    129e:	tst.b d0
-    12a0:	bgt.w 1388 <main+0x1314>
-					ScrollerDir = 1;
-    12a4:	move.b #1,55ae <ScrollerDir>
-    12ac:	moveq #1,d0
-			ScrollerY += ScrollerDir;
-    12ae:	add.w d0,d5
-    12b0:	move.w d5,55ac <ScrollerY>
-    12b6:	bra.w da0 <main+0xd2c>
-				if (ScrollerDir > -1)
-    12ba:	tst.b d0
-    12bc:	blt.w 1388 <main+0x1314>
-					ScrollerDir = -1;
-    12c0:	st 55ae <ScrollerDir>
-    12c6:	moveq #-1,d0
-			ScrollerY += ScrollerDir;
-    12c8:	add.w d0,d5
-    12ca:	move.w d5,55ac <ScrollerY>
-    12d0:	bra.w da0 <main+0xd2c>
-				 (BmpScroller.Bplt - Screen.Bpl) - (BmpScroller.Bplt * 2));
-    12d4:	movea.w d7,a6
-    12d6:	adda.w d7,a6
-    12d8:	sub.w a6,d4
-    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
-    12da:	move.w #264,(a0)
-    *copListEnd++ = modOdd;
-    12de:	move.w d4,2(a0)
-    *copListEnd++ = BPL2MOD; //even  planes 2,4
-    12e2:	move.w #266,4(a0)
-    *copListEnd++ = modEven;
-    12e8:	move.w d4,6(a0)
-		MirrorEnabled = !MirrorEnabled;
-    12ec:	tst.w d0
-    12ee:	seq d0
-    12f0:	ext.w d0
-    12f2:	neg.w d0
-    12f4:	move.w d0,1d980 <MirrorEnabled>
-		chr = Scrolltext[ScrolltextCnt++];
-    12fa:	move.w d1,d4
-    12fc:	addq.w #1,d4
-    12fe:	move.w d4,1d982 <ScrolltextCnt>
-    1304:	andi.l #65535,d1
-    130a:	move.b (0,a5,d1.l),d0
-    130e:	bra.w 1100 <main+0x108c>
-		KPrintF("p61Init failed!\n");
-    1312:	pea 334a <incbin_P61_Player_end+0x4a>
-    1318:	jsr (a5)
-    131a:	addq.l #4,sp
-	Point2D ps2 = {0, 32};
-    131c:	clr.l d2
-    131e:	moveq #32,d3
+     c08:	movea.l 213ee <VBR>,a3
+     c0e:	move.l #6372,108(a3)
+	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
+     c16:	move.w #-16352,154(a2)
+	custom->intreq = 1 << INTB_VERTB; //reset vbl req
+     c1c:	move.w #32,156(a2)
 	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
-    1320:	move.w 1dae0 <BmpLogo+0x4>,d5
-    1326:	move.w 1dae4 <BmpLogo+0x8>,d4
-    132c:	move.l 1daec <BmpLogo+0x10>,d6
-    1332:	movea.w 1dab0 <BmpUpperPart_PF1+0x8>,a1
-    1338:	move.l 1dab8 <BmpUpperPart_PF1+0x10>,d1
+     c22:	move.l 21572 <BmpLogo+0xe>,d2
 	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
-    133e:	movea.l 1db52 <custom>,a0
-    1344:	move.w 2(a0),d0
+     c28:	move.w 2(a2),d0
 	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
-    1348:	bra.w b6e <main+0xafa>
-		Exit(0);
-    134c:	suba.l a6,a6
-    134e:	moveq #0,d1
-    1350:	jsr -144(a6)
-    1354:	bra.w c2 <main+0x4e>
-		Exit(0);
-    1358:	movea.l 1db44 <DOSBase>,a6
-    135e:	moveq #0,d1
-    1360:	jsr -144(a6)
-	DOSBase = (struct DosLibrary *)OpenLibrary((CONST_STRPTR) "dos.library", 0);
-    1364:	movea.l 1db4c <SysBase>,a6
-    136a:	lea 3312 <incbin_P61_Player_end+0x12>,a1
-    1370:	moveq #0,d0
-    1372:	jsr -552(a6)
-    1376:	move.l d0,1db44 <DOSBase>
-	if (!DOSBase)
-    137c:	bne.w c2 <main+0x4e>
-    1380:	bra.s 134c <main+0x12d8>
-	APTR vbr = 0;
-    1382:	moveq #0,d0
-    1384:	bra.w 772 <main+0x6fe>
-				ScrollerDir -= 1;
-    1388:	move.b d0,55ae <ScrollerDir>
+     c2c:	move.w 2(a2),d0
+     c30:	btst #14,d0
+     c34:	bne.s c2c <main+0xbb8>
+	custom->bltcon0 = 0x09f0;
+     c36:	move.w #2544,64(a2)
+	custom->bltcon1 = 0x0000;
+     c3c:	move.w #0,66(a2)
+	custom->bltafwm = 0xffff;
+     c42:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+     c48:	move.w #-1,70(a2)
+	custom->bltamod = imgA.Bpl - (width / 8);
+     c4e:	addi.w #-32,d1
+     c52:	move.w d1,100(a2)
+	custom->bltdmod = imgD.Bpl - (width / 8);
+     c56:	addi.w #-32,d5
+     c5a:	move.w d5,102(a2)
+	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
+     c5e:	move.l d2,80(a2)
+	custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+     c62:	addq.l #4,d6
+     c64:	move.l d6,84(a2)
+	custom->bltsize = ((height * imgA.Bpls) << 6) + (width / 16);
+     c68:	move.w a4,d0
+     c6a:	lsl.w #6,d0
+     c6c:	adda.w d0,a4
+     c6e:	move.w a4,d0
+     c70:	lsl.w #7,d0
+     c72:	movea.w d0,a4
+     c74:	lea 16(a4),a4
+     c78:	move.w a4,88(a2)
+inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
+     c7c:	move.b bfe001 <_end+0xbdca25>,d0
+	while (!MouseLeft())
+     c82:	btst #6,d0
+     c86:	beq.w 16f2 <main+0x167e>
+     c8a:	move.w 214cc <BmpUpperPart_Buf1+0x4>,d0
+     c90:	move.w 214ce <BmpUpperPart_Buf1+0x6>,d3
+     c96:	move.l 214d6 <BmpUpperPart_Buf1+0xe>,d2
+				ScrollerDir = (ScrollerMax - ScrollerY) * 1000 / 12000;
+     c9c:	move.w 4000 <ScrollerY>,d1
+	short incY[6] = {3, 3, 2, 2, 5, 3};
+     ca2:	move.w #3,118(sp)
+     ca8:	move.w #5,120(sp)
+     cae:	move.w #2,116(sp)
+     cb4:	move.w #2,112(sp)
+     cba:	move.w #3,114(sp)
+     cc0:	move.w #3,122(sp)
+	short incX[6] = {4, 5, 6, 7, 8, 9};
+     cc6:	move.w #9,104(sp)
+     ccc:	move.w #8,106(sp)
+     cd2:	move.w #7,102(sp)
+     cd8:	move.w #6,108(sp)
+     cde:	move.w #5,100(sp)
+     ce4:	move.w #4,110(sp)
+	Point2D pdb[6] = {
+     cea:	movea.w #90,a1
+     cee:	move.l a1,66(sp)
+     cf2:	movea.w #28,a6
+     cf6:	move.l a6,62(sp)
+     cfa:	movea.w #50,a5
+     cfe:	move.l #160,70(sp)
+     d06:	movea.w #70,a4
+     d0a:	move.l a1,74(sp)
+     d0e:	movea.w #30,a6
+     d12:	move.l a6,78(sp)
+     d16:	movea.w #70,a1
+     d1a:	move.l a1,82(sp)
+     d1e:	movea.w #10,a6
+     d22:	move.l a6,58(sp)
+     d26:	movea.w #20,a1
+     d2a:	move.l a1,54(sp)
+     d2e:	clr.l 86(sp)
+     d32:	clr.l 90(sp)
+     d36:	lea 19de <BetterBlit.constprop.0.isra.0>,a3
+		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
+     d3c:	movea.l dff004 <_end+0xddda28>,a1
+     d42:	move.l a1,128(sp)
+		vpos &= 0x1ff00;
+     d46:	move.l 128(sp),d4
+     d4a:	andi.l #130816,d4
+     d50:	move.l d4,128(sp)
+		if (vpos != (311 << 8))
+     d54:	movea.l 128(sp),a1
+     d58:	cmpa.l #79616,a1
+     d5e:	beq.s d3c <main+0xcc8>
+		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
+     d60:	movea.l dff004 <_end+0xddda28>,a1
+     d66:	move.l a1,124(sp)
+		vpos &= 0x1ff00;
+     d6a:	move.l 124(sp),d4
+     d6e:	andi.l #130816,d4
+     d74:	move.l d4,124(sp)
+		if (vpos == (311 << 8))
+     d78:	movea.l 124(sp),a1
+     d7c:	cmpa.l #79616,a1
+     d82:	bne.s d60 <main+0xcec>
+		CopyBitmap(BmpUpperPart_Buf1, BmpUpperPart_PF2);
+     d84:	move.w 214ca <BmpUpperPart_Buf1+0x2>,d6
+	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
+     d8a:	movea.w 2(a2),a1
+	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
+     d8e:	move.w 2(a2),d5
+     d92:	move.w d5,d4
+     d94:	andi.w #16384,d4
+     d98:	btst #14,d5
+     d9c:	bne.s d8e <main+0xd1a>
+	custom->bltcon0 = 0x09f0;
+     d9e:	move.w #2544,64(a2)
+	custom->bltcon1 = 0x0000;
+     da4:	move.w #0,66(a2)
+	custom->bltapt = (UBYTE *)bmpS.ImageData;
+     daa:	move.l d2,80(a2)
+	custom->bltdpt = (UBYTE *)bmpD.ImageData;
+     dae:	move.l a0,84(a2)
+	custom->bltafwm = 0xffff;
+     db2:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+     db8:	move.w #-1,70(a2)
+	custom->bltamod = 0;
+     dbe:	move.w #0,100(a2)
+	custom->bltdmod = 0;
+     dc4:	move.w #0,102(a2)
+	custom->bltsize = ((bmpS.Height * bmpS.Bpls) << 6) + (bmpS.Bpl / 2);
+     dca:	muls.w d6,d0
+     dcc:	lsl.w #6,d0
+     dce:	lsr.w #1,d3
+     dd0:	add.w d0,d3
+     dd2:	move.w d3,88(a2)
+			pdb[b].X += incX[b];
+     dd6:	movea.l 90(sp),a2
+     dda:	move.w 110(sp),d3
+     dde:	movea.w d3,a0
+     de0:	lea (0,a0,a2.l),a2
+     de4:	move.l a2,90(sp)
+			pdb[b].Y += incY[b];
+     de8:	movea.l 86(sp),a2
+     dec:	move.w 122(sp),d3
+     df0:	movea.w d3,a0
+     df2:	lea (0,a0,a2.l),a2
+     df6:	move.l a2,86(sp)
+			if (pdb[b].X >= 320 - 32)
+     dfa:	cmpi.l #287,90(sp)
+     e02:	ble.w 169c <main+0x1628>
+				incX[b] *= -1;
+     e06:	neg.w 110(sp)
+				pdb[b].X = 320 - 32;
+     e0a:	move.l #288,90(sp)
+			if (pdb[b].Y >= 130 - 32)
+     e12:	moveq #97,d0
+     e14:	cmp.l 86(sp),d0
+     e18:	bge.w 1688 <main+0x1614>
+				incY[b] *= -1;
+     e1c:	neg.w 122(sp)
+				pdb[b].Y = 130 - 32;
+     e20:	movea.w #98,a2
+     e24:	move.l a2,86(sp)
+			pdb[b].X += incX[b];
+     e28:	movea.l 54(sp),a2
+     e2c:	move.w 100(sp),d3
+     e30:	movea.w d3,a0
+     e32:	lea (0,a0,a2.l),a2
+     e36:	move.l a2,54(sp)
+			pdb[b].Y += incY[b];
+     e3a:	movea.l 58(sp),a2
+     e3e:	move.w 114(sp),d3
+     e42:	movea.w d3,a0
+     e44:	lea (0,a0,a2.l),a2
+     e48:	move.l a2,58(sp)
+			if (pdb[b].X >= 320 - 32)
+     e4c:	cmpi.l #287,54(sp)
+     e54:	ble.w 1674 <main+0x1600>
+				incX[b] *= -1;
+     e58:	neg.w 100(sp)
+				pdb[b].X = 320 - 32;
+     e5c:	move.l #288,54(sp)
+			if (pdb[b].Y >= 130 - 32)
+     e64:	moveq #97,d0
+     e66:	cmp.l 58(sp),d0
+     e6a:	bge.w 1660 <main+0x15ec>
+				incY[b] *= -1;
+     e6e:	neg.w 114(sp)
+				pdb[b].Y = 130 - 32;
+     e72:	movea.w #98,a2
+     e76:	move.l a2,58(sp)
+			pdb[b].X += incX[b];
+     e7a:	movea.l 82(sp),a2
+     e7e:	move.w 108(sp),d3
+     e82:	movea.w d3,a0
+     e84:	lea (0,a0,a2.l),a2
+     e88:	move.l a2,82(sp)
+			pdb[b].Y += incY[b];
+     e8c:	movea.l 78(sp),a2
+     e90:	move.w 112(sp),d3
+     e94:	movea.w d3,a0
+     e96:	lea (0,a0,a2.l),a2
+     e9a:	move.l a2,78(sp)
+			if (pdb[b].X >= 320 - 32)
+     e9e:	cmpi.l #287,82(sp)
+     ea6:	ble.w 164c <main+0x15d8>
+				incX[b] *= -1;
+     eaa:	neg.w 108(sp)
+				pdb[b].X = 320 - 32;
+     eae:	move.l #288,82(sp)
+			if (pdb[b].Y >= 130 - 32)
+     eb6:	moveq #97,d0
+     eb8:	cmp.l 78(sp),d0
+     ebc:	bge.w 1638 <main+0x15c4>
+				incY[b] *= -1;
+     ec0:	neg.w 112(sp)
+				pdb[b].Y = 130 - 32;
+     ec4:	movea.w #98,a2
+     ec8:	move.l a2,78(sp)
+			pdb[b].X += incX[b];
+     ecc:	movea.l 74(sp),a2
+     ed0:	move.w 102(sp),d3
+     ed4:	movea.w d3,a0
+     ed6:	lea (0,a0,a2.l),a2
+     eda:	move.l a2,74(sp)
+			pdb[b].Y += incY[b];
+     ede:	movea.w 116(sp),a2
+     ee2:	movea.w a2,a6
+     ee4:	lea (0,a6,a4.l),a4
+			if (pdb[b].X >= 320 - 32)
+     ee8:	cmpi.l #287,74(sp)
+     ef0:	ble.w 1624 <main+0x15b0>
+				incX[b] *= -1;
+     ef4:	neg.w d3
+     ef6:	move.w d3,102(sp)
+				pdb[b].X = 320 - 32;
+     efa:	move.l #288,74(sp)
+			if (pdb[b].Y >= 130 - 32)
+     f02:	moveq #97,d0
+     f04:	cmp.l a4,d0
+     f06:	bge.w 1612 <main+0x159e>
+				incY[b] *= -1;
+     f0a:	neg.w 116(sp)
+				pdb[b].Y = 130 - 32;
+     f0e:	movea.w #98,a4
+			pdb[b].X += incX[b];
+     f12:	movea.l 70(sp),a2
+     f16:	move.w 106(sp),d3
+     f1a:	movea.w d3,a0
+     f1c:	lea (0,a0,a2.l),a2
+     f20:	move.l a2,70(sp)
+			pdb[b].Y += incY[b];
+     f24:	movea.w 120(sp),a2
+     f28:	movea.w a2,a6
+     f2a:	lea (0,a6,a5.l),a5
+			if (pdb[b].X >= 320 - 32)
+     f2e:	cmpi.l #287,70(sp)
+     f36:	ble.w 15fe <main+0x158a>
+				incX[b] *= -1;
+     f3a:	neg.w d3
+     f3c:	move.w d3,106(sp)
+				pdb[b].X = 320 - 32;
+     f40:	move.l #288,70(sp)
+			if (pdb[b].Y >= 130 - 32)
+     f48:	moveq #97,d0
+     f4a:	cmp.l a5,d0
+     f4c:	bge.w 15ec <main+0x1578>
+				incY[b] *= -1;
+     f50:	neg.w 120(sp)
+				pdb[b].Y = 130 - 32;
+     f54:	movea.w #98,a5
+			pdb[b].X += incX[b];
+     f58:	movea.l 62(sp),a2
+     f5c:	move.w 104(sp),d3
+     f60:	movea.w d3,a0
+     f62:	lea (0,a0,a2.l),a2
+     f66:	move.l a2,62(sp)
+			pdb[b].Y += incY[b];
+     f6a:	movea.l 66(sp),a2
+     f6e:	move.w 118(sp),d3
+     f72:	movea.w d3,a0
+     f74:	lea (0,a0,a2.l),a2
+     f78:	move.l a2,66(sp)
+			if (pdb[b].X >= 320 - 32)
+     f7c:	cmpi.l #287,62(sp)
+     f84:	ble.w 15d8 <main+0x1564>
+				incX[b] *= -1;
+     f88:	neg.w 104(sp)
+				pdb[b].X = 320 - 32;
+     f8c:	move.l #288,62(sp)
+			if (pdb[b].Y >= 130 - 32)
+     f94:	moveq #97,d0
+     f96:	cmp.l 66(sp),d0
+     f9a:	bge.w 15c4 <main+0x1550>
+				incY[b] *= -1;
+     f9e:	neg.w 118(sp)
+				pdb[b].Y = 130 - 32;
+     fa2:	movea.w #98,a2
+     fa6:	move.l a2,66(sp)
+		if (BounceEnabled)
+     faa:	tst.w 213de <BounceEnabled>
+     fb0:	beq.s ff2 <main+0xf7e>
+			if (ScrollerDir > 0)
+     fb2:	move.b 4002 <ScrollerDir>,d0
+     fb8:	ble.w 16b0 <main+0x163c>
+				ScrollerDir = (ScrollerMax - ScrollerY) * 1000 / 12000;
+     fbc:	pea c <_start+0xc>
+     fc0:	movea.w #40,a6
+     fc4:	suba.w d1,a6
+     fc6:	move.l a6,-(sp)
+     fc8:	move.l d1,54(sp)
+     fcc:	jsr 1dd6 <__divsi3>
+     fd2:	addq.l #8,sp
+				if (ScrollerDir > 6)
+     fd4:	move.l 46(sp),d1
+     fd8:	cmpi.b #6,d0
+     fdc:	ble.w 16d0 <main+0x165c>
+					ScrollerDir = 6;
+     fe0:	move.b #6,4002 <ScrollerDir>
+     fe8:	moveq #6,d0
 			ScrollerY += ScrollerDir;
-    138e:	ext.w d0
-    1390:	add.w d0,d5
-    1392:	move.w d5,55ac <ScrollerY>
-    1398:	bra.w da0 <main+0xd2c>
+     fea:	add.w d0,d1
+     fec:	move.w d1,4000 <ScrollerY>
+		if (ScrollerY >= ScrollerMax)
+     ff2:	movea.w d1,a0
+     ff4:	cmpi.w #39,d1
+     ff8:	ble.w 1528 <main+0x14b4>
+			ScrollerY = ScrollerMax;
+     ffc:	move.w #40,4000 <ScrollerY>
+			ScrollerDir = -1;
+    1004:	st 4002 <ScrollerDir>
+	int BltOffs = startY * theDesc.Bplt;
+    100a:	move.w d7,d2
+    100c:	mulu.w #40,d2
+	int Brcorner = height * theDesc.Bplt - 2;
+    1010:	moveq #0,d0
+    1012:	move.w d7,d0
+    1014:	lsl.l #5,d0
+    1016:	move.l d0,d7
+    1018:	subq.l #2,d7
+	WaitBlit();
+    101a:	movea.l 215ce <GfxBase>,a6
+    1020:	jsr -228(a6)
+	custom->bltcon0 = ((UWORD)speed << 12) + 0x9f0;
+    1024:	movea.l 215d8 <custom>,a2
+    102a:	move.w #18928,64(a2)
+	custom->bltcon1 = 0x0002;
+    1030:	move.w #2,66(a2)
+	custom->bltafwm = 0xffff;
+    1036:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+    103c:	move.w #-1,70(a2)
+	custom->bltapt = theBitmap + BltOffs + Brcorner;
+    1042:	move.l d2,d0
+    1044:	add.l d7,d0
+    1046:	add.l 94(sp),d0
+    104a:	move.l d0,80(a2)
+	custom->bltdpt = theBitmap + BltOffs + Brcorner;
+    104e:	move.l d0,84(a2)
+	custom->bltamod = 0;
+    1052:	move.w #0,100(a2)
+	custom->bltdmod = 0;
+    1058:	move.w #0,102(a2)
+	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
+    105e:	move.w 98(sp),d0
+    1062:	moveq #11,d1
+    1064:	lsl.w d1,d0
+    1066:	lea 21494 <BmpScroller>,a0
+    106c:	move.w (a0),d1
+    106e:	lsr.w #4,d1
+    1070:	add.w d1,d0
+    1072:	move.w d0,88(a2)
+	ScrollCnt += speed;
+    1076:	move.w 213d8 <ScrollCnt>,d0
+    107c:	addq.w #4,d0
+    107e:	move.w d0,213d8 <ScrollCnt>
+	if (ScrollCnt >= 32)
+    1084:	cmpi.w #31,d0
+    1088:	bhi.w 12ee <main+0x127a>
+		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
+    108c:	move.w 2149a <BmpScroller+0x6>,d5
+    1092:	move.l 214a2 <BmpScroller+0xe>,94(sp)
+    109a:	move.w 4000 <ScrollerY>,d1
+    10a0:	move.w 21498 <BmpScroller+0x4>,98(sp)
+    10a8:	moveq #0,d6
+    10aa:	move.w 98(sp),d6
+    10ae:	movea.l 213da <copScrollerBmpP>,a6
+    10b4:	andi.l #65535,d5
+    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
+    10ba:	move.l d5,-(sp)
+    10bc:	movea.w d1,a0
+    10be:	move.l a0,-(sp)
+    10c0:	move.l d1,54(sp)
+    10c4:	jsr 1d58 <__mulsi3>
+    10ca:	addq.l #4,sp
+    10cc:	move.l d6,(sp)
+    10ce:	move.l d0,-(sp)
+    10d0:	jsr 1d58 <__mulsi3>
+    10d6:	addq.l #8,sp
+    10d8:	add.l 94(sp),d0
+        addr += Bpl;
+    10dc:	move.w #224,d2
     for (USHORT i = 0; i < numPlanes; i++)
-    139c:	movea.l a0,a1
-    139e:	bra.w 96c <main+0x8f8>
-    13a2:	nop
+    10e0:	move.l 46(sp),d1
+    10e4:	tst.l d6
+    10e6:	beq.s 1110 <main+0x109c>
+        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]);
+    10e8:	move.w d2,(a6)
+        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
+    10ea:	move.l d0,d3
+    10ec:	clr.w d3
+    10ee:	swap d3
+    10f0:	move.w d3,2(a6)
+        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]) + 2;
+    10f4:	move.w d2,d3
+    10f6:	addq.w #2,d3
+    10f8:	move.w d3,4(a6)
+        *copListEnd++ = (UWORD)addr; // high-word of adress
+    10fc:	addq.l #8,a6
+    10fe:	move.w d0,-2(a6)
+        addr += Bpl;
+    1102:	add.l d5,d0
+    for (USHORT i = 0; i < numPlanes; i++)
+    1104:	addq.w #1,d4
+    1106:	addq.w #4,d2
+    1108:	moveq #0,d3
+    110a:	move.w d4,d3
+    110c:	cmp.l d6,d3
+    110e:	blt.s 10e8 <main+0x1074>
+		ClearBitmap(BmpUpperPart_Buf1, 130);
+    1110:	lea 214c8 <BmpUpperPart_Buf1>,a1
+    1116:	movea.w (a1),a0
+    1118:	move.w 214cc <BmpUpperPart_Buf1+0x4>,d0
+    111e:	move.l 214d6 <BmpUpperPart_Buf1+0xe>,d2
+	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
+    1124:	movea.w 2(a2),a1
+	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
+    1128:	move.w 2(a2),d3
+    112c:	btst #14,d3
+    1130:	bne.s 1128 <main+0x10b4>
+	custom->bltcon0 = 0x0900;
+    1132:	move.w #2304,64(a2)
+	custom->bltcon1 = 0x0000;
+    1138:	move.w #0,66(a2)
+	custom->bltapt = (UBYTE *)bmpD.ImageData;
+    113e:	move.l d2,80(a2)
+	custom->bltdpt = (UBYTE *)bmpD.ImageData;
+    1142:	move.l d2,84(a2)
+	custom->bltafwm = 0xffff;
+    1146:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+    114c:	move.w #-1,70(a2)
+	custom->bltamod = 0;
+    1152:	move.w #0,100(a2)
+	custom->bltdmod = 0;
+    1158:	move.w #0,102(a2)
+	custom->bltsize = ((lines * bmpD.Bpls) << 6) + (bmpD.Width / 16);
+    115e:	move.w d0,d3
+    1160:	lsl.w #6,d3
+    1162:	add.w d0,d3
+    1164:	lsl.w #7,d3
+    1166:	move.w a0,d4
+    1168:	lsr.w #4,d4
+    116a:	movea.w d4,a0
+    116c:	adda.w d3,a0
+    116e:	move.w a0,88(a2)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[0], 32, 32);
+    1172:	move.w 21430 <BmpCookie+0x4>,d4
+    1178:	move.w 21432 <BmpCookie+0x6>,d5
+    117e:	move.w 21434 <BmpCookie+0x8>,d6
+    1184:	move.l 2143a <BmpCookie+0xe>,d7
+    118a:	move.w 214ce <BmpUpperPart_Buf1+0x6>,d3
+    1190:	movea.w 214d0 <BmpUpperPart_Buf1+0x8>,a6
+    1196:	move.l 90(sp),132(sp)
+    119c:	move.l 86(sp),136(sp)
+    11a2:	move.l 136(sp),-(sp)
+    11a6:	move.l 136(sp),-(sp)
+    11aa:	clr.l -(sp)
+    11ac:	clr.l -(sp)
+    11ae:	move.l d2,-(sp)
+    11b0:	move.l a6,-(sp)
+    11b2:	move.l d3,-(sp)
+    11b4:	move.l d7,-(sp)
+    11b6:	move.l d6,-(sp)
+    11b8:	move.l d5,-(sp)
+    11ba:	move.l d4,-(sp)
+    11bc:	move.l d0,94(sp)
+    11c0:	move.l d1,90(sp)
+    11c4:	jsr (a3)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[1], 32, 32);
+    11c6:	move.l 98(sp),184(sp)
+    11cc:	move.l 102(sp),188(sp)
+    11d2:	lea 44(sp),sp
+    11d6:	move.l 144(sp),-(sp)
+    11da:	move.l 144(sp),-(sp)
+    11de:	clr.l -(sp)
+    11e0:	clr.l -(sp)
+    11e2:	move.l d2,-(sp)
+    11e4:	move.l a6,-(sp)
+    11e6:	move.l d3,-(sp)
+    11e8:	move.l d7,-(sp)
+    11ea:	move.l d6,-(sp)
+    11ec:	move.l d5,-(sp)
+    11ee:	move.l d4,-(sp)
+    11f0:	jsr (a3)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[2], 32, 32);
+    11f2:	move.l 126(sp),192(sp)
+    11f8:	move.l 122(sp),196(sp)
+    11fe:	lea 44(sp),sp
+    1202:	move.l 152(sp),-(sp)
+    1206:	move.l 152(sp),-(sp)
+    120a:	clr.l -(sp)
+    120c:	clr.l -(sp)
+    120e:	move.l d2,-(sp)
+    1210:	move.l a6,-(sp)
+    1212:	move.l d3,-(sp)
+    1214:	move.l d7,-(sp)
+    1216:	move.l d6,-(sp)
+    1218:	move.l d5,-(sp)
+    121a:	move.l d4,-(sp)
+    121c:	jsr (a3)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[3], 32, 32);
+    121e:	move.l 118(sp),200(sp)
+    1224:	move.l a4,204(sp)
+    1228:	lea 44(sp),sp
+    122c:	move.l 160(sp),-(sp)
+    1230:	move.l 160(sp),-(sp)
+    1234:	clr.l -(sp)
+    1236:	clr.l -(sp)
+    1238:	move.l d2,-(sp)
+    123a:	move.l a6,-(sp)
+    123c:	move.l d3,-(sp)
+    123e:	move.l d7,-(sp)
+    1240:	move.l d6,-(sp)
+    1242:	move.l d5,-(sp)
+    1244:	move.l d4,-(sp)
+    1246:	jsr (a3)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[4], 32, 32);
+    1248:	move.l 114(sp),208(sp)
+    124e:	move.l a5,212(sp)
+    1252:	lea 44(sp),sp
+    1256:	move.l 168(sp),-(sp)
+    125a:	move.l 168(sp),-(sp)
+    125e:	clr.l -(sp)
+    1260:	clr.l -(sp)
+    1262:	move.l d2,-(sp)
+    1264:	move.l a6,-(sp)
+    1266:	move.l d3,-(sp)
+    1268:	move.l d7,-(sp)
+    126a:	move.l d6,-(sp)
+    126c:	move.l d5,-(sp)
+    126e:	move.l d4,-(sp)
+    1270:	jsr (a3)
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, ps2, pdb[5], 32, 32);
+    1272:	move.l 106(sp),216(sp)
+    1278:	move.l 110(sp),220(sp)
+    127e:	lea 44(sp),sp
+    1282:	move.l 176(sp),-(sp)
+    1286:	move.l 176(sp),-(sp)
+    128a:	clr.l -(sp)
+    128c:	clr.l -(sp)
+    128e:	move.l d2,-(sp)
+    1290:	move.l a6,-(sp)
+    1292:	move.l d3,-(sp)
+    1294:	move.l d7,-(sp)
+    1296:	move.l d6,-(sp)
+    1298:	move.l d5,-(sp)
+    129a:	move.l d4,-(sp)
+    129c:	jsr (a3)
+inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
+    129e:	move.b bfe001 <_end+0xbdca25>,d4
+	while (!MouseLeft())
+    12a4:	lea 44(sp),sp
+    12a8:	move.l 50(sp),d0
+    12ac:	move.l 46(sp),d1
+    12b0:	btst #6,d4
+    12b4:	beq.w 16ec <main+0x1678>
+    12b8:	movea.l 2150a <BmpUpperPart_PF2+0xe>,a0
+    12be:	move.w 2149c <BmpScroller+0x8>,d7
+		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
+    12c4:	movea.l dff004 <_end+0xddda28>,a1
+    12ca:	move.l a1,128(sp)
+		vpos &= 0x1ff00;
+    12ce:	move.l 128(sp),d4
+    12d2:	andi.l #130816,d4
+    12d8:	move.l d4,128(sp)
+		if (vpos != (311 << 8))
+    12dc:	movea.l 128(sp),a1
+    12e0:	cmpa.l #79616,a1
+    12e6:	beq.w d3c <main+0xcc8>
+    12ea:	bra.w d60 <main+0xcec>
+		ScrollCnt = 0;
+    12ee:	clr.w 213d8 <ScrollCnt>
+		PlotChar(BmpFont32, (UBYTE *)BmpFont32P, BmpScroller, (UBYTE *)BmpScroller.ImageData, startY, 32, 32);
+    12f4:	move.l 214a2 <BmpScroller+0xe>,94(sp)
+    12fc:	move.w 21464 <BmpFont32+0x4>,d3
+    1302:	move.w 21466 <BmpFont32+0x6>,d6
+    1308:	movea.w 21468 <BmpFont32+0x8>,a1
+    130e:	move.w 2149a <BmpScroller+0x6>,d5
+    1314:	move.w 2149c <BmpScroller+0x8>,d7
+	UBYTE chr = Scrolltext[ScrolltextCnt++];
+    131a:	movea.w 213d6 <ScrolltextCnt>,a0
+    1320:	move.w a0,d1
+    1322:	addq.w #1,d1
+    1324:	move.w d1,213d6 <ScrolltextCnt>
+    132a:	moveq #0,d0
+    132c:	move.w a0,d0
+    132e:	lea 38e6 <Scrolltext>,a6
+    1334:	move.b (0,a6,d0.l),d0
+	if (chr == 'b')
+    1338:	cmpi.b #98,d0
+    133c:	beq.w 14de <main+0x146a>
+	if (chr == 'm')
+    1340:	cmpi.b #109,d0
+    1344:	beq.w 13dc <main+0x1368>
+	if (chr == 0)
+    1348:	tst.b d0
+    134a:	bne.w 1436 <main+0x13c2>
+		chr = Scrolltext[ScrolltextCnt++];
+    134e:	move.w #1,213d6 <ScrolltextCnt>
+    1356:	moveq #0,d2
+    1358:	moveq #4,d1
+	source = (row * bmpFont.Bplt * charH) + (col << 2);
+    135a:	move.l d1,-(sp)
+    135c:	move.w a1,-(sp)
+    135e:	clr.w -(sp)
+    1360:	jsr 1d58 <__mulsi3>
+    1366:	addq.l #8,sp
+    1368:	lsl.l #5,d0
+    136a:	add.l d0,d2
+	dest = (plotY * bmpDest.Bplt) + (Screen.Bpl);
+    136c:	mulu.w #40,d7
+    1370:	moveq #0,d0
+    1372:	move.w 2159e <Screen+0x6>,d0
+    1378:	add.l d0,d7
+	WaitBlit();
+    137a:	movea.l 215ce <GfxBase>,a6
+    1380:	jsr -228(a6)
+	custom->bltcon0 = 0x09f0;
+    1384:	movea.l 215d8 <custom>,a2
+    138a:	move.w #2544,64(a2)
+	custom->bltcon1 = 0x0000;
+    1390:	move.w #0,66(a2)
+	custom->bltafwm = 0xffff;
+    1396:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+    139c:	move.w #-1,70(a2)
+	custom->bltapt = bmpFontP + source;
+    13a2:	addi.l #28870,d2
+    13a8:	move.l d2,80(a2)
+	custom->bltdpt = bmpDestP + dest;
+    13ac:	add.l 94(sp),d7
+    13b0:	move.l d7,84(a2)
+	custom->bltamod = bmpFont.Bpl - charW / 8;
+    13b4:	subq.w #4,d6
+    13b6:	move.w d6,100(a2)
+	custom->bltdmod = bmpDest.Bpl - charW / 8;
+    13ba:	subq.w #4,d5
+    13bc:	move.w d5,102(a2)
+	custom->bltsize = ((charH * bmpFont.Bpls) << 6) + (charW / 16);
+    13c0:	moveq #11,d0
+    13c2:	lsl.w d0,d3
+    13c4:	addq.w #2,d3
+    13c6:	move.w d3,88(a2)
+		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
+    13ca:	move.w 2149a <BmpScroller+0x6>,d5
+    13d0:	move.l 214a2 <BmpScroller+0xe>,94(sp)
+    13d8:	bra.w 109a <main+0x1026>
+		if (MirrorEnabled)
+    13dc:	move.w 213d4 <MirrorEnabled>,d0
+				 BmpScroller.Bplt - Screen.Bpl);
+    13e2:	move.w d7,d2
+    13e4:	sub.w 2159e <Screen+0x6>,d2
+	copSetBplMod(0, copMirrorBmpP,
+    13ea:	movea.l 213d0 <copMirrorBmpP>,a0
+		if (MirrorEnabled)
+    13f0:	tst.w d0
+    13f2:	beq.w 1848 <main+0x17d4>
+    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
+    13f6:	move.w #264,(a0)
+    *copListEnd++ = modOdd;
+    13fa:	move.w d2,2(a0)
+    *copListEnd++ = BPL2MOD; //even  planes 2,4
+    13fe:	move.w #266,4(a0)
+    *copListEnd++ = modEven;
+    1404:	move.w d2,6(a0)
+		MirrorEnabled = !MirrorEnabled;
+    1408:	tst.w d0
+    140a:	seq d0
+    140c:	ext.w d0
+    140e:	neg.w d0
+    1410:	move.w d0,213d4 <MirrorEnabled>
+		chr = Scrolltext[ScrolltextCnt++];
+    1416:	move.w d1,d0
+    1418:	addq.w #1,d0
+    141a:	move.w d0,213d6 <ScrolltextCnt>
+    1420:	andi.l #65535,d1
+    1426:	lea 38e6 <Scrolltext>,a0
+    142c:	move.b (0,a0,d1.l),d0
+	if (chr == 0)
+    1430:	tst.b d0
+    1432:	beq.w 134e <main+0x12da>
+	if (chr < 32 || chr > (32 + 80))
+    1436:	addi.b #-32,d0
+    143a:	cmpi.b #80,d0
+    143e:	bhi.w 109a <main+0x1026>
+	row = chr / 10;
+    1442:	andi.w #255,d0
+    1446:	move.w d0,d2
+    1448:	mulu.w #-13107,d2
+    144c:	clr.w d2
+    144e:	swap d2
+    1450:	lsr.w #3,d2
+    1452:	moveq #0,d1
+    1454:	move.b d2,d1
+	col = chr % 10;
+    1456:	movea.w d2,a0
+    1458:	adda.w d2,a0
+    145a:	adda.w a0,a0
+    145c:	adda.w d2,a0
+    145e:	adda.w a0,a0
+    1460:	sub.w a0,d0
+    1462:	moveq #0,d2
+    1464:	move.b d0,d2
+	source = (row * bmpFont.Bplt * charH) + (col << 2);
+    1466:	add.l d2,d2
+    1468:	add.l d2,d2
+    146a:	move.l d1,-(sp)
+    146c:	move.w a1,-(sp)
+    146e:	clr.w -(sp)
+    1470:	jsr 1d58 <__mulsi3>
+    1476:	addq.l #8,sp
+    1478:	lsl.l #5,d0
+    147a:	add.l d0,d2
+	dest = (plotY * bmpDest.Bplt) + (Screen.Bpl);
+    147c:	mulu.w #40,d7
+    1480:	moveq #0,d0
+    1482:	move.w 2159e <Screen+0x6>,d0
+    1488:	add.l d0,d7
+	WaitBlit();
+    148a:	movea.l 215ce <GfxBase>,a6
+    1490:	jsr -228(a6)
+	custom->bltcon0 = 0x09f0;
+    1494:	movea.l 215d8 <custom>,a2
+    149a:	move.w #2544,64(a2)
+	custom->bltcon1 = 0x0000;
+    14a0:	move.w #0,66(a2)
+	custom->bltafwm = 0xffff;
+    14a6:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+    14ac:	move.w #-1,70(a2)
+	custom->bltapt = bmpFontP + source;
+    14b2:	addi.l #28870,d2
+    14b8:	move.l d2,80(a2)
+	custom->bltdpt = bmpDestP + dest;
+    14bc:	add.l 94(sp),d7
+    14c0:	move.l d7,84(a2)
+	custom->bltamod = bmpFont.Bpl - charW / 8;
+    14c4:	subq.w #4,d6
+    14c6:	move.w d6,100(a2)
+	custom->bltdmod = bmpDest.Bpl - charW / 8;
+    14ca:	subq.w #4,d5
+    14cc:	move.w d5,102(a2)
+	custom->bltsize = ((charH * bmpFont.Bpls) << 6) + (charW / 16);
+    14d0:	moveq #11,d0
+    14d2:	lsl.w d0,d3
+    14d4:	addq.w #2,d3
+    14d6:	move.w d3,88(a2)
+    14da:	bra.w 13ca <main+0x1356>
+		if (BounceEnabled)
+    14de:	move.w 213de <BounceEnabled>,d0
+    14e4:	beq.s 14f4 <main+0x1480>
+			ScrollerY = ScrollerMax;
+    14e6:	move.w #40,4000 <ScrollerY>
+			ScrollerDir = -1;
+    14ee:	st 4002 <ScrollerDir>
+		BounceEnabled = !BounceEnabled;
+    14f4:	tst.w d0
+    14f6:	seq d0
+    14f8:	ext.w d0
+    14fa:	neg.w d0
+    14fc:	move.w d0,213de <BounceEnabled>
+		chr = Scrolltext[ScrolltextCnt++];
+    1502:	addq.w #2,a0
+    1504:	move.w a0,213d6 <ScrolltextCnt>
+    150a:	andi.l #65535,d1
+    1510:	lea 38e6 <Scrolltext>,a6
+    1516:	move.b (0,a6,d1.l),d0
+    151a:	move.w a0,d1
+	if (chr == 'm')
+    151c:	cmpi.b #109,d0
+    1520:	bne.w 1348 <main+0x12d4>
+    1524:	bra.w 13dc <main+0x1368>
+		else if (ScrollerY <= ScrollerMin)
+    1528:	cmpa.w #0,a0
+    152c:	bgt.w 100a <main+0xf96>
+			ScrollerY = ScrollerMin;
+    1530:	clr.w 4000 <ScrollerY>
+			ScrollerDir = 1;
+    1536:	move.b #1,4002 <ScrollerDir>
+	int BltOffs = startY * theDesc.Bplt;
+    153e:	move.w d7,d2
+    1540:	mulu.w #40,d2
+	int Brcorner = height * theDesc.Bplt - 2;
+    1544:	moveq #0,d0
+    1546:	move.w d7,d0
+    1548:	lsl.l #5,d0
+    154a:	move.l d0,d7
+    154c:	subq.l #2,d7
+	WaitBlit();
+    154e:	movea.l 215ce <GfxBase>,a6
+    1554:	jsr -228(a6)
+	custom->bltcon0 = ((UWORD)speed << 12) + 0x9f0;
+    1558:	movea.l 215d8 <custom>,a2
+    155e:	move.w #18928,64(a2)
+	custom->bltcon1 = 0x0002;
+    1564:	move.w #2,66(a2)
+	custom->bltafwm = 0xffff;
+    156a:	move.w #-1,68(a2)
+	custom->bltalwm = 0xffff;
+    1570:	move.w #-1,70(a2)
+	custom->bltapt = theBitmap + BltOffs + Brcorner;
+    1576:	move.l d2,d0
+    1578:	add.l d7,d0
+    157a:	add.l 94(sp),d0
+    157e:	move.l d0,80(a2)
+	custom->bltdpt = theBitmap + BltOffs + Brcorner;
+    1582:	move.l d0,84(a2)
+	custom->bltamod = 0;
+    1586:	move.w #0,100(a2)
+	custom->bltdmod = 0;
+    158c:	move.w #0,102(a2)
+	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
+    1592:	move.w 98(sp),d0
+    1596:	moveq #11,d1
+    1598:	lsl.w d1,d0
+    159a:	lea 21494 <BmpScroller>,a0
+    15a0:	move.w (a0),d1
+    15a2:	lsr.w #4,d1
+    15a4:	add.w d1,d0
+    15a6:	move.w d0,88(a2)
+	ScrollCnt += speed;
+    15aa:	move.w 213d8 <ScrollCnt>,d0
+    15b0:	addq.w #4,d0
+    15b2:	move.w d0,213d8 <ScrollCnt>
+	if (ScrollCnt >= 32)
+    15b8:	cmpi.w #31,d0
+    15bc:	bls.w 108c <main+0x1018>
+    15c0:	bra.w 12ee <main+0x127a>
+			if (pdb[b].Y <= 0)
+    15c4:	tst.l 66(sp)
+    15c8:	bgt.w faa <main+0xf36>
+				incY[b] *= -1;
+    15cc:	neg.w 118(sp)
+				pdb[b].Y = 0;
+    15d0:	clr.l 66(sp)
+    15d4:	bra.w faa <main+0xf36>
+			if (pdb[b].X <= 0)
+    15d8:	tst.l 62(sp)
+    15dc:	bgt.w f94 <main+0xf20>
+				incX[b] *= -1;
+    15e0:	neg.w 104(sp)
+				pdb[b].X = 0;
+    15e4:	clr.l 62(sp)
+    15e8:	bra.w f94 <main+0xf20>
+			if (pdb[b].Y <= 0)
+    15ec:	cmpa.w #0,a5
+    15f0:	bgt.w f58 <main+0xee4>
+				incY[b] *= -1;
+    15f4:	neg.w 120(sp)
+				pdb[b].Y = 0;
+    15f8:	suba.l a5,a5
+    15fa:	bra.w f58 <main+0xee4>
+			if (pdb[b].X <= 0)
+    15fe:	tst.l 70(sp)
+    1602:	bgt.w f48 <main+0xed4>
+				incX[b] *= -1;
+    1606:	neg.w 106(sp)
+				pdb[b].X = 0;
+    160a:	clr.l 70(sp)
+    160e:	bra.w f48 <main+0xed4>
+			if (pdb[b].Y <= 0)
+    1612:	cmpa.w #0,a4
+    1616:	bgt.w f12 <main+0xe9e>
+				incY[b] *= -1;
+    161a:	neg.w 116(sp)
+				pdb[b].Y = 0;
+    161e:	suba.l a4,a4
+    1620:	bra.w f12 <main+0xe9e>
+			if (pdb[b].X <= 0)
+    1624:	tst.l 74(sp)
+    1628:	bgt.w f02 <main+0xe8e>
+				incX[b] *= -1;
+    162c:	neg.w 102(sp)
+				pdb[b].X = 0;
+    1630:	clr.l 74(sp)
+    1634:	bra.w f02 <main+0xe8e>
+			if (pdb[b].Y <= 0)
+    1638:	tst.l 78(sp)
+    163c:	bgt.w ecc <main+0xe58>
+				incY[b] *= -1;
+    1640:	neg.w 112(sp)
+				pdb[b].Y = 0;
+    1644:	clr.l 78(sp)
+    1648:	bra.w ecc <main+0xe58>
+			if (pdb[b].X <= 0)
+    164c:	tst.l 82(sp)
+    1650:	bgt.w eb6 <main+0xe42>
+				incX[b] *= -1;
+    1654:	neg.w 108(sp)
+				pdb[b].X = 0;
+    1658:	clr.l 82(sp)
+    165c:	bra.w eb6 <main+0xe42>
+			if (pdb[b].Y <= 0)
+    1660:	tst.l 58(sp)
+    1664:	bgt.w e7a <main+0xe06>
+				incY[b] *= -1;
+    1668:	neg.w 114(sp)
+				pdb[b].Y = 0;
+    166c:	clr.l 58(sp)
+    1670:	bra.w e7a <main+0xe06>
+			if (pdb[b].X <= 0)
+    1674:	tst.l 54(sp)
+    1678:	bgt.w e64 <main+0xdf0>
+				incX[b] *= -1;
+    167c:	neg.w 100(sp)
+				pdb[b].X = 0;
+    1680:	clr.l 54(sp)
+    1684:	bra.w e64 <main+0xdf0>
+			if (pdb[b].Y <= 0)
+    1688:	tst.l 86(sp)
+    168c:	bgt.w e28 <main+0xdb4>
+				incY[b] *= -1;
+    1690:	neg.w 122(sp)
+				pdb[b].Y = 0;
+    1694:	clr.l 86(sp)
+    1698:	bra.w e28 <main+0xdb4>
+			if (pdb[b].X <= 0)
+    169c:	tst.l 90(sp)
+    16a0:	bgt.w e12 <main+0xd9e>
+				incX[b] *= -1;
+    16a4:	neg.w 110(sp)
+				pdb[b].X = 0;
+    16a8:	clr.l 90(sp)
+    16ac:	bra.w e12 <main+0xd9e>
+				ScrollerDir -= 1;
+    16b0:	subq.b #1,d0
+				if (ScrollerDir < -4)
+    16b2:	cmpi.b #-4,d0
+    16b6:	bge.w 182e <main+0x17ba>
+					ScrollerDir = -4;
+    16ba:	move.b #-4,4002 <ScrollerDir>
+    16c2:	moveq #-4,d0
+			ScrollerY += ScrollerDir;
+    16c4:	add.w d0,d1
+    16c6:	move.w d1,4000 <ScrollerY>
+    16cc:	bra.w ff2 <main+0xf7e>
+				if (ScrollerDir < 1)
+    16d0:	tst.b d0
+    16d2:	bgt.w 18c8 <main+0x1854>
+					ScrollerDir = 1;
+    16d6:	move.b #1,4002 <ScrollerDir>
+    16de:	moveq #1,d0
+			ScrollerY += ScrollerDir;
+    16e0:	add.w d0,d1
+    16e2:	move.w d1,4000 <ScrollerY>
+    16e8:	bra.w ff2 <main+0xf7e>
+    16ec:	movea.l 213f2 <copPtr>,a1
+	FreeMem(copPtr, 1024);
+    16f2:	movea.l 215d2 <SysBase>,a6
+    16f8:	move.l #1024,d0
+    16fe:	jsr -210(a6)
+	FreeMem((UBYTE *)BmpScroller.ImageData, BmpScroller.Btot);
+    1702:	movea.l 215d2 <SysBase>,a6
+    1708:	movea.l 214a2 <BmpScroller+0xe>,a1
+    170e:	moveq #0,d0
+    1710:	move.w 214a0 <BmpScroller+0xc>,d0
+    1716:	jsr -210(a6)
+	FreeMem((UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Btot);
+    171a:	movea.l 215d2 <SysBase>,a6
+    1720:	movea.l 2153e <BmpUpperPart_PF1+0xe>,a1
+    1726:	moveq #0,d0
+    1728:	move.w 2153c <BmpUpperPart_PF1+0xc>,d0
+    172e:	jsr -210(a6)
+	FreeMem((UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Btot);
+    1732:	movea.l 215d2 <SysBase>,a6
+    1738:	movea.l 2150a <BmpUpperPart_PF2+0xe>,a1
+    173e:	moveq #0,d0
+    1740:	move.w 21508 <BmpUpperPart_PF2+0xc>,d0
+    1746:	jsr -210(a6)
+	WaitVbl();
+    174a:	jsr 1926 <WaitVbl>
+	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
+    1750:	movea.l 215d8 <custom>,a0
+    1756:	move.w 2(a0),d0
+	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
+    175a:	move.w 2(a0),d0
+    175e:	btst #14,d0
+    1762:	bne.s 175a <main+0x16e6>
+	custom->intena = 0x7fff; //disable all interrupts
+    1764:	move.w #32767,154(a0)
+	custom->intreq = 0x7fff; //Clear any interrupts that were pending
+    176a:	move.w #32767,156(a0)
+	custom->dmacon = 0x7fff; //Clear all DMA channels
+    1770:	move.w #32767,150(a0)
+	*(volatile APTR *)(((UBYTE *)VBR) + 0x6c) = interrupt;
+    1776:	movea.l 213ee <VBR>,a1
+    177c:	move.l 213ea <SystemIrq>,108(a1)
+	custom->cop1lc = (ULONG)GfxBase->copinit;
+    1784:	movea.l 215ce <GfxBase>,a6
+    178a:	move.l 38(a6),128(a0)
+	custom->cop2lc = (ULONG)GfxBase->LOFlist;
+    1790:	move.l 50(a6),132(a0)
+	custom->copjmp1 = 0x7fff; //start coppper
+    1796:	move.w #32767,136(a0)
+	custom->intena = SystemInts | 0x8000;
+    179c:	move.w 213e8 <SystemInts>,d0
+    17a2:	ori.w #-32768,d0
+    17a6:	move.w d0,154(a0)
+	custom->dmacon = SystemDMA | 0x8000;
+    17aa:	move.w 213e6 <SystemDMA>,d0
+    17b0:	ori.w #-32768,d0
+    17b4:	move.w d0,150(a0)
+	custom->adkcon = SystemADKCON | 0x8000;
+    17b8:	move.w 213e4 <SystemADKCON>,d0
+    17be:	ori.w #-32768,d0
+    17c2:	move.w d0,158(a0)
+	LoadView(ActiView);
+    17c6:	movea.l 213e0 <ActiView>,a1
+    17cc:	jsr -222(a6)
+	WaitTOF();
+    17d0:	movea.l 215ce <GfxBase>,a6
+    17d6:	jsr -270(a6)
+	WaitTOF();
+    17da:	movea.l 215ce <GfxBase>,a6
+    17e0:	jsr -270(a6)
+	WaitBlit();
+    17e4:	movea.l 215ce <GfxBase>,a6
+    17ea:	jsr -228(a6)
+	DisownBlitter();
+    17ee:	movea.l 215ce <GfxBase>,a6
+    17f4:	jsr -462(a6)
+	Enable();
+    17f8:	movea.l 215d2 <SysBase>,a6
+    17fe:	jsr -126(a6)
+	CloseLibrary((struct Library *)DOSBase);
+    1802:	movea.l 215d2 <SysBase>,a6
+    1808:	movea.l 215ca <DOSBase>,a1
+    180e:	jsr -414(a6)
+	CloseLibrary((struct Library *)GfxBase);
+    1812:	movea.l 215d2 <SysBase>,a6
+    1818:	movea.l 215ce <GfxBase>,a1
+    181e:	jsr -414(a6)
+}
+    1822:	moveq #0,d0
+    1824:	movem.l (sp)+,d2-d7/a2-a6
+    1828:	lea 136(sp),sp
+    182c:	rts
+				if (ScrollerDir > -1)
+    182e:	tst.b d0
+    1830:	blt.w 18c8 <main+0x1854>
+					ScrollerDir = -1;
+    1834:	st 4002 <ScrollerDir>
+    183a:	moveq #-1,d0
+			ScrollerY += ScrollerDir;
+    183c:	add.w d0,d1
+    183e:	move.w d1,4000 <ScrollerY>
+    1844:	bra.w ff2 <main+0xf7e>
+				 (BmpScroller.Bplt - Screen.Bpl) - (BmpScroller.Bplt * 2));
+    1848:	movea.w d7,a6
+    184a:	adda.w d7,a6
+    184c:	sub.w a6,d2
+    *copListEnd++ = BPL1MOD; //odd planes   1,3,5
+    184e:	move.w #264,(a0)
+    *copListEnd++ = modOdd;
+    1852:	move.w d2,2(a0)
+    *copListEnd++ = BPL2MOD; //even  planes 2,4
+    1856:	move.w #266,4(a0)
+    *copListEnd++ = modEven;
+    185c:	move.w d2,6(a0)
+		MirrorEnabled = !MirrorEnabled;
+    1860:	tst.w d0
+    1862:	seq d0
+    1864:	ext.w d0
+    1866:	neg.w d0
+    1868:	move.w d0,213d4 <MirrorEnabled>
+		chr = Scrolltext[ScrolltextCnt++];
+    186e:	move.w d1,d0
+    1870:	addq.w #1,d0
+    1872:	move.w d0,213d6 <ScrolltextCnt>
+    1878:	andi.l #65535,d1
+    187e:	lea 38e6 <Scrolltext>,a0
+    1884:	move.b (0,a0,d1.l),d0
+    1888:	bra.w 1430 <main+0x13bc>
+		Exit(0);
+    188c:	suba.l a6,a6
+    188e:	moveq #0,d1
+    1890:	jsr -144(a6)
+    1894:	bra.w c2 <main+0x4e>
+		Exit(0);
+    1898:	movea.l 215ca <DOSBase>,a6
+    189e:	moveq #0,d1
+    18a0:	jsr -144(a6)
+	DOSBase = (struct DosLibrary *)OpenLibrary((CONST_STRPTR) "dos.library", 0);
+    18a4:	movea.l 215d2 <SysBase>,a6
+    18aa:	lea 38ae <incbin_P61_Player_end+0x12>,a1
+    18b0:	moveq #0,d0
+    18b2:	jsr -552(a6)
+    18b6:	move.l d0,215ca <DOSBase>
+	if (!DOSBase)
+    18bc:	bne.w c2 <main+0x4e>
+    18c0:	bra.s 188c <main+0x1818>
+	APTR vbr = 0;
+    18c2:	moveq #0,d0
+    18c4:	bra.w 85c <main+0x7e8>
+				ScrollerDir -= 1;
+    18c8:	move.b d0,4002 <ScrollerDir>
+			ScrollerY += ScrollerDir;
+    18ce:	ext.w d0
+    18d0:	add.w d0,d1
+    18d2:	move.w d1,4000 <ScrollerY>
+    18d8:	bra.w ff2 <main+0xf7e>
+    for (USHORT i = 0; i < numPlanes; i++)
+    18dc:	movea.l a2,a6
+    18de:	bra.w a5c <main+0x9e8>
+    18e2:	nop
 
-000013a4 <interruptHandler>:
+000018e4 <interruptHandler>:
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
 
 static __attribute__((interrupt)) void interruptHandler()
 {
-    13a4:	movem.l d0/a0/a3/a6,-(sp)
+    18e4:	movem.l d0/a0/a3/a6,-(sp)
 
     custom->intreq = (1 << INTB_VERTB);
-    13a8:	movea.l 1db52 <custom>,a0
-    13ae:	move.w #32,156(a0)
+    18e8:	movea.l 215d8 <custom>,a0
+    18ee:	move.w #32,156(a0)
     custom->intreq = (1 << INTB_VERTB); //reset vbl req. twice for a4000 bug.
-    13b4:	move.w #32,156(a0)
+    18f4:	move.w #32,156(a0)
 	register volatile const void *_a3 ASM("a3") = P61_Player;
-    13ba:	lea 199a <incbin_P61_Player_start>,a3
+    18fa:	lea 1f36 <incbin_P61_Player_start>,a3
 	register volatile const void *_a6 ASM("a6") = (void *)0xdff000;
-    13c0:	movea.l #14675968,a6
+    1900:	movea.l #14675968,a6
 	__asm volatile(
-    13c6:	movem.l d0-a2/a4-a5,-(sp)
-    13ca:	jsr 4(a3)
-    13ce:	movem.l (sp)+,d0-a2/a4-a5
+    1906:	movem.l d0-a2/a4-a5,-(sp)
+    190a:	jsr 4(a3)
+    190e:	movem.l (sp)+,d0-a2/a4-a5
 
     // DEMO - ThePlayer
     p61Music();
 
     // DEMO - increment frameCounter
     frameCounter++;
-    13d2:	move.w 1db50 <frameCounter>,d0
-    13d8:	addq.w #1,d0
-    13da:	move.w d0,1db50 <frameCounter>
+    1912:	move.w 215d6 <frameCounter>,d0
+    1918:	addq.w #1,d0
+    191a:	move.w d0,215d6 <frameCounter>
 }
-    13e0:	movem.l (sp)+,d0/a0/a3/a6
-    13e4:	rte
+    1920:	movem.l (sp)+,d0/a0/a3/a6
+    1924:	rte
 
-000013e6 <WaitVbl>:
+00001926 <WaitVbl>:
 {
-    13e6:	subq.l #8,sp
+    1926:	subq.l #8,sp
 		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
-    13e8:	move.l dff004 <_end+0xde14ac>,d0
-    13ee:	move.l d0,(sp)
+    1928:	move.l dff004 <_end+0xddda28>,d0
+    192e:	move.l d0,(sp)
 		vpos &= 0x1ff00;
-    13f0:	move.l (sp),d0
-    13f2:	andi.l #130816,d0
-    13f8:	move.l d0,(sp)
+    1930:	move.l (sp),d0
+    1932:	andi.l #130816,d0
+    1938:	move.l d0,(sp)
 		if (vpos != (311 << 8))
-    13fa:	move.l (sp),d0
-    13fc:	cmpi.l #79616,d0
-    1402:	beq.s 13e8 <WaitVbl+0x2>
+    193a:	move.l (sp),d0
+    193c:	cmpi.l #79616,d0
+    1942:	beq.s 1928 <WaitVbl+0x2>
 		volatile ULONG vpos = *(volatile ULONG *)0xDFF004;
-    1404:	move.l dff004 <_end+0xde14ac>,d0
-    140a:	move.l d0,4(sp)
+    1944:	move.l dff004 <_end+0xddda28>,d0
+    194a:	move.l d0,4(sp)
 		vpos &= 0x1ff00;
-    140e:	move.l 4(sp),d0
-    1412:	andi.l #130816,d0
-    1418:	move.l d0,4(sp)
+    194e:	move.l 4(sp),d0
+    1952:	andi.l #130816,d0
+    1958:	move.l d0,4(sp)
 		if (vpos == (311 << 8))
-    141c:	move.l 4(sp),d0
-    1420:	cmpi.l #79616,d0
-    1426:	bne.s 1404 <WaitVbl+0x1e>
+    195c:	move.l 4(sp),d0
+    1960:	cmpi.l #79616,d0
+    1966:	bne.s 1944 <WaitVbl+0x1e>
 }
-    1428:	addq.l #8,sp
-    142a:	rts
+    1968:	addq.l #8,sp
+    196a:	rts
 
-0000142c <KPrintF>:
+0000196c <KPrintF>:
 void KPrintF(const char* fmt, ...) {
-    142c:	lea -128(sp),sp
-    1430:	movem.l a2-a3/a6,-(sp)
+    196c:	lea -128(sp),sp
+    1970:	movem.l a2-a3/a6,-(sp)
 	if(*((UWORD *)UaeDbgLog) == 0x4eb9 || *((UWORD *)UaeDbgLog) == 0xa00e) {
-    1434:	move.w f0ff60 <_end+0xef2408>,d0
-    143a:	cmpi.w #20153,d0
-    143e:	beq.s 146a <KPrintF+0x3e>
-    1440:	cmpi.w #-24562,d0
-    1444:	beq.s 146a <KPrintF+0x3e>
+    1974:	move.w f0ff60 <_end+0xeee984>,d0
+    197a:	cmpi.w #20153,d0
+    197e:	beq.s 19aa <KPrintF+0x3e>
+    1980:	cmpi.w #-24562,d0
+    1984:	beq.s 19aa <KPrintF+0x3e>
 		RawDoFmt((CONST_STRPTR)fmt, vl, KPutCharX, 0);
-    1446:	movea.l 1db4c <SysBase>,a6
-    144c:	movea.l 144(sp),a0
-    1450:	lea 148(sp),a1
-    1454:	lea 18b6 <KPutCharX>,a2
-    145a:	suba.l a3,a3
-    145c:	jsr -522(a6)
+    1986:	movea.l 215d2 <SysBase>,a6
+    198c:	movea.l 144(sp),a0
+    1990:	lea 148(sp),a1
+    1994:	lea 1e52 <KPutCharX>,a2
+    199a:	suba.l a3,a3
+    199c:	jsr -522(a6)
 }
-    1460:	movem.l (sp)+,a2-a3/a6
-    1464:	lea 128(sp),sp
-    1468:	rts
+    19a0:	movem.l (sp)+,a2-a3/a6
+    19a4:	lea 128(sp),sp
+    19a8:	rts
 		RawDoFmt((CONST_STRPTR)fmt, vl, PutChar, temp);
-    146a:	movea.l 1db4c <SysBase>,a6
-    1470:	movea.l 144(sp),a0
-    1474:	lea 148(sp),a1
-    1478:	lea 18c4 <PutChar>,a2
-    147e:	lea 12(sp),a3
-    1482:	jsr -522(a6)
+    19aa:	movea.l 215d2 <SysBase>,a6
+    19b0:	movea.l 144(sp),a0
+    19b4:	lea 148(sp),a1
+    19b8:	lea 1e60 <PutChar>,a2
+    19be:	lea 12(sp),a3
+    19c2:	jsr -522(a6)
 		UaeDbgLog(86, temp);
-    1486:	move.l a3,-(sp)
-    1488:	pea 56 <_start+0x56>
-    148c:	jsr f0ff60 <_end+0xef2408>
-    1492:	addq.l #8,sp
+    19c6:	move.l a3,-(sp)
+    19c8:	pea 56 <_start+0x56>
+    19cc:	jsr f0ff60 <_end+0xeee984>
+    19d2:	addq.l #8,sp
 }
-    1494:	movem.l (sp)+,a2-a3/a6
-    1498:	lea 128(sp),sp
-    149c:	rts
+    19d4:	movem.l (sp)+,a2-a3/a6
+    19d8:	lea 128(sp),sp
+    19dc:	rts
 
-0000149e <BetterBlit.constprop.0.isra.0>:
+000019de <BetterBlit.constprop.0.isra.0>:
 void BetterBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
-    149e:	move.l a2,-(sp)
-    14a0:	move.l d2,-(sp)
-    14a2:	move.l 48(sp),d2
-    14a6:	movea.l 52(sp),a0
+    19de:	movem.l d2-d7/a2,-(sp)
+    19e2:	move.l 68(sp),d2
+    19e6:	move.l 72(sp),d1
 	UWORD tst = *(volatile UWORD *)&custom->dmaconr; //for compatiblity a1000
-    14aa:	movea.l 1db52 <custom>,a2
-    14b0:	move.w 2(a2),d0
+    19ea:	movea.l 215d8 <custom>,a2
+    19f0:	move.w 2(a2),d0
 	while (*(volatile UWORD *)&custom->dmaconr & (1 << 14))
-    14b4:	move.w 2(a2),d0
-    14b8:	btst #14,d0
-    14bc:	bne.s 14b4 <BetterBlit.constprop.0.isra.0+0x16>
-	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | x << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
-    14be:	move.w #4042,64(a2)
-	custom->bltcon1 = x << BSHIFTSHIFT;
-    14c4:	move.w #0,66(a2)
+    19f4:	move.w 2(a2),d0
+    19f8:	btst #14,d0
+    19fc:	bne.s 19f4 <BetterBlit.constprop.0.isra.0+0x16>
+	BYTE shift = startD.X % 16;
+    19fe:	move.l d2,d4
+    1a00:	andi.l #-2147483633,d4
+    1a06:	tst.l d2
+    1a08:	blt.w 1b26 <BetterBlit.constprop.0.isra.0+0x148>
+    1a0c:	moveq #15,d6
+    1a0e:	and.l d2,d6
+	if (shift)
+    1a10:	beq.w 1acc <BetterBlit.constprop.0.isra.0+0xee>
+    1a14:	moveq #3,d3
+    1a16:	moveq #6,d5
+	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | (shift) << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
+    1a18:	move.l d4,d0
+    1a1a:	moveq #12,d7
+    1a1c:	lsl.l d7,d0
+    1a1e:	ori.w #4042,d0
+    1a22:	move.w d0,64(a2)
+	custom->bltcon1 = (shift) << BSHIFTSHIFT;
+    1a26:	move.w d4,d0
+    1a28:	lsl.w d7,d0
+    1a2a:	move.w d0,66(a2)
 	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
-    14ca:	moveq #0,d0
-    14cc:	move.w 22(sp),d0
-    14d0:	lsl.l #5,d0
-    14d2:	add.l 24(sp),d0
-    14d6:	move.l d0,80(a2)
+    1a2e:	move.l 44(sp),80(a2)
 	custom->bltamod = imgA.Bpl - (width / 8);
-    14da:	move.w 18(sp),d0
-    14de:	subq.w #4,d0
-    14e0:	move.w d0,100(a2)
+    1a34:	move.w 38(sp),d0
+    1a38:	sub.w d5,d0
+    1a3a:	move.w d0,100(a2)
 	custom->bltbpt = (UBYTE *)BmpCookieMask.ImageData + (startA.Y * BmpCookieMask.Bpl) + (startA.X / 8);
-    14e4:	move.w 1d9ac <BmpCookieMask+0x8>,d1
-    14ea:	moveq #0,d0
-    14ec:	move.w d1,d0
-    14ee:	lsl.l #5,d0
-    14f0:	add.l 1d9b4 <BmpCookieMask+0x10>,d0
-    14f6:	move.l d0,76(a2)
+    1a3e:	move.l 21406 <BmpCookieMask+0xe>,76(a2)
 	custom->bltbmod = BmpCookieMask.Bpl - (width / 8);
-    14fa:	subq.w #4,d1
-    14fc:	move.w d1,98(a2)
-	custom->bltcpt = custom->bltdpt =  (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
-    1500:	move.l a0,-(sp)
-    1502:	move.w 38(sp),-(sp)
-    1506:	clr.w -(sp)
-    1508:	jsr 17bc <__mulsi3>
-    150e:	addq.l #8,sp
-    1510:	move.l d2,d1
-    1512:	bmi.s 1554 <BetterBlit.constprop.0.isra.0+0xb6>
-    1514:	asr.l #3,d1
-    1516:	add.l d1,d0
-    1518:	add.l 36(sp),d0
-    151c:	move.l d0,84(a2)
-    1520:	move.l d0,72(a2)
+    1a46:	move.w 213fe <BmpCookieMask+0x6>,d0
+    1a4c:	sub.w d5,d0
+    1a4e:	move.w d0,98(a2)
+	custom->bltcpt = custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+    1a52:	move.l d1,-(sp)
+    1a54:	move.w 58(sp),-(sp)
+    1a58:	clr.w -(sp)
+    1a5a:	jsr 1d58 <__mulsi3>
+    1a60:	addq.l #8,sp
+    1a62:	tst.l d2
+    1a64:	blt.w 1b20 <BetterBlit.constprop.0.isra.0+0x142>
+    1a68:	asr.l #3,d2
+    1a6a:	add.l d0,d2
+    1a6c:	add.l 56(sp),d2
+    1a70:	move.l d2,84(a2)
+    1a74:	move.l d2,72(a2)
 	custom->bltcmod = custom->bltdmod = imgD.Bpl - (width / 8);
-    1524:	move.w 30(sp),d0
-    1528:	subq.w #4,d0
-    152a:	move.w d0,102(a2)
-    152e:	move.w d0,96(a2)
+    1a78:	move.w 50(sp),d0
+    1a7c:	sub.w d5,d0
+    1a7e:	move.w d0,102(a2)
+    1a82:	move.w d0,96(a2)
 	custom->bltafwm = 0xffff;
-    1532:	move.w #-1,68(a2)
-	custom->bltalwm = 0xffff;
-    1538:	move.w #-1,70(a2)
+    1a86:	move.w #-1,68(a2)
+	custom->bltalwm = shift ? 0xffff << (15 - shift) : 0xffff;
+    1a8c:	tst.l d6
+    1a8e:	beq.s 1ab2 <BetterBlit.constprop.0.isra.0+0xd4>
+    1a90:	moveq #15,d1
+    1a92:	sub.l d4,d1
+    1a94:	moveq #0,d0
+    1a96:	not.w d0
+    1a98:	lsl.l d1,d0
+    1a9a:	move.w d0,70(a2)
 	custom->bltsize = ((height * imgA.Bpls) << HSIZEBITS) | (width / 16);
-    153e:	move.w 14(sp),d0
-    1542:	moveq #11,d1
-    1544:	lsl.w d1,d0
-    1546:	ori.w #2,d0
-    154a:	move.w d0,88(a2)
+    1a9e:	move.w 34(sp),d0
+    1aa2:	moveq #11,d1
+    1aa4:	lsl.w d1,d0
+    1aa6:	or.w d3,d0
+    1aa8:	move.w d0,88(a2)
 }
-    154e:	move.l (sp)+,d2
-    1550:	movea.l (sp)+,a2
-    1552:	rts
-	custom->bltcpt = custom->bltdpt =  (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
-    1554:	addq.l #7,d1
-    1556:	asr.l #3,d1
-    1558:	add.l d1,d0
-    155a:	add.l 36(sp),d0
-    155e:	move.l d0,84(a2)
-    1562:	move.l d0,72(a2)
-	custom->bltcmod = custom->bltdmod = imgD.Bpl - (width / 8);
-    1566:	move.w 30(sp),d0
-    156a:	subq.w #4,d0
-    156c:	move.w d0,102(a2)
-    1570:	move.w d0,96(a2)
-	custom->bltafwm = 0xffff;
-    1574:	move.w #-1,68(a2)
-	custom->bltalwm = 0xffff;
-    157a:	move.w #-1,70(a2)
+    1aac:	movem.l (sp)+,d2-d7/a2
+    1ab0:	rts
+	custom->bltalwm = shift ? 0xffff << (15 - shift) : 0xffff;
+    1ab2:	moveq #-1,d0
+    1ab4:	move.w d0,70(a2)
 	custom->bltsize = ((height * imgA.Bpls) << HSIZEBITS) | (width / 16);
-    1580:	move.w 14(sp),d0
-    1584:	moveq #11,d1
-    1586:	lsl.w d1,d0
-    1588:	ori.w #2,d0
-    158c:	move.w d0,88(a2)
+    1ab8:	move.w 34(sp),d0
+    1abc:	moveq #11,d1
+    1abe:	lsl.w d1,d0
+    1ac0:	or.w d3,d0
+    1ac2:	move.w d0,88(a2)
 }
-    1590:	move.l (sp)+,d2
-    1592:	movea.l (sp)+,a2
-    1594:	rts
+    1ac6:	movem.l (sp)+,d2-d7/a2
+    1aca:	rts
+	if (shift)
+    1acc:	moveq #2,d3
+    1ace:	moveq #4,d5
+	custom->bltcon0 = 0xca | SRCA | SRCB | SRCC | DEST | (shift) << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
+    1ad0:	move.l d4,d0
+    1ad2:	moveq #12,d7
+    1ad4:	lsl.l d7,d0
+    1ad6:	ori.w #4042,d0
+    1ada:	move.w d0,64(a2)
+	custom->bltcon1 = (shift) << BSHIFTSHIFT;
+    1ade:	move.w d4,d0
+    1ae0:	lsl.w d7,d0
+    1ae2:	move.w d0,66(a2)
+	custom->bltapt = (UBYTE *)imgA.ImageData + (startA.Y * imgA.Bplt) + (startA.X / 8);
+    1ae6:	move.l 44(sp),80(a2)
+	custom->bltamod = imgA.Bpl - (width / 8);
+    1aec:	move.w 38(sp),d0
+    1af0:	sub.w d5,d0
+    1af2:	move.w d0,100(a2)
+	custom->bltbpt = (UBYTE *)BmpCookieMask.ImageData + (startA.Y * BmpCookieMask.Bpl) + (startA.X / 8);
+    1af6:	move.l 21406 <BmpCookieMask+0xe>,76(a2)
+	custom->bltbmod = BmpCookieMask.Bpl - (width / 8);
+    1afe:	move.w 213fe <BmpCookieMask+0x6>,d0
+    1b04:	sub.w d5,d0
+    1b06:	move.w d0,98(a2)
+	custom->bltcpt = custom->bltdpt = (UBYTE *)imgD.ImageData + (startD.Y * imgD.Bplt) + (startD.X / 8);
+    1b0a:	move.l d1,-(sp)
+    1b0c:	move.w 58(sp),-(sp)
+    1b10:	clr.w -(sp)
+    1b12:	jsr 1d58 <__mulsi3>
+    1b18:	addq.l #8,sp
+    1b1a:	tst.l d2
+    1b1c:	bge.w 1a68 <BetterBlit.constprop.0.isra.0+0x8a>
+    1b20:	addq.l #7,d2
+    1b22:	bra.w 1a68 <BetterBlit.constprop.0.isra.0+0x8a>
+	BYTE shift = startD.X % 16;
+    1b26:	subq.l #1,d4
+    1b28:	moveq #-16,d0
+    1b2a:	or.l d0,d4
+    1b2c:	addq.l #1,d4
+    1b2e:	bra.w 1a0c <BetterBlit.constprop.0.isra.0+0x2e>
 
-00001596 <strlen>:
+00001b32 <strlen>:
 unsigned long strlen(const char* s) {
-    1596:	movea.l 4(sp),a0
+    1b32:	movea.l 4(sp),a0
 	unsigned long t=0;
-    159a:	moveq #0,d0
+    1b36:	moveq #0,d0
 	while(*s++)
-    159c:	tst.b (a0)
-    159e:	beq.s 15a8 <strlen+0x12>
+    1b38:	tst.b (a0)
+    1b3a:	beq.s 1b44 <strlen+0x12>
 		t++;
-    15a0:	addq.l #1,d0
+    1b3c:	addq.l #1,d0
 	while(*s++)
-    15a2:	tst.b (0,a0,d0.l)
-    15a6:	bne.s 15a0 <strlen+0xa>
+    1b3e:	tst.b (0,a0,d0.l)
+    1b42:	bne.s 1b3c <strlen+0xa>
 }
-    15a8:	rts
+    1b44:	rts
 
-000015aa <memset>:
+00001b46 <memset>:
 	void* memset(void *dest, int val, unsigned long len) {
-    15aa:	movem.l d2-d7/a2-a3,-(sp)
-    15ae:	move.l 36(sp),d0
-    15b2:	move.l 40(sp),d4
-    15b6:	movea.l 44(sp),a1
+    1b46:	movem.l d2-d7/a2-a3,-(sp)
+    1b4a:	move.l 36(sp),d0
+    1b4e:	move.l 40(sp),d4
+    1b52:	movea.l 44(sp),a1
 	while(len-- > 0)
-    15ba:	move.l a1,d5
-    15bc:	subq.l #1,d5
-    15be:	cmpa.w #0,a1
-    15c2:	beq.w 1672 <memset+0xc8>
+    1b56:	move.l a1,d5
+    1b58:	subq.l #1,d5
+    1b5a:	cmpa.w #0,a1
+    1b5e:	beq.w 1c0e <memset+0xc8>
 		*ptr++ = val;
-    15c6:	move.b d4,d7
-    15c8:	move.l d0,d1
-    15ca:	neg.l d1
-    15cc:	moveq #3,d2
-    15ce:	and.l d2,d1
-    15d0:	moveq #5,d6
-    15d2:	movea.l d0,a2
-    15d4:	cmp.l d5,d6
-    15d6:	bcc.s 1642 <memset+0x98>
-    15d8:	tst.l d1
-    15da:	beq.s 1600 <memset+0x56>
-    15dc:	move.b d4,(a2)+
+    1b62:	move.b d4,d7
+    1b64:	move.l d0,d1
+    1b66:	neg.l d1
+    1b68:	moveq #3,d2
+    1b6a:	and.l d2,d1
+    1b6c:	moveq #5,d6
+    1b6e:	movea.l d0,a2
+    1b70:	cmp.l d5,d6
+    1b72:	bcc.s 1bde <memset+0x98>
+    1b74:	tst.l d1
+    1b76:	beq.s 1b9c <memset+0x56>
+    1b78:	move.b d4,(a2)+
 	while(len-- > 0)
-    15de:	subq.l #1,d5
-    15e0:	moveq #1,d2
-    15e2:	cmp.l d1,d2
-    15e4:	beq.s 1600 <memset+0x56>
+    1b7a:	subq.l #1,d5
+    1b7c:	moveq #1,d2
+    1b7e:	cmp.l d1,d2
+    1b80:	beq.s 1b9c <memset+0x56>
 		*ptr++ = val;
-    15e6:	movea.l d0,a2
-    15e8:	addq.l #2,a2
-    15ea:	movea.l d0,a0
-    15ec:	move.b d4,1(a0)
+    1b82:	movea.l d0,a2
+    1b84:	addq.l #2,a2
+    1b86:	movea.l d0,a0
+    1b88:	move.b d4,1(a0)
 	while(len-- > 0)
-    15f0:	subq.l #1,d5
-    15f2:	moveq #3,d2
-    15f4:	cmp.l d1,d2
-    15f6:	bne.s 1600 <memset+0x56>
+    1b8c:	subq.l #1,d5
+    1b8e:	moveq #3,d2
+    1b90:	cmp.l d1,d2
+    1b92:	bne.s 1b9c <memset+0x56>
 		*ptr++ = val;
-    15f8:	addq.l #1,a2
-    15fa:	move.b d4,2(a0)
+    1b94:	addq.l #1,a2
+    1b96:	move.b d4,2(a0)
 	while(len-- > 0)
-    15fe:	subq.l #1,d5
-    1600:	move.l a1,d3
-    1602:	sub.l d1,d3
-    1604:	moveq #0,d6
-    1606:	move.b d4,d6
-    1608:	move.l d6,d2
-    160a:	swap d2
-    160c:	clr.w d2
-    160e:	movea.l d2,a0
-    1610:	move.l d4,d2
-    1612:	lsl.w #8,d2
-    1614:	swap d2
-    1616:	clr.w d2
-    1618:	lsl.l #8,d6
-    161a:	movea.l d6,a3
-    161c:	move.l a0,d6
-    161e:	or.l d6,d2
-    1620:	move.l a3,d6
-    1622:	or.l d6,d2
-    1624:	move.b d7,d2
-    1626:	movea.l d0,a0
-    1628:	adda.l d1,a0
-    162a:	moveq #-4,d1
-    162c:	and.l d3,d1
-    162e:	add.l a0,d1
+    1b9a:	subq.l #1,d5
+    1b9c:	move.l a1,d3
+    1b9e:	sub.l d1,d3
+    1ba0:	moveq #0,d6
+    1ba2:	move.b d4,d6
+    1ba4:	move.l d6,d2
+    1ba6:	swap d2
+    1ba8:	clr.w d2
+    1baa:	movea.l d2,a0
+    1bac:	move.l d4,d2
+    1bae:	lsl.w #8,d2
+    1bb0:	swap d2
+    1bb2:	clr.w d2
+    1bb4:	lsl.l #8,d6
+    1bb6:	movea.l d6,a3
+    1bb8:	move.l a0,d6
+    1bba:	or.l d6,d2
+    1bbc:	move.l a3,d6
+    1bbe:	or.l d6,d2
+    1bc0:	move.b d7,d2
+    1bc2:	movea.l d0,a0
+    1bc4:	adda.l d1,a0
+    1bc6:	moveq #-4,d1
+    1bc8:	and.l d3,d1
+    1bca:	add.l a0,d1
 		*ptr++ = val;
-    1630:	move.l d2,(a0)+
+    1bcc:	move.l d2,(a0)+
 	while(len-- > 0)
-    1632:	cmpa.l d1,a0
-    1634:	bne.s 1630 <memset+0x86>
-    1636:	moveq #-4,d1
-    1638:	and.l d3,d1
-    163a:	adda.l d1,a2
-    163c:	sub.l d1,d5
-    163e:	cmp.l d3,d1
-    1640:	beq.s 1672 <memset+0xc8>
+    1bce:	cmpa.l d1,a0
+    1bd0:	bne.s 1bcc <memset+0x86>
+    1bd2:	moveq #-4,d1
+    1bd4:	and.l d3,d1
+    1bd6:	adda.l d1,a2
+    1bd8:	sub.l d1,d5
+    1bda:	cmp.l d3,d1
+    1bdc:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    1642:	move.b d4,(a2)
+    1bde:	move.b d4,(a2)
 	while(len-- > 0)
-    1644:	tst.l d5
-    1646:	beq.s 1672 <memset+0xc8>
+    1be0:	tst.l d5
+    1be2:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    1648:	move.b d4,1(a2)
+    1be4:	move.b d4,1(a2)
 	while(len-- > 0)
-    164c:	moveq #1,d1
-    164e:	cmp.l d5,d1
-    1650:	beq.s 1672 <memset+0xc8>
+    1be8:	moveq #1,d1
+    1bea:	cmp.l d5,d1
+    1bec:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    1652:	move.b d4,2(a2)
+    1bee:	move.b d4,2(a2)
 	while(len-- > 0)
-    1656:	moveq #2,d2
-    1658:	cmp.l d5,d2
-    165a:	beq.s 1672 <memset+0xc8>
+    1bf2:	moveq #2,d2
+    1bf4:	cmp.l d5,d2
+    1bf6:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    165c:	move.b d4,3(a2)
+    1bf8:	move.b d4,3(a2)
 	while(len-- > 0)
-    1660:	moveq #3,d6
-    1662:	cmp.l d5,d6
-    1664:	beq.s 1672 <memset+0xc8>
+    1bfc:	moveq #3,d6
+    1bfe:	cmp.l d5,d6
+    1c00:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    1666:	move.b d4,4(a2)
+    1c02:	move.b d4,4(a2)
 	while(len-- > 0)
-    166a:	subq.l #4,d5
-    166c:	beq.s 1672 <memset+0xc8>
+    1c06:	subq.l #4,d5
+    1c08:	beq.s 1c0e <memset+0xc8>
 		*ptr++ = val;
-    166e:	move.b d4,5(a2)
+    1c0a:	move.b d4,5(a2)
 }
-    1672:	movem.l (sp)+,d2-d7/a2-a3
-    1676:	rts
+    1c0e:	movem.l (sp)+,d2-d7/a2-a3
+    1c12:	rts
 
-00001678 <memcpy>:
+00001c14 <memcpy>:
 void* memcpy(void *dest, const void *src, unsigned long len) {
-    1678:	movem.l d2-d6,-(sp)
-    167c:	move.l 24(sp),d0
-    1680:	move.l 28(sp),d1
-    1684:	move.l 32(sp),d3
+    1c14:	movem.l d2-d6,-(sp)
+    1c18:	move.l 24(sp),d0
+    1c1c:	move.l 28(sp),d1
+    1c20:	move.l 32(sp),d3
 	while(len--)
-    1688:	move.l d3,d4
-    168a:	subq.l #1,d4
-    168c:	tst.l d3
-    168e:	beq.s 16ee <memcpy+0x76>
-    1690:	movea.l d1,a0
-    1692:	addq.l #1,a0
-    1694:	move.l d0,d2
-    1696:	sub.l a0,d2
-    1698:	moveq #2,d5
-    169a:	cmp.l d2,d5
-    169c:	sc.s d2
-    169e:	neg.b d2
-    16a0:	moveq #8,d6
-    16a2:	cmp.l d4,d6
-    16a4:	sc.s d5
-    16a6:	neg.b d5
-    16a8:	and.b d5,d2
-    16aa:	beq.s 16f4 <memcpy+0x7c>
-    16ac:	move.l d0,d2
-    16ae:	or.l d1,d2
-    16b0:	moveq #3,d5
-    16b2:	and.l d5,d2
-    16b4:	bne.s 16f4 <memcpy+0x7c>
-    16b6:	movea.l d1,a0
-    16b8:	movea.l d0,a1
-    16ba:	moveq #-4,d2
-    16bc:	and.l d3,d2
-    16be:	add.l d1,d2
+    1c24:	move.l d3,d4
+    1c26:	subq.l #1,d4
+    1c28:	tst.l d3
+    1c2a:	beq.s 1c8a <memcpy+0x76>
+    1c2c:	movea.l d1,a0
+    1c2e:	addq.l #1,a0
+    1c30:	move.l d0,d2
+    1c32:	sub.l a0,d2
+    1c34:	moveq #2,d5
+    1c36:	cmp.l d2,d5
+    1c38:	sc.s d2
+    1c3a:	neg.b d2
+    1c3c:	moveq #8,d6
+    1c3e:	cmp.l d4,d6
+    1c40:	sc.s d5
+    1c42:	neg.b d5
+    1c44:	and.b d5,d2
+    1c46:	beq.s 1c90 <memcpy+0x7c>
+    1c48:	move.l d0,d2
+    1c4a:	or.l d1,d2
+    1c4c:	moveq #3,d5
+    1c4e:	and.l d5,d2
+    1c50:	bne.s 1c90 <memcpy+0x7c>
+    1c52:	movea.l d1,a0
+    1c54:	movea.l d0,a1
+    1c56:	moveq #-4,d2
+    1c58:	and.l d3,d2
+    1c5a:	add.l d1,d2
 		*d++ = *s++;
-    16c0:	move.l (a0)+,(a1)+
+    1c5c:	move.l (a0)+,(a1)+
 	while(len--)
-    16c2:	cmp.l a0,d2
-    16c4:	bne.s 16c0 <memcpy+0x48>
-    16c6:	moveq #-4,d2
-    16c8:	and.l d3,d2
-    16ca:	movea.l d0,a0
-    16cc:	adda.l d2,a0
-    16ce:	add.l d2,d1
-    16d0:	sub.l d2,d4
-    16d2:	cmp.l d3,d2
-    16d4:	beq.s 16ee <memcpy+0x76>
+    1c5e:	cmp.l a0,d2
+    1c60:	bne.s 1c5c <memcpy+0x48>
+    1c62:	moveq #-4,d2
+    1c64:	and.l d3,d2
+    1c66:	movea.l d0,a0
+    1c68:	adda.l d2,a0
+    1c6a:	add.l d2,d1
+    1c6c:	sub.l d2,d4
+    1c6e:	cmp.l d3,d2
+    1c70:	beq.s 1c8a <memcpy+0x76>
 		*d++ = *s++;
-    16d6:	movea.l d1,a1
-    16d8:	move.b (a1),(a0)
+    1c72:	movea.l d1,a1
+    1c74:	move.b (a1),(a0)
 	while(len--)
-    16da:	tst.l d4
-    16dc:	beq.s 16ee <memcpy+0x76>
+    1c76:	tst.l d4
+    1c78:	beq.s 1c8a <memcpy+0x76>
 		*d++ = *s++;
-    16de:	move.b 1(a1),1(a0)
+    1c7a:	move.b 1(a1),1(a0)
 	while(len--)
-    16e4:	subq.l #1,d4
-    16e6:	beq.s 16ee <memcpy+0x76>
+    1c80:	subq.l #1,d4
+    1c82:	beq.s 1c8a <memcpy+0x76>
 		*d++ = *s++;
-    16e8:	move.b 2(a1),2(a0)
+    1c84:	move.b 2(a1),2(a0)
 }
-    16ee:	movem.l (sp)+,d2-d6
-    16f2:	rts
-    16f4:	movea.l d0,a1
-    16f6:	add.l d3,d1
+    1c8a:	movem.l (sp)+,d2-d6
+    1c8e:	rts
+    1c90:	movea.l d0,a1
+    1c92:	add.l d3,d1
 		*d++ = *s++;
-    16f8:	move.b -1(a0),(a1)+
+    1c94:	move.b -1(a0),(a1)+
 	while(len--)
-    16fc:	cmp.l a0,d1
-    16fe:	beq.s 16ee <memcpy+0x76>
-    1700:	addq.l #1,a0
-    1702:	bra.s 16f8 <memcpy+0x80>
+    1c98:	cmp.l a0,d1
+    1c9a:	beq.s 1c8a <memcpy+0x76>
+    1c9c:	addq.l #1,a0
+    1c9e:	bra.s 1c94 <memcpy+0x80>
 
-00001704 <memmove>:
+00001ca0 <memmove>:
 void* memmove(void *dest, const void *src, unsigned long len) {
-    1704:	movem.l d2-d5/a2,-(sp)
-    1708:	move.l 24(sp),d0
-    170c:	move.l 28(sp),d1
-    1710:	move.l 32(sp),d2
+    1ca0:	movem.l d2-d5/a2,-(sp)
+    1ca4:	move.l 24(sp),d0
+    1ca8:	move.l 28(sp),d1
+    1cac:	move.l 32(sp),d2
 		while (len--)
-    1714:	movea.l d2,a1
-    1716:	subq.l #1,a1
+    1cb0:	movea.l d2,a1
+    1cb2:	subq.l #1,a1
 	if (d < s) {
-    1718:	cmp.l d0,d1
-    171a:	bls.s 1788 <memmove+0x84>
+    1cb4:	cmp.l d0,d1
+    1cb6:	bls.s 1d24 <memmove+0x84>
 		while (len--)
-    171c:	tst.l d2
-    171e:	beq.s 1782 <memmove+0x7e>
-    1720:	movea.l d1,a2
-    1722:	addq.l #1,a2
-    1724:	move.l d0,d3
-    1726:	sub.l a2,d3
-    1728:	moveq #2,d4
-    172a:	cmp.l d3,d4
-    172c:	sc.s d3
-    172e:	neg.b d3
-    1730:	moveq #8,d5
-    1732:	cmp.l a1,d5
-    1734:	sc.s d4
-    1736:	neg.b d4
-    1738:	and.b d4,d3
-    173a:	beq.s 17ac <memmove+0xa8>
-    173c:	move.l d0,d3
-    173e:	or.l d1,d3
-    1740:	moveq #3,d4
-    1742:	and.l d4,d3
-    1744:	bne.s 17ac <memmove+0xa8>
-    1746:	movea.l d1,a0
-    1748:	movea.l d0,a2
-    174a:	moveq #-4,d3
-    174c:	and.l d2,d3
-    174e:	add.l d1,d3
+    1cb8:	tst.l d2
+    1cba:	beq.s 1d1e <memmove+0x7e>
+    1cbc:	movea.l d1,a2
+    1cbe:	addq.l #1,a2
+    1cc0:	move.l d0,d3
+    1cc2:	sub.l a2,d3
+    1cc4:	moveq #2,d4
+    1cc6:	cmp.l d3,d4
+    1cc8:	sc.s d3
+    1cca:	neg.b d3
+    1ccc:	moveq #8,d5
+    1cce:	cmp.l a1,d5
+    1cd0:	sc.s d4
+    1cd2:	neg.b d4
+    1cd4:	and.b d4,d3
+    1cd6:	beq.s 1d48 <memmove+0xa8>
+    1cd8:	move.l d0,d3
+    1cda:	or.l d1,d3
+    1cdc:	moveq #3,d4
+    1cde:	and.l d4,d3
+    1ce0:	bne.s 1d48 <memmove+0xa8>
+    1ce2:	movea.l d1,a0
+    1ce4:	movea.l d0,a2
+    1ce6:	moveq #-4,d3
+    1ce8:	and.l d2,d3
+    1cea:	add.l d1,d3
 			*d++ = *s++;
-    1750:	move.l (a0)+,(a2)+
+    1cec:	move.l (a0)+,(a2)+
 		while (len--)
-    1752:	cmp.l a0,d3
-    1754:	bne.s 1750 <memmove+0x4c>
-    1756:	moveq #-4,d3
-    1758:	and.l d2,d3
-    175a:	movea.l d0,a2
-    175c:	adda.l d3,a2
-    175e:	movea.l d1,a0
-    1760:	adda.l d3,a0
-    1762:	suba.l d3,a1
-    1764:	cmp.l d2,d3
-    1766:	beq.s 1782 <memmove+0x7e>
+    1cee:	cmp.l a0,d3
+    1cf0:	bne.s 1cec <memmove+0x4c>
+    1cf2:	moveq #-4,d3
+    1cf4:	and.l d2,d3
+    1cf6:	movea.l d0,a2
+    1cf8:	adda.l d3,a2
+    1cfa:	movea.l d1,a0
+    1cfc:	adda.l d3,a0
+    1cfe:	suba.l d3,a1
+    1d00:	cmp.l d2,d3
+    1d02:	beq.s 1d1e <memmove+0x7e>
 			*d++ = *s++;
-    1768:	move.b (a0),(a2)
+    1d04:	move.b (a0),(a2)
 		while (len--)
-    176a:	cmpa.w #0,a1
-    176e:	beq.s 1782 <memmove+0x7e>
+    1d06:	cmpa.w #0,a1
+    1d0a:	beq.s 1d1e <memmove+0x7e>
 			*d++ = *s++;
-    1770:	move.b 1(a0),1(a2)
+    1d0c:	move.b 1(a0),1(a2)
 		while (len--)
-    1776:	moveq #1,d5
-    1778:	cmp.l a1,d5
-    177a:	beq.s 1782 <memmove+0x7e>
+    1d12:	moveq #1,d5
+    1d14:	cmp.l a1,d5
+    1d16:	beq.s 1d1e <memmove+0x7e>
 			*d++ = *s++;
-    177c:	move.b 2(a0),2(a2)
+    1d18:	move.b 2(a0),2(a2)
 }
-    1782:	movem.l (sp)+,d2-d5/a2
-    1786:	rts
+    1d1e:	movem.l (sp)+,d2-d5/a2
+    1d22:	rts
 		const char *lasts = s + (len - 1);
-    1788:	lea (0,a1,d1.l),a0
+    1d24:	lea (0,a1,d1.l),a0
 		char *lastd = d + (len - 1);
-    178c:	adda.l d0,a1
+    1d28:	adda.l d0,a1
 		while (len--)
-    178e:	tst.l d2
-    1790:	beq.s 1782 <memmove+0x7e>
-    1792:	move.l a0,d1
-    1794:	sub.l d2,d1
+    1d2a:	tst.l d2
+    1d2c:	beq.s 1d1e <memmove+0x7e>
+    1d2e:	move.l a0,d1
+    1d30:	sub.l d2,d1
 			*lastd-- = *lasts--;
-    1796:	move.b (a0),(a1)
+    1d32:	move.b (a0),(a1)
 		while (len--)
-    1798:	subq.l #1,a0
-    179a:	subq.l #1,a1
-    179c:	cmp.l a0,d1
-    179e:	beq.s 1782 <memmove+0x7e>
+    1d34:	subq.l #1,a0
+    1d36:	subq.l #1,a1
+    1d38:	cmp.l a0,d1
+    1d3a:	beq.s 1d1e <memmove+0x7e>
 			*lastd-- = *lasts--;
-    17a0:	move.b (a0),(a1)
+    1d3c:	move.b (a0),(a1)
 		while (len--)
-    17a2:	subq.l #1,a0
-    17a4:	subq.l #1,a1
-    17a6:	cmp.l a0,d1
-    17a8:	bne.s 1796 <memmove+0x92>
-    17aa:	bra.s 1782 <memmove+0x7e>
-    17ac:	movea.l d0,a1
-    17ae:	add.l d2,d1
+    1d3e:	subq.l #1,a0
+    1d40:	subq.l #1,a1
+    1d42:	cmp.l a0,d1
+    1d44:	bne.s 1d32 <memmove+0x92>
+    1d46:	bra.s 1d1e <memmove+0x7e>
+    1d48:	movea.l d0,a1
+    1d4a:	add.l d2,d1
 			*d++ = *s++;
-    17b0:	move.b -1(a2),(a1)+
+    1d4c:	move.b -1(a2),(a1)+
 		while (len--)
-    17b4:	cmp.l a2,d1
-    17b6:	beq.s 1782 <memmove+0x7e>
-    17b8:	addq.l #1,a2
-    17ba:	bra.s 17b0 <memmove+0xac>
+    1d50:	cmp.l a2,d1
+    1d52:	beq.s 1d1e <memmove+0x7e>
+    1d54:	addq.l #1,a2
+    1d56:	bra.s 1d4c <memmove+0xac>
 
-000017bc <__mulsi3>:
+00001d58 <__mulsi3>:
 	.text
 	.type __mulsi3, function
 	.globl	__mulsi3
 __mulsi3:
 	.cfi_startproc
 	movew	sp@(4), d0	/* x0 -> d0 */
-    17bc:	move.w 4(sp),d0
+    1d58:	move.w 4(sp),d0
 	muluw	sp@(10), d0	/* x0*y1 */
-    17c0:	mulu.w 10(sp),d0
+    1d5c:	mulu.w 10(sp),d0
 	movew	sp@(6), d1	/* x1 -> d1 */
-    17c4:	move.w 6(sp),d1
+    1d60:	move.w 6(sp),d1
 	muluw	sp@(8), d1	/* x1*y0 */
-    17c8:	mulu.w 8(sp),d1
+    1d64:	mulu.w 8(sp),d1
 	addw	d1, d0
-    17cc:	add.w d1,d0
+    1d68:	add.w d1,d0
 	swap	d0
-    17ce:	swap d0
+    1d6a:	swap d0
 	clrw	d0
-    17d0:	clr.w d0
+    1d6c:	clr.w d0
 	movew	sp@(6), d1	/* x1 -> d1 */
-    17d2:	move.w 6(sp),d1
+    1d6e:	move.w 6(sp),d1
 	muluw	sp@(10), d1	/* x1*y1 */
-    17d6:	mulu.w 10(sp),d1
+    1d72:	mulu.w 10(sp),d1
 	addl	d1, d0
-    17da:	add.l d1,d0
+    1d76:	add.l d1,d0
 	rts
-    17dc:	rts
+    1d78:	rts
 
-000017de <__udivsi3>:
+00001d7a <__udivsi3>:
 	.text
 	.type __udivsi3, function
 	.globl	__udivsi3
 __udivsi3:
 	.cfi_startproc
 	movel	d2, sp@-
-    17de:	move.l d2,-(sp)
+    1d7a:	move.l d2,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	sp@(12), d1	/* d1 = divisor */
-    17e0:	move.l 12(sp),d1
+    1d7c:	move.l 12(sp),d1
 	movel	sp@(8), d0	/* d0 = dividend */
-    17e4:	move.l 8(sp),d0
+    1d80:	move.l 8(sp),d0
 
 	cmpl	#0x10000, d1 /* divisor >= 2 ^ 16 ?   */
-    17e8:	cmpi.l #65536,d1
+    1d84:	cmpi.l #65536,d1
 	jcc	3f		/* then try next algorithm */
-    17ee:	bcc.s 1806 <__udivsi3+0x28>
+    1d8a:	bcc.s 1da2 <__udivsi3+0x28>
 	movel	d0, d2
-    17f0:	move.l d0,d2
+    1d8c:	move.l d0,d2
 	clrw	d2
-    17f2:	clr.w d2
+    1d8e:	clr.w d2
 	swap	d2
-    17f4:	swap d2
+    1d90:	swap d2
 	divu	d1, d2          /* high quotient in lower word */
-    17f6:	divu.w d1,d2
+    1d92:	divu.w d1,d2
 	movew	d2, d0		/* save high quotient */
-    17f8:	move.w d2,d0
+    1d94:	move.w d2,d0
 	swap	d0
-    17fa:	swap d0
+    1d96:	swap d0
 	movew	sp@(10), d2	/* get low dividend + high rest */
-    17fc:	move.w 10(sp),d2
+    1d98:	move.w 10(sp),d2
 	divu	d1, d2		/* low quotient */
-    1800:	divu.w d1,d2
+    1d9c:	divu.w d1,d2
 	movew	d2, d0
-    1802:	move.w d2,d0
+    1d9e:	move.w d2,d0
 	jra	6f
-    1804:	bra.s 1836 <__udivsi3+0x58>
+    1da0:	bra.s 1dd2 <__udivsi3+0x58>
 
 3:	movel	d1, d2		/* use d2 as divisor backup */
-    1806:	move.l d1,d2
+    1da2:	move.l d1,d2
 4:	lsrl	#1, d1	/* shift divisor */
-    1808:	lsr.l #1,d1
+    1da4:	lsr.l #1,d1
 	lsrl	#1, d0	/* shift dividend */
-    180a:	lsr.l #1,d0
+    1da6:	lsr.l #1,d0
 	cmpl	#0x10000, d1 /* still divisor >= 2 ^ 16 ?  */
-    180c:	cmpi.l #65536,d1
+    1da8:	cmpi.l #65536,d1
 	jcc	4b
-    1812:	bcc.s 1808 <__udivsi3+0x2a>
+    1dae:	bcc.s 1da4 <__udivsi3+0x2a>
 	divu	d1, d0		/* now we have 16-bit divisor */
-    1814:	divu.w d1,d0
+    1db0:	divu.w d1,d0
 	andl	#0xffff, d0 /* mask out divisor, ignore remainder */
-    1816:	andi.l #65535,d0
+    1db2:	andi.l #65535,d0
 
 /* Multiply the 16-bit tentative quotient with the 32-bit divisor.  Because of
    the operand ranges, this might give a 33-bit product.  If this product is
    greater than the dividend, the tentative quotient was too large. */
 	movel	d2, d1
-    181c:	move.l d2,d1
+    1db8:	move.l d2,d1
 	mulu	d0, d1		/* low part, 32 bits */
-    181e:	mulu.w d0,d1
+    1dba:	mulu.w d0,d1
 	swap	d2
-    1820:	swap d2
+    1dbc:	swap d2
 	mulu	d0, d2		/* high part, at most 17 bits */
-    1822:	mulu.w d0,d2
+    1dbe:	mulu.w d0,d2
 	swap	d2		/* align high part with low part */
-    1824:	swap d2
+    1dc0:	swap d2
 	tstw	d2		/* high part 17 bits? */
-    1826:	tst.w d2
+    1dc2:	tst.w d2
 	jne	5f		/* if 17 bits, quotient was too large */
-    1828:	bne.s 1834 <__udivsi3+0x56>
+    1dc4:	bne.s 1dd0 <__udivsi3+0x56>
 	addl	d2, d1		/* add parts */
-    182a:	add.l d2,d1
+    1dc6:	add.l d2,d1
 	jcs	5f		/* if sum is 33 bits, quotient was too large */
-    182c:	bcs.s 1834 <__udivsi3+0x56>
+    1dc8:	bcs.s 1dd0 <__udivsi3+0x56>
 	cmpl	sp@(8), d1	/* compare the sum with the dividend */
-    182e:	cmp.l 8(sp),d1
+    1dca:	cmp.l 8(sp),d1
 	jls	6f		/* if sum > dividend, quotient was too large */
-    1832:	bls.s 1836 <__udivsi3+0x58>
+    1dce:	bls.s 1dd2 <__udivsi3+0x58>
 5:	subql	#1, d0	/* adjust quotient */
-    1834:	subq.l #1,d0
+    1dd0:	subq.l #1,d0
 
 6:	movel	sp@+, d2
-    1836:	move.l (sp)+,d2
+    1dd2:	move.l (sp)+,d2
 	.cfi_adjust_cfa_offset -4
 	rts
-    1838:	rts
+    1dd4:	rts
 
-0000183a <__divsi3>:
+00001dd6 <__divsi3>:
 	.text
 	.type __divsi3, function
 	.globl	__divsi3
  __divsi3:
  	.cfi_startproc
 	movel	d2, sp@-
-    183a:	move.l d2,-(sp)
+    1dd6:	move.l d2,-(sp)
 	.cfi_adjust_cfa_offset 4
 
 	moveq	#1, d2	/* sign of result stored in d2 (=1 or =-1) */
-    183c:	moveq #1,d2
+    1dd8:	moveq #1,d2
 	movel	sp@(12), d1	/* d1 = divisor */
-    183e:	move.l 12(sp),d1
+    1dda:	move.l 12(sp),d1
 	jpl	1f
-    1842:	bpl.s 1848 <__divsi3+0xe>
+    1dde:	bpl.s 1de4 <__divsi3+0xe>
 	negl	d1
-    1844:	neg.l d1
+    1de0:	neg.l d1
 	negb	d2		/* change sign because divisor <0  */
-    1846:	neg.b d2
+    1de2:	neg.b d2
 1:	movel	sp@(8), d0	/* d0 = dividend */
-    1848:	move.l 8(sp),d0
+    1de4:	move.l 8(sp),d0
 	jpl	2f
-    184c:	bpl.s 1852 <__divsi3+0x18>
+    1de8:	bpl.s 1dee <__divsi3+0x18>
 	negl	d0
-    184e:	neg.l d0
+    1dea:	neg.l d0
 	negb	d2
-    1850:	neg.b d2
+    1dec:	neg.b d2
 
 2:	movel	d1, sp@-
-    1852:	move.l d1,-(sp)
+    1dee:	move.l d1,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	d0, sp@-
-    1854:	move.l d0,-(sp)
+    1df0:	move.l d0,-(sp)
 	.cfi_adjust_cfa_offset 4
 	jbsr	__udivsi3	/* divide abs(dividend) by abs(divisor) */
-    1856:	bsr.s 17de <__udivsi3>
+    1df2:	bsr.s 1d7a <__udivsi3>
 	addql	#8, sp
-    1858:	addq.l #8,sp
+    1df4:	addq.l #8,sp
 	.cfi_adjust_cfa_offset -8
 
 	tstb	d2
-    185a:	tst.b d2
+    1df6:	tst.b d2
 	jpl	3f
-    185c:	bpl.s 1860 <__divsi3+0x26>
+    1df8:	bpl.s 1dfc <__divsi3+0x26>
 	negl	d0
-    185e:	neg.l d0
+    1dfa:	neg.l d0
 
 3:	movel	sp@+, d2
-    1860:	move.l (sp)+,d2
+    1dfc:	move.l (sp)+,d2
 	.cfi_adjust_cfa_offset -4
 	rts
-    1862:	rts
+    1dfe:	rts
 
-00001864 <__modsi3>:
+00001e00 <__modsi3>:
 	.text
 	.type __modsi3, function
 	.globl	__modsi3
 __modsi3:
 	.cfi_startproc
 	movel	sp@(8), d1	/* d1 = divisor */
-    1864:	move.l 8(sp),d1
+    1e00:	move.l 8(sp),d1
 	movel	sp@(4), d0	/* d0 = dividend */
-    1868:	move.l 4(sp),d0
+    1e04:	move.l 4(sp),d0
 	movel	d1, sp@-
-    186c:	move.l d1,-(sp)
+    1e08:	move.l d1,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	d0, sp@-
-    186e:	move.l d0,-(sp)
+    1e0a:	move.l d0,-(sp)
 	.cfi_adjust_cfa_offset 4
 	jbsr	__divsi3
-    1870:	bsr.s 183a <__divsi3>
+    1e0c:	bsr.s 1dd6 <__divsi3>
 	addql	#8, sp
-    1872:	addq.l #8,sp
+    1e0e:	addq.l #8,sp
 	.cfi_adjust_cfa_offset -8
 	movel	sp@(8), d1	/* d1 = divisor */
-    1874:	move.l 8(sp),d1
+    1e10:	move.l 8(sp),d1
 	movel	d1, sp@-
-    1878:	move.l d1,-(sp)
+    1e14:	move.l d1,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	d0, sp@-
-    187a:	move.l d0,-(sp)
+    1e16:	move.l d0,-(sp)
 	.cfi_adjust_cfa_offset 4
 	jbsr	__mulsi3	/* d0 = (a/b)*b */
-    187c:	bsr.w 17bc <__mulsi3>
+    1e18:	bsr.w 1d58 <__mulsi3>
 	addql	#8, sp
-    1880:	addq.l #8,sp
+    1e1c:	addq.l #8,sp
 	.cfi_adjust_cfa_offset -8
 	movel	sp@(4), d1	/* d1 = dividend */
-    1882:	move.l 4(sp),d1
+    1e1e:	move.l 4(sp),d1
 	subl	d0, d1		/* d1 = a - (a/b)*b */
-    1886:	sub.l d0,d1
+    1e22:	sub.l d0,d1
 	movel	d1, d0
-    1888:	move.l d1,d0
+    1e24:	move.l d1,d0
 	rts
-    188a:	rts
+    1e26:	rts
 
-0000188c <__umodsi3>:
+00001e28 <__umodsi3>:
 	.text
 	.type __umodsi3, function
 	.globl	__umodsi3
 __umodsi3:
 	.cfi_startproc
 	movel	sp@(8), d1	/* d1 = divisor */
-    188c:	move.l 8(sp),d1
+    1e28:	move.l 8(sp),d1
 	movel	sp@(4), d0	/* d0 = dividend */
-    1890:	move.l 4(sp),d0
+    1e2c:	move.l 4(sp),d0
 	movel	d1, sp@-
-    1894:	move.l d1,-(sp)
+    1e30:	move.l d1,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	d0, sp@-
-    1896:	move.l d0,-(sp)
+    1e32:	move.l d0,-(sp)
 	.cfi_adjust_cfa_offset 4
 	jbsr	__udivsi3
-    1898:	bsr.w 17de <__udivsi3>
+    1e34:	bsr.w 1d7a <__udivsi3>
 	addql	#8, sp
-    189c:	addq.l #8,sp
+    1e38:	addq.l #8,sp
 	.cfi_adjust_cfa_offset -8
 	movel	sp@(8), d1	/* d1 = divisor */
-    189e:	move.l 8(sp),d1
+    1e3a:	move.l 8(sp),d1
 	movel	d1, sp@-
-    18a2:	move.l d1,-(sp)
+    1e3e:	move.l d1,-(sp)
 	.cfi_adjust_cfa_offset 4
 	movel	d0, sp@-
-    18a4:	move.l d0,-(sp)
+    1e40:	move.l d0,-(sp)
 	.cfi_adjust_cfa_offset 4
 	jbsr	__mulsi3	/* d0 = (a/b)*b */
-    18a6:	bsr.w 17bc <__mulsi3>
+    1e42:	bsr.w 1d58 <__mulsi3>
 	addql	#8, sp
-    18aa:	addq.l #8,sp
+    1e46:	addq.l #8,sp
 	.cfi_adjust_cfa_offset -8
 	movel	sp@(4), d1	/* d1 = dividend */
-    18ac:	move.l 4(sp),d1
+    1e48:	move.l 4(sp),d1
 	subl	d0, d1		/* d1 = a - (a/b)*b */
-    18b0:	sub.l d0,d1
+    1e4c:	sub.l d0,d1
 	movel	d1, d0
-    18b2:	move.l d1,d0
+    1e4e:	move.l d1,d0
 	rts
-    18b4:	rts
+    1e50:	rts
 
-000018b6 <KPutCharX>:
+00001e52 <KPutCharX>:
 	.type KPutCharX, function
 	.globl	KPutCharX
 
 KPutCharX:
 	.cfi_startproc
     move.l  a6, -(sp)
-    18b6:	move.l a6,-(sp)
+    1e52:	move.l a6,-(sp)
 	.cfi_adjust_cfa_offset 4
     move.l  4.w, a6
-    18b8:	movea.l 4 <_start+0x4>,a6
+    1e54:	movea.l 4 <_start+0x4>,a6
     jsr     -0x204(a6)
-    18bc:	jsr -516(a6)
+    1e58:	jsr -516(a6)
     move.l (sp)+, a6
-    18c0:	movea.l (sp)+,a6
+    1e5c:	movea.l (sp)+,a6
 	.cfi_adjust_cfa_offset -4
     rts
-    18c2:	rts
+    1e5e:	rts
 
-000018c4 <PutChar>:
+00001e60 <PutChar>:
 	.type PutChar, function
 	.globl	PutChar
 
 PutChar:
 	.cfi_startproc
 	move.b d0, (a3)+
-    18c4:	move.b d0,(a3)+
+    1e60:	move.b d0,(a3)+
 	rts
-    18c6:	rts
+    1e62:	rts
 
-000018c8 <_doynaxdepack_asm>:
+00001e64 <_doynaxdepack_asm>:
 
 	|Entry point. Wind up the decruncher
 	.type _doynaxdepack_asm,function
 	.globl _doynaxdepack_asm
 _doynaxdepack_asm:
 	movea.l	(a0)+,a2				|Unaligned literal buffer at the end of
-    18c8:	movea.l (a0)+,a2
+    1e64:	movea.l (a0)+,a2
 	adda.l	a0,a2					|the stream
-    18ca:	adda.l a0,a2
+    1e66:	adda.l a0,a2
 	move.l	a2,a3
-    18cc:	movea.l a2,a3
+    1e68:	movea.l a2,a3
 	move.l	(a0)+,d0				|Seed the shift register
-    18ce:	move.l (a0)+,d0
+    1e6a:	move.l (a0)+,d0
 	moveq	#0x38,d4				|Masks for match offset extraction
-    18d0:	moveq #56,d4
+    1e6c:	moveq #56,d4
 	moveq	#8,d5
-    18d2:	moveq #8,d5
+    1e6e:	moveq #8,d5
 	bra.s	.Lliteral
-    18d4:	bra.s 193e <_doynaxdepack_asm+0x76>
+    1e70:	bra.s 1eda <_doynaxdepack_asm+0x76>
 
 	|******** Copy a literal sequence ********
 
 .Llcopy:							|Copy two bytes at a time, with the
 	move.b	(a0)+,(a1)+				|deferral of the length LSB helping
-    18d6:	move.b (a0)+,(a1)+
+    1e72:	move.b (a0)+,(a1)+
 	move.b	(a0)+,(a1)+				|slightly in the unrolling
-    18d8:	move.b (a0)+,(a1)+
+    1e74:	move.b (a0)+,(a1)+
 	dbf		d1,.Llcopy
-    18da:	dbf d1,18d6 <_doynaxdepack_asm+0xe>
+    1e76:	dbf d1,1e72 <_doynaxdepack_asm+0xe>
 
 	lsl.l	#2,d0					|Copy odd bytes separately in order
-    18de:	lsl.l #2,d0
+    1e7a:	lsl.l #2,d0
 	bcc.s	.Lmatch					|to keep the source aligned
-    18e0:	bcc.s 18e4 <_doynaxdepack_asm+0x1c>
+    1e7c:	bcc.s 1e80 <_doynaxdepack_asm+0x1c>
 .Llsingle:
 	move.b	(a2)+,(a1)+
-    18e2:	move.b (a2)+,(a1)+
+    1e7e:	move.b (a2)+,(a1)+
 
 	|******** Process a match ********
 
 	|Start by refilling the bit-buffer
 .Lmatch:
 	DOY_REFILL1 mprefix
-    18e4:	tst.w d0
-    18e6:	bne.s 18f0 <_doynaxdepack_asm+0x28>
+    1e80:	tst.w d0
+    1e82:	bne.s 1e8c <_doynaxdepack_asm+0x28>
 	cmp.l	a0,a3					|Take the opportunity to test for the
-    18e8:	cmpa.l a0,a3
+    1e84:	cmpa.l a0,a3
 	bls.s	.Lreturn				|end of the stream while refilling
-    18ea:	bls.s 1962 <doy_table+0x6>
+    1e86:	bls.s 1efe <doy_table+0x6>
 .Lmrefill:
 	DOY_REFILL2
-    18ec:	move.w (a0)+,d0
-    18ee:	swap d0
+    1e88:	move.w (a0)+,d0
+    1e8a:	swap d0
 
 .Lmprefix:
 	|Fetch the first three bits identifying the match length, and look up
 	|the corresponding table entry
 	rol.l	#3+3,d0
-    18f0:	rol.l #6,d0
+    1e8c:	rol.l #6,d0
 	move.w	d0,d1
-    18f2:	move.w d0,d1
+    1e8e:	move.w d0,d1
 	and.w	d4,d1
-    18f4:	and.w d4,d1
+    1e90:	and.w d4,d1
 	eor.w	d1,d0
-    18f6:	eor.w d1,d0
+    1e92:	eor.w d1,d0
 	movem.w	doy_table(pc,d1.w),d2/d3/a4
-    18f8:	movem.w (195c <doy_table>,pc,d1.w),d2-d3/a4
+    1e94:	movem.w (1ef8 <doy_table>,pc,d1.w),d2-d3/a4
 
 	|Extract the offset bits and compute the relative source address from it
 	rol.l	d2,d0					|Reduced by 3 to account for 8x offset
-    18fe:	rol.l d2,d0
+    1e9a:	rol.l d2,d0
 	and.w	d0,d3					|scaling
-    1900:	and.w d0,d3
+    1e9c:	and.w d0,d3
 	eor.w	d3,d0
-    1902:	eor.w d3,d0
+    1e9e:	eor.w d3,d0
 	suba.w	d3,a4
-    1904:	suba.w d3,a4
+    1ea0:	suba.w d3,a4
 	adda.l	a1,a4
-    1906:	adda.l a1,a4
+    1ea2:	adda.l a1,a4
 
 	|Decode the match length
 	DOY_REFILL
-    1908:	tst.w d0
-    190a:	bne.s 1910 <_doynaxdepack_asm+0x48>
-    190c:	move.w (a0)+,d0
-    190e:	swap d0
+    1ea4:	tst.w d0
+    1ea6:	bne.s 1eac <_doynaxdepack_asm+0x48>
+    1ea8:	move.w (a0)+,d0
+    1eaa:	swap d0
 	and.w	d5,d1					|Check the initial length bit from the
-    1910:	and.w d5,d1
+    1eac:	and.w d5,d1
 	beq.s	.Lmcopy					|type triple
-    1912:	beq.s 192a <_doynaxdepack_asm+0x62>
+    1eae:	beq.s 1ec6 <_doynaxdepack_asm+0x62>
 
 	moveq	#1,d1					|This loops peeks at the next flag
-    1914:	moveq #1,d1
+    1eb0:	moveq #1,d1
 	tst.l	d0						|through the sign bit bit while keeping
-    1916:	tst.l d0
+    1eb2:	tst.l d0
 	bpl.s	.Lmendlen2				|the LSB in carry
-    1918:	bpl.s 1926 <_doynaxdepack_asm+0x5e>
+    1eb4:	bpl.s 1ec2 <_doynaxdepack_asm+0x5e>
 	lsl.l	#2,d0
-    191a:	lsl.l #2,d0
+    1eb6:	lsl.l #2,d0
 	bpl.s	.Lmendlen1
-    191c:	bpl.s 1924 <_doynaxdepack_asm+0x5c>
+    1eb8:	bpl.s 1ec0 <_doynaxdepack_asm+0x5c>
 .Lmgetlen:
 	addx.b	d1,d1
-    191e:	addx.b d1,d1
+    1eba:	addx.b d1,d1
 	lsl.l	#2,d0
-    1920:	lsl.l #2,d0
+    1ebc:	lsl.l #2,d0
 	bmi.s	.Lmgetlen
-    1922:	bmi.s 191e <_doynaxdepack_asm+0x56>
+    1ebe:	bmi.s 1eba <_doynaxdepack_asm+0x56>
 .Lmendlen1:
 	addx.b	d1,d1
-    1924:	addx.b d1,d1
+    1ec0:	addx.b d1,d1
 .Lmendlen2:
 	|Copy the match data a word at a time. Note that the minimum length is
 	|two bytes
 	lsl.l	#2,d0					|The trailing length payload bit is
-    1926:	lsl.l #2,d0
+    1ec2:	lsl.l #2,d0
 	bcc.s	.Lmhalf					|stored out-of-order
-    1928:	bcc.s 192c <_doynaxdepack_asm+0x64>
+    1ec4:	bcc.s 1ec8 <_doynaxdepack_asm+0x64>
 .Lmcopy:
 	move.b	(a4)+,(a1)+
-    192a:	move.b (a4)+,(a1)+
+    1ec6:	move.b (a4)+,(a1)+
 .Lmhalf:
 	move.b	(a4)+,(a1)+
-    192c:	move.b (a4)+,(a1)+
+    1ec8:	move.b (a4)+,(a1)+
 	dbf		d1,.Lmcopy
-    192e:	dbf d1,192a <_doynaxdepack_asm+0x62>
+    1eca:	dbf d1,1ec6 <_doynaxdepack_asm+0x62>
 
 	|Fetch a bit flag to see whether what follows is a literal run or
 	|another match
 	add.l	d0,d0
-    1932:	add.l d0,d0
+    1ece:	add.l d0,d0
 	bcc.s	.Lmatch
-    1934:	bcc.s 18e4 <_doynaxdepack_asm+0x1c>
+    1ed0:	bcc.s 1e80 <_doynaxdepack_asm+0x1c>
 
 
 	|******** Process a run of literal bytes ********
 
 	DOY_REFILL						|Replenish the shift-register
-    1936:	tst.w d0
-    1938:	bne.s 193e <_doynaxdepack_asm+0x76>
-    193a:	move.w (a0)+,d0
-    193c:	swap d0
+    1ed2:	tst.w d0
+    1ed4:	bne.s 1eda <_doynaxdepack_asm+0x76>
+    1ed6:	move.w (a0)+,d0
+    1ed8:	swap d0
 .Lliteral:
 	|Extract delta-coded run length in the same swizzled format as the
 	|matches above
 	moveq	#0,d1
-    193e:	moveq #0,d1
+    1eda:	moveq #0,d1
 	add.l	d0,d0
-    1940:	add.l d0,d0
+    1edc:	add.l d0,d0
 	bcc.s	.Llsingle				|Single out the one-byte case
-    1942:	bcc.s 18e2 <_doynaxdepack_asm+0x1a>
+    1ede:	bcc.s 1e7e <_doynaxdepack_asm+0x1a>
 	bpl.s	.Llendlen
-    1944:	bpl.s 194c <_doynaxdepack_asm+0x84>
+    1ee0:	bpl.s 1ee8 <_doynaxdepack_asm+0x84>
 .Llgetlen:
 	addx.b	d1,d1
-    1946:	addx.b d1,d1
+    1ee2:	addx.b d1,d1
 	lsl.l	#2,d0
-    1948:	lsl.l #2,d0
+    1ee4:	lsl.l #2,d0
 	bmi.s	.Llgetlen
-    194a:	bmi.s 1946 <_doynaxdepack_asm+0x7e>
+    1ee6:	bmi.s 1ee2 <_doynaxdepack_asm+0x7e>
 .Llendlen:
 	addx.b	d1,d1
-    194c:	addx.b d1,d1
+    1ee8:	addx.b d1,d1
 	|or greater, in which case the sixteen guaranteed bits in the buffer
 	|may have run out.
 	|In the latter case simply give up and stuff the payload bits back onto
 	|the stream before fetching a literal 16-bit run length instead
 .Llcopy_near:
 	dbvs	d1,.Llcopy
-    194e:	dbv.s d1,18d6 <_doynaxdepack_asm+0xe>
+    1eea:	dbv.s d1,1e72 <_doynaxdepack_asm+0xe>
 
 	add.l	d0,d0
-    1952:	add.l d0,d0
+    1eee:	add.l d0,d0
 	eor.w	d1,d0		
-    1954:	eor.w d1,d0
+    1ef0:	eor.w d1,d0
 	ror.l	#7+1,d0					|Note that the constant MSB acts as a
-    1956:	ror.l #8,d0
+    1ef2:	ror.l #8,d0
 	move.w	(a0)+,d1				|substitute for the unfetched stop bit
-    1958:	move.w (a0)+,d1
+    1ef4:	move.w (a0)+,d1
 	bra.s	.Llcopy_near
-    195a:	bra.s 194e <_doynaxdepack_asm+0x86>
+    1ef6:	bra.s 1eea <_doynaxdepack_asm+0x86>
 
-0000195c <doy_table>:
-    195c:	......Nu........
+00001ef8 <doy_table>:
+    1ef8:	......Nu........
 doy_table:
 	DOY_OFFSET 3,1					|Short A
 .Lreturn:
 	rts
 	DOY_OFFSET 4,1					|Long A
 	dc.w	0						|(Empty hole)
-    196c:	...?............
+    1f08:	...?............
 	DOY_OFFSET 6,1+8				|Short B
 	dc.w	0						|(Empty hole)
 	DOY_OFFSET 7,1+16				|Long B
 	dc.w	0						|(Empty hole)
-    197c:	.............o..
+    1f18:	.............o..
 	DOY_OFFSET 8,1+8+64				|Short C
 	dc.w	0						|(Empty hole)
 	DOY_OFFSET 10,1+16+128			|Long C
 	dc.w	0						|(Empty hole)
-    198c:	.............o
+    1f28:	.............o

@@ -8,9 +8,7 @@ struct _bmpDescriptor
     USHORT Height;
     /// Bitplanes
     USHORT Bpls;
-    /// No. colors
-    USHORT NoCols;
-    /// Bytes per line
+     /// Bytes per line
     USHORT Bpl;
     /// Bytes per line total (BPL*BPLS)
     USHORT Bplt;
@@ -26,7 +24,6 @@ struct _bmpDescriptor
 /// USHORT Width     - Width
 /// USHORT Height    - Height
 /// USHORT Bpls      - No of bitplanes
-/// USHORT NoCols    - No of Colors (2**Bpls)
 /// USHORT Bpl       - Bytes per Line
 /// USHORT Bplt      - Bytes per Line total
 /// USHORT Bpp       - Bytes per bitplane

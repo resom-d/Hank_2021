@@ -1,7 +1,7 @@
 #if !defined(HANK_2021)
 #define HANK_2021
 
-#define MUSIC
+//#define MUSIC
 
 #include "../support/gcc8_c_support.h"
 #include "custom_defines.h"
@@ -56,8 +56,7 @@ APTR GetInterruptHandler(void);
 #define Abs(a) (a < 0 ? a * -1 : a)
 
 //libs
-struct ExecBase *
-    SysBase;
+struct ExecBase *SysBase;
 volatile struct Custom *custom;
 struct DosLibrary *DOSBase;
 struct GfxBase *GfxBase;
@@ -82,6 +81,7 @@ INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookieMask.raw");
 BmpDescriptor Screen;
 BmpDescriptor BmpUpperPart_PF1;
 BmpDescriptor BmpUpperPart_PF2;
+BmpDescriptor BmpUpperPart_Buf1;
 BmpDescriptor BmpLogo;
 BmpDescriptor BmpScroller;
 ;
@@ -97,7 +97,7 @@ UWORD FontPaletteRGB4[8] =
         0x0000, 0x0017, 0x0259, 0x036A, 0x048B, 0x05BD, 0x06DE, 0x08FF};
 UWORD CookiePaletteRGB4[8] =
     {
-        0x0000, 0x0FFF, 0x0A20, 0x0B40, 0x0C70, 0x0D90, 0x0EB0, 0x0080};
+        0x0000,0x0820,0x0940,0x0A60,0x0C70,0x0D90,0x0EB0,0x0EB0 };
 
 // scrolltext-stuff
 USHORT ScrollerMin = 0;
@@ -114,11 +114,11 @@ USHORT *copMirrorBmpP;
 CONST char Scrolltext[] = "\
 HANK VAN BASTARD PRESENTS: THE HANK VAN BASTARD SHOW           \
 HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME. \
-OH, POOR SCROLLER I'LL TRY TO HELP US OUT - WE WILL FIND A WAY TO ...          \
-I CAN'T WAIT TO.b..OOPS!     OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND. \
+OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A MOMENT....AH! THERE!....  \
+ObOPS!     OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND. \
 BUT STILL NOT HAPPY?   LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!  \
-OK, OK... I'LL TRY MY BEST TO CLEAN IT UP ....          \
-OK WE WILL SEE...  m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
+OK, OK... I'LL TRY MY BEST TO CLEAN IT UP ....            \
+m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
 SEE YOU MY FRIENDS.               bm\
 \0";
 // music bin
@@ -240,7 +240,7 @@ void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
 void InitImagePlanes(BmpDescriptor *img);
 void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
-void ClearBitmap(BmpDescriptor bmpD);
+void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
 void LineDraw(BmpDescriptor bitmap, int x0, int y0, int x1, int y1, UBYTE col);
