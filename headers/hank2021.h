@@ -1,7 +1,7 @@
 #if !defined(HANK_2021)
 #define HANK_2021
 
-//#define MUSIC
+#define MUSIC
 
 #include "../support/gcc8_c_support.h"
 #include "custom_defines.h"
@@ -76,8 +76,8 @@ USHORT *copPtr;
 // bitmaps
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/320x256x3_32x32_font.raw") // load image into chipmem so we can use it without copying
-INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie.raw");
-INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookieMask.raw");
+INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
+INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2Mask.raw");
 BmpDescriptor Screen;
 BmpDescriptor BmpUpperPart_PF1;
 BmpDescriptor BmpUpperPart_PF2;
@@ -89,37 +89,45 @@ BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
 BmpDescriptor BmpCookieMask;
 // palettes
-UWORD LogoPaletteRGB4[8] =
-    {
-        0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
-UWORD FontPaletteRGB4[8] =
-    {
-        0x0000, 0x0017, 0x0259, 0x036A, 0x048B, 0x05BD, 0x06DE, 0x08FF};
-UWORD CookiePaletteRGB4[8] =
-    {
-        0x0000,0x0820,0x0940,0x0A60,0x0C70,0x0D90,0x0EB0,0x0EB0 };
+UWORD LogoPaletteRGB4[8] = {
+    0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
+UWORD FontPaletteRGB4[8] = {
+    0x0BF0,0x08F0,0x06F0,0x03F0,0x01F0,0x00F1,0x00F4,0x00F6};
+UWORD CookiePaletteRGB4[8] = {
+    0x0000,0x0066,0x0077,0x0088,0x00A9,0x00BB,0x00CC,0x00DD};
+UWORD colgradbluePaletteRGB4[40] = {
+    0x0015,0x0016,0x0016,0x0016,0x0026,0x0027,0x0027,
+	0x0037,0x0037,0x0038,0x0038,0x0048,0x0048,0x0049,0x0049,
+	0x0059,0x0059,0x005A,0x005A,0x006A,0x006A,0x006B,0x006B,
+	0x007B,0x007B,0x007C,0x008C,0x008C,0x008C,0x008D,0x009D,
+	0x009D,0x009D,0x009E,0x00AE,0x00AE,0x00AE,0x00AF,0x00BF,
+	0x00BF};
 
+ 
 // scrolltext-stuff
-USHORT ScrollerMin = 0;
-USHORT ScrollerMax = 40;
-SHORT ScrollerY = 40;
+#define SCRT_MIN (0)
+#define SCRT_MAX (40)
+USHORT ScrollerMin = SCRT_MIN;
+USHORT ScrollerMax = SCRT_MAX;
+SHORT ScrollerY = SCRT_MAX - 24;
 BYTE ScrollerDir = -1;
 USHORT ScrollCnt;
 USHORT ScrolltextCnt;
 BOOL BounceEnabled = FALSE;
-USHORT *copScrollerBmpP;
 BOOL MirrorEnabled = FALSE;
+// pointer to copperlist bitplane pointers for bouncing
+USHORT *copScrollerBmpP;
 // pointer to (re)set mirror effect (change bplmod) in copperlist
-USHORT *copMirrorBmpP;      
+USHORT *copMirrorBmpP;
 CONST char Scrolltext[] = "\
 HANK VAN BASTARD PRESENTS: THE HANK VAN BASTARD SHOW           \
 HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME. \
-OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A MOMENT....AH! THERE!....  \
-ObOPS!     OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND. \
+OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A MOMENT....AH! THERE!....b  \
+OOPS!     OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND. \
 BUT STILL NOT HAPPY?   LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!  \
 OK, OK... I'LL TRY MY BEST TO CLEAN IT UP ....            \
-m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!   \
-SEE YOU MY FRIENDS.               bm\
+m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!           \
+SEE YOU MY FRIENDS.                 bm\
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
@@ -225,6 +233,18 @@ inline USHORT *copWaitY(USHORT *copListEnd, USHORT i)
     *copListEnd++ = COP_WAIT;
     return copListEnd;
 }
+inline USHORT *copSkipY(USHORT *copListEnd, USHORT i)
+{
+    *copListEnd++ = (i << 8) | 4 | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
+    *copListEnd++ = COP_SKIP;
+    return copListEnd;
+}
+inline USHORT *copSkipXY(USHORT *copListEnd, USHORT x, USHORT i)
+{
+    *copListEnd++ = (i << 8) | (x << 1) | 1; //bit 1 means wait. waits for vertical position x<<8, first raster stop position outside the left
+    *copListEnd++ = COP_SKIP;
+    return copListEnd;
+}
 inline USHORT *copSetColor(USHORT *copListCurrent, USHORT index, USHORT color)
 {
     *copListCurrent++ = offsetof(struct Custom, color[index]);
@@ -239,7 +259,7 @@ void BounceScroller(USHORT pos);
 void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
 void InitImagePlanes(BmpDescriptor *img);
 void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
-void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
+void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
@@ -248,7 +268,6 @@ void PolygonDraw(BmpDescriptor bitmap, Point2D *pointlist, USHORT length, BYTE c
 void EllipseDraw(BmpDescriptor bitmap, BYTE col, int xm, int ym, int a, int b);
 void SinusDraw(Point2D *targetList, USHORT sinstart, USHORT x, USHORT y, int amp, int width);
 void MakePolys();
-void GetCookieMask(UBYTE planes, UBYTE **bmp, UBYTE *destMask, USHORT height, USHORT width);
 void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
 int p61Init(const void *module);

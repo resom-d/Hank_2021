@@ -7,6 +7,7 @@
 
 /*		Name		Address		Access	O	E	A	Description */
 #define COP_WAIT    0xfffe
+#define COP_SKIP    0xffff
 #define BLTDDAT		0x000		//	ER	*	*	*	Blitter dest. early read (dummy address)
 #define DMACONR		0x002		//	R	*	*	*	Dma control (and blitter status) read
 #define VPOSR		0x004		//	R	*	*	*	Read vertical most sig. bits (and frame flop)
