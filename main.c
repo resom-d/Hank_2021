@@ -60,7 +60,7 @@ int main()
 	custom->cop1lc = (ULONG)copPtr;
 	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
 	custom->copjmp1 = 0x7fff;	   //start coppper
-	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG;
+	custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG | DMAF_SPRITE;
 	// DEMO
 	SetInterruptHandler((APTR)interruptHandler);
 	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
@@ -95,6 +95,7 @@ int main()
 
 void MainLoop()
 {
+	InitStarfieldSprite();
 
 	Point2D ps = {0, 0};
 	Point2D pd = {32, 0};
@@ -118,33 +119,10 @@ void MainLoop()
 	while (!MouseLeft())
 	{
 		WaitVbl();
-		CopyBitmap(BmpUpperPart_Buf1, BmpUpperPart_PF2);
 
-		for (int b = 0; b < 4; b++)
-		{
-			pdb[b].X += incX[b];
-			pdb[b].Y += incY[b];
-			if (pdb[b].X >= 320 - 32)
-			{
-				pdb[b].X = 320 - 32;
-				incX[b] *= -1;
-			}
-			if (pdb[b].X <= 0)
-			{
-				pdb[b].X = 0;
-				incX[b] *= -1;
-			}
-			if (pdb[b].Y >= 130 - 32)
-			{
-				pdb[b].Y = 130 - 32;
-				incY[b] *= -1;
-			}
-			if (pdb[b].Y <= 0)
-			{
-				pdb[b].Y = 0;
-				incY[b] *= -1;
-			}
-		}
+		if (ScrollerPause > 0)
+			ScrollerPause--;
+		CopyBitmap(BmpUpperPart_Buf1, BmpUpperPart_PF2);
 
 		if (BounceEnabled)
 		{
@@ -178,17 +156,48 @@ void MainLoop()
 			ScrollerDir = 1;
 		}
 		// make scroller scroll
-		Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
+		if (ScrollerPause < 1)
+			Scrollit(BmpScroller, (UBYTE *)BmpScroller.ImageData, 40, 32, 4);
 		// make scroller bounce
 		copSetPlanesInterleafed(0, copScrollerBmpP, (UBYTE *)BmpScroller.ImageData, BmpScroller.Bpls, BmpScroller.Bpl, ScrollerY);
 		// start preparing for next vblank
-		ClearBitmap(BmpUpperPart_Buf1, 130);
+		ClearBitmapPart(BmpUpperPart_Buf1, pdb[3].X, pdb[3].Y, 32, 32);
+		ClearBitmapPart(BmpUpperPart_Buf1, pdb[2].X, pdb[2].Y, 32, 32);
+		ClearBitmapPart(BmpUpperPart_Buf1, pdb[1].X, pdb[1].Y, 32, 32);
+		ClearBitmapPart(BmpUpperPart_Buf1, pdb[0].X, pdb[0].Y, 32, 32);
+		for (int b = 0; b < 4; b++)
+		{
+			pdb[b].X += incX[b];
+			pdb[b].Y += incY[b];
+			if (pdb[b].X >= 320 - 32)
+			{
+				pdb[b].X = 320 - 32;
+				incX[b] *= -1;
+			}
+			if (pdb[b].X <= 0)
+			{
+				pdb[b].X = 0;
+				incX[b] *= -1;
+			}
+			if (pdb[b].Y >= 130 - 32)
+			{
+				pdb[b].Y = 130 - 32;
+				incY[b] *= -1;
+			}
+			if (pdb[b].Y <= 0)
+			{
+				pdb[b].Y = 0;
+				incY[b] *= -1;
+			}
+		}		
 		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, ps2, pdb[0], 32, 32);
 		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, ps3, pdb[1], 32, 32);
 		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, ps4, pdb[2], 32, 32);
 		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, ps5, pdb[3], 32, 32);
-		// BetterBlit(BmpCookie, BmpUpperPart_Buf1,BmpCookieMask, ps2, pdb[4], 32, 32);
-		// BetterBlit(BmpCookie, BmpUpperPart_Buf1,BmpCookieMask, ps2, pdb[5], 32, 32);
+
+		MoveStarfield();
+
+		//custom->color[0]=0xf00;
 	}
 }
 
@@ -224,6 +233,43 @@ void SetupCopper(USHORT *copPtr)
 	// set logo bitplane pointers
 	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
 	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
+	// set sprite pointers
+	*copPtr++ = SPR0PTH;
+	*copPtr++ = (LONG)StarSprite >> 16;
+	*copPtr++ = SPR0PTL;
+	*copPtr++ = (LONG)StarSprite;
+	*copPtr++ = SPR1PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR1PTL;
+	*copPtr++ = (LONG)NullSprite;
+	// sprite 0+1 colors
+	copPtr = copSetColor(copPtr, 17, 0xfff);
+	copPtr = copSetColor(copPtr, 18, 0x44f);
+	copPtr = copSetColor(copPtr, 19, 0x88e);
+	*copPtr++ = SPR2PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR2PTL;
+	*copPtr++ = (LONG)NullSprite;
+	*copPtr++ = SPR3PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR3PTL;
+	*copPtr++ = (LONG)NullSprite;
+	*copPtr++ = SPR4PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR4PTL;
+	*copPtr++ = (LONG)NullSprite;
+	*copPtr++ = SPR5PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR5PTL;
+	*copPtr++ = (LONG)NullSprite;
+	*copPtr++ = SPR6PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR6PTL;
+	*copPtr++ = (LONG)NullSprite;
+	*copPtr++ = SPR7PTH;
+	*copPtr++ = (LONG)NullSprite >> 16;
+	*copPtr++ = SPR7PTL;
+	*copPtr++ = (LONG)NullSprite;
 	// enable bitplanes
 	*copPtr++ = BPLCON0;
 	*copPtr++ = ((BmpLogo.Bpls * 2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
@@ -256,6 +302,7 @@ void SetupCopper(USHORT *copPtr)
 	// wait till below logo
 	line = 0x2c + BmpUpperPart_PF1.Height;
 	copPtr = copWaitY(copPtr, line++);
+	// turn off bitplanes to waste 8 lines, giving the logo more bottom space
 	*copPtr++ = BPLCON0;
 	*copPtr++ = (0) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
 	line = 0x2c + BmpUpperPart_PF1.Height + 8;
@@ -269,11 +316,12 @@ void SetupCopper(USHORT *copPtr)
 						  BmpScroller.Bplt - Screen.Bpl);
 	*copPtr++ = BPLCON0;
 	*copPtr++ = ((BmpLogo.Bpls) << 12) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
-
+	// set font colors for scroller
 	for (int a = 1; a < 8; a++)
 	{
 		copPtr = copSetColor(copPtr, a, FontPaletteRGB4[a]);
 	}
+	// blue gradient below logo
 	for (int l = 0; l < 24; l++)
 	{
 		copPtr = copWaitY(copPtr, line);
@@ -281,63 +329,33 @@ void SetupCopper(USHORT *copPtr)
 		line += 2;
 	}
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
+	copPtr = copSetColor(copPtr, 0, 0x777);
 	copPtr = copWaitY(copPtr, line++);
 	copPtr = copSetColor(copPtr, 0, 0x49b);
+	line += 7;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0x49b);
-	line += 3;
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
+	copPtr = copSetColor(copPtr, 0, 0x777);
 	copPtr = copWaitY(copPtr, line++);
 	copPtr = copSetColor(copPtr, 0, 0x49b);
-	line += 5;
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0x49b);
-	line += 5;
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0x49b);
-	// mirror Effect?
 	// set bitplane mods
-	line = 0x2c + BmpLogo.Height + 64 + 8; // 246
-	copPtr = copWaitY(copPtr, line++); 
+	line = 0x2c + BmpLogo.Height + 72 + 7; // 209
+	copPtr = copWaitY(copPtr, line++);
 	copMirrorBmpP = copPtr;
 	copPtr = copSetBplMod(0, copPtr, (BmpLogo.Bplt - BmpLogo.Bpl), (BmpLogo.Bplt - BmpLogo.Bpl));
 
 	copPtr = copWaitXY(copPtr, 0xf0, 0xff);
-	
-	line = 0x010;
+
+	line = 0x05;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
+	copPtr = copSetColor(copPtr, 0, 0x777);
 	copPtr = copWaitY(copPtr, line++);
 	copPtr = copSetColor(copPtr, 0, 0x49b);
 
-	line += 14;
+	line = 0x2c;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0x49b);
-	line += 10;
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, 0xfff);
+	copPtr = copSetColor(copPtr, 0, 0x777);
 	copPtr = copWaitY(copPtr, line++);
 	copPtr = copSetColor(copPtr, 0, 0x49b);
-	// line += 8;
-	// copPtr = copWaitY(copPtr, line++);
-	// copPtr = copSetColor(copPtr, 0, 0xfff);
-	// copPtr = copWaitY(copPtr, line++);
-	// copPtr = copSetColor(copPtr, 0, 0x49b);
-	// line += 2;
-	// copPtr = copWaitY(copPtr, line++);
-	// copPtr = copSetColor(copPtr, 0, 0xfff);
-	// copPtr = copWaitY(copPtr, line++);
-	// copPtr = copSetColor(copPtr, 0, 0x49b);
 
 	copPtr = copWaitXY(copPtr, 0xff, 0xff);
 }
@@ -391,8 +409,8 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 	{
 		if (BounceEnabled)
 		{
-			ScrollerY = SCRT_MAX - 24;
-			ScrollerDir = -1;
+			ScrollerY = SCRT_MIN;
+			ScrollerDir = 1;
 		}
 		BounceEnabled = !BounceEnabled;
 
@@ -410,6 +428,11 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 		}
 
 		MirrorEnabled = !MirrorEnabled;
+		chr = Scrolltext[ScrolltextCnt++];
+	}
+	if (chr == 's')
+	{
+		ScrollerPause = (Scrolltext[ScrolltextCnt++] - 48) * 50;
 		chr = Scrolltext[ScrolltextCnt++];
 	}
 	if (chr == 0)
@@ -704,13 +727,29 @@ void ClearBitmap(BmpDescriptor bmpD, USHORT lines)
 	custom->bltcon0 = 0x0900;
 	custom->bltcon1 = 0x0000;
 	custom->bltapt = (UBYTE *)bmpD.ImageData;
-	;
 	custom->bltdpt = (UBYTE *)bmpD.ImageData;
 	custom->bltafwm = 0xffff;
 	custom->bltalwm = 0xffff;
 	custom->bltamod = 0;
 	custom->bltdmod = 0;
 	custom->bltsize = ((lines * bmpD.Bpls) << 6) + (bmpD.Width / 16);
+}
+
+void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width)
+{
+	WaitBlt();
+	BYTE shift = x % 16;
+	if (shift)
+		width += 16;
+	custom->bltcon0 = 0x0 | SRCA | DEST | (shift) << ASHIFTSHIFT; // A = source, B = mask, C = background, D = destination
+	custom->bltcon1 = (shift) << BSHIFTSHIFT;
+	custom->bltapt = (UBYTE *)bmp.ImageData + (bmp.Bplt * y) + (x / 8);
+	custom->bltdpt = (UBYTE *)bmp.ImageData + (bmp.Bplt * y) + (x / 8);
+	custom->bltafwm = 0xffff;
+	custom->bltalwm = shift ? 0xffff << (15 - shift) : 0xffff;;
+	custom->bltamod = bmp.Bpl-(width/8);
+	custom->bltdmod = bmp.Bpl-(width/8);
+	custom->bltsize = ((height * bmp.Bpls) << 6) + (width / 16);
 }
 
 void SimpleBlit(BmpDescriptor imgA, BmpDescriptor imgD, Point2D startA, Point2D startD, USHORT height, USHORT width)
@@ -799,4 +838,61 @@ void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls)
 	bmp->Bpl = w / 8;
 	bmp->Bplt = w / 8 * bpls;
 	bmp->Btot = w / 8 * h * bpls;
+}
+
+void InitStarfieldSprite()
+{
+	short line = 0;
+	USHORT hpos = 14633;
+	BYTE vpos = 0x2c;
+
+	for (int l = 0; l < 100; l++)
+	{
+		hpos = (7*hpos)%255;
+		
+		StarSprite[line++] = vpos << 8 | (hpos & 0x00ff);	  //v-pos, h-pos
+		StarSprite[line++] = (vpos + 1) << 8 | 0; //v-stop, ctrl
+
+		switch (l % 3)
+		{
+		case 0:
+			StarSprite[line++] = 0x8000; //color-1
+			StarSprite[line++] = 0x0000; //color-1
+			break;
+		case 1:
+			StarSprite[line++] = 0x0000; //color-2
+			StarSprite[line++] = 0x8000; //color-2
+			break;
+		case 2:
+			StarSprite[line++] = 0x8000; //color-3
+			StarSprite[line++] = 0x8000; //color-3
+			break;
+		}
+
+		vpos += 2;
+	}
+	StarSprite[line++] = 0;
+	StarSprite[line++] = 0;
+}
+
+void MoveStarfield()
+{
+	BYTE hpos;
+	int line = 1;
+	for (int l = 0; l < 100; l++)
+	{
+		switch (l % 3)
+		{
+		case 0:
+			((volatile UBYTE *)StarSprite)[line] += 3;
+			break;
+		case 1:
+			((volatile UBYTE *)StarSprite)[line] += 1;
+			break;
+		case 2:
+			((volatile UBYTE *)StarSprite)[line] += 2;
+			break;
+		}
+		line += 8;
+	}
 }

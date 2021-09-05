@@ -1,7 +1,7 @@
 #if !defined(HANK_2021)
 #define HANK_2021
 
-#define MUSIC
+//#define MUSIC
 
 #include "../support/gcc8_c_support.h"
 #include "custom_defines.h"
@@ -75,7 +75,7 @@ USHORT *copPtr;
 
 // bitmaps
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
-INCBIN_CHIP(BmpFont32P, "Art/grfx/320x256x3_32x32_font.raw") // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font02.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
 INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2Mask.raw");
 BmpDescriptor Screen;
@@ -102,17 +102,17 @@ UWORD colgradbluePaletteRGB4[40] = {
 	0x007B,0x007B,0x007C,0x008C,0x008C,0x008C,0x008D,0x009D,
 	0x009D,0x009D,0x009E,0x00AE,0x00AE,0x00AE,0x00AF,0x00BF,
 	0x00BF};
-
  
 // scrolltext-stuff
 #define SCRT_MIN (0)
 #define SCRT_MAX (40)
 USHORT ScrollerMin = SCRT_MIN;
 USHORT ScrollerMax = SCRT_MAX;
-SHORT ScrollerY = SCRT_MAX - 24;
-BYTE ScrollerDir = -1;
+SHORT ScrollerY = SCRT_MIN;
+BYTE ScrollerDir = 1;
 USHORT ScrollCnt;
 USHORT ScrolltextCnt;
+USHORT ScrollerPause =0;
 BOOL BounceEnabled = FALSE;
 BOOL MirrorEnabled = FALSE;
 // pointer to copperlist bitplane pointers for bouncing
@@ -120,19 +120,21 @@ USHORT *copScrollerBmpP;
 // pointer to (re)set mirror effect (change bplmod) in copperlist
 USHORT *copMirrorBmpP;
 CONST char Scrolltext[] = "\
-HANK VAN BASTARD PRESENTS: THE HANK VAN BASTARD SHOW           \
+HANK   s1VAN    s1BASTARD s1 PRESENTS:s1 # THE HANK VAN BASTARD SHOW #           \
 HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME. \
-OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A MOMENT....AH! THERE!....b  \
-OOPS!     OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND. \
+OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A MOMENT....AH! THERE!.... \
+OFF WE GOb!s4        OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH! NEVERMIND - \
 BUT STILL NOT HAPPY?   LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!  \
 OK, OK... I'LL TRY MY BEST TO CLEAN IT UP ....            \
-m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!           \
+m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO! s2           \
 SEE YOU MY FRIENDS.                 bm\
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
 INCBIN_CHIP(module, "Art/music/chipper.p61")
-
+// sprite data
+__attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[180*4+2];
+__attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[]= {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};
 //proto
 void SetInterruptHandler(APTR interrupt);
 void WaitVbl(void);
@@ -261,6 +263,7 @@ void InitImagePlanes(BmpDescriptor *img);
 void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
+void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width);
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
 void LineDraw(BmpDescriptor bitmap, int x0, int y0, int x1, int y1, UBYTE col);
@@ -270,6 +273,8 @@ void SinusDraw(Point2D *targetList, USHORT sinstart, USHORT x, USHORT y, int amp
 void MakePolys();
 void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
+void InitStarfieldSprite(void);
+void MoveStarfield(void);
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
