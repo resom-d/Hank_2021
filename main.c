@@ -84,11 +84,12 @@ int main()
 	FreeMem((UBYTE *)BmpScroller.ImageData, BmpScroller.Btot);
 	FreeMem((UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Btot);
 	FreeMem((UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Btot);
-	// FREE SYSTEM
-	FreeSystem();
+	FreeMem((UBYTE *)BmpUpperPart_Buf1.ImageData, BmpUpperPart_PF2.Btot);
 	// CLOSE SYSTEM-LIBS
 	CloseLibrary((struct Library *)DOSBase);
 	CloseLibrary((struct Library *)GfxBase);
+	// FREE SYSTEM
+	FreeSystem();
 
 	return 0;
 }
@@ -392,7 +393,7 @@ void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT hei
 	custom->bltsize = ((height * theDesc.Bpls) << 6) + BmpScroller.Width / 16;
 
 	ScrollCnt += speed;
-	if (ScrollCnt >= 32)
+	if (ScrollCnt >= NextPlot)
 	{
 		ScrollCnt = 0;
 		PlotChar(BmpFont32, (UBYTE *)BmpFont32P, BmpScroller, (UBYTE *)BmpScroller.ImageData, startY, 32, 32);
@@ -404,6 +405,8 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 	UBYTE chr = Scrolltext[ScrolltextCnt++];
 	ULONG source, dest;
 	ULONG row, col;
+
+	NextPlot = 32;
 
 	if (chr == 'b')
 	{
@@ -435,11 +438,20 @@ void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBY
 		ScrollerPause = (Scrolltext[ScrolltextCnt++] - 48) * 50;
 		chr = Scrolltext[ScrolltextCnt++];
 	}
+	if (chr == '!' || chr == 'I')
+	{
+		NextPlot = 12;
+	}
+	if (chr == 'J')
+	{
+		NextPlot = 24;
+	}
 	if (chr == 0)
 	{
 		ScrolltextCnt = 0;
 		chr = Scrolltext[ScrolltextCnt++];
 	}
+	
 	if (chr < 32 || chr > (32 + 80))
 	{
 		return;
@@ -843,10 +855,10 @@ void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls)
 void InitStarfieldSprite()
 {
 	short line = 0;
-	USHORT hpos = 14633;
+	USHORT hpos = 3;
 	BYTE vpos = 0x2c;
 
-	for (int l = 0; l < 100; l++)
+	for (int l = 0; l < 93; l++)
 	{
 		hpos = (7*hpos)%255;
 		
@@ -879,7 +891,7 @@ void MoveStarfield()
 {
 	BYTE hpos;
 	int line = 1;
-	for (int l = 0; l < 100; l++)
+	for (int l = 0; l < 93; l++)
 	{
 		switch (l % 3)
 		{
