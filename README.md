@@ -10,15 +10,15 @@ Hank is coding for a real Amiga 1200, M68020, 2Mb chipram, 8Mb fastram, 68882 fp
 ## [AmigaForever!](https://www.amigaforever.com)
 - For Kick-Roms, Personal Paint and everthing else
 
-## Marlon Beijer
-- I use the hardware [header files](https://github.com/AmigaPorts/Amiga-Scoopex-C) written by him 
-
 ## [PHOTON of SCOOPEX](http://www.scoopex1988.org/photon.html)
 for his wonderfull tutorials on [youtube](https://www.youtube.com/channel/UC1lfCoAuwbQ22H-KoImEygg)
 and more information found at [Coppershade.org](http://coppershade.org)
 
 ## Wei-Ju Wu 
 for his nice tutorials on [youtube](https://www.youtube.com/channel/UC1lfCoAuwbQ22H-KoImEygg)
+
+## Marlon Beijer
+- I use the hardware [header files](https://github.com/AmigaPorts/Amiga-Scoopex-C) written by him 
 
 ## We are all standing on the shoulder of giants. 
 ## So I give credit to all the unsung heroes who dedicated their time to get this stuff up and going. 
