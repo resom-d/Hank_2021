@@ -27,8 +27,8 @@ int main()
 	BitmapInit(&Screen, 320, 256, 3);
 	BitmapInit(&BmpLogo, 256, 130, 3);
 	BitmapInit(&BmpUpperPart_PF1, 320, 130, 3);
-	BitmapInit(&BmpUpperPart_PF2, 320, 130, 3);
-	BitmapInit(&BmpUpperPart_Buf1, 320, 130, 3);
+	BitmapInit(&BmpUpperPart_PF2, 320 + 64, 130, 3);
+	BitmapInit(&BmpUpperPart_Buf1, 320 + 64, 130, 3);
 	BitmapInit(&BmpScroller, 320 + 32, 166, 3);
 	BitmapInit(&BmpFont32, 320, 256, 3);
 	BitmapInit(&BmpCookie, 320, 256, 3);
@@ -44,15 +44,22 @@ int main()
 	BmpCookie.ImageData = (UWORD *)BmpCookieP;
 	BmpCookieMask.ImageData = (UWORD *)BmpCookieMaskP;
 
-	InitImagePlanes(&BmpUpperPart_PF1);
-	InitImagePlanes(&BmpUpperPart_PF2);
-	InitImagePlanes(&BmpUpperPart_Buf1);
-	InitImagePlanes(&BmpScroller);
-	InitImagePlanes(&BmpFont32);
-	InitImagePlanes(&BmpCookie);
-	InitImagePlanes(&BmpCookieMask);
+	InitImagePlanes(&BmpUpperPart_PF1, 0);
+	InitImagePlanes(&BmpUpperPart_PF2, 32/8);
+	InitImagePlanes(&BmpUpperPart_Buf1, 32/8);
+	InitImagePlanes(&BmpScroller, 0);
+	InitImagePlanes(&BmpFont32, 0);
+	InitImagePlanes(&BmpCookie, 0);
+	InitImagePlanes(&BmpCookieMask, 0);
 
 	TakeSystem();
+
+	// setup the sprite's pixels
+	InitStarfieldSprite();
+	// copy logo to upper half
+	Point2D ps = {0, 0};
+	Point2D pd = {32, 0};
+	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
 
 	WaitVbl();
 
@@ -74,12 +81,6 @@ int main()
 	if (p61Init(module) != 0)
 		KPrintF("p61Init failed!\n");
 #endif
-	// setup the sprite's pixels
-	InitStarfieldSprite();
-	// copy logo to upper half
-	Point2D ps = {0, 0};
-	Point2D pd = {32, 0};
-	SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 130, 256);
 	// MAIN LOOP
 	MainLoop();
 	// CLEANUP
@@ -182,42 +183,17 @@ void MainLoop()
 		// ...move bobs...
 		MoveBobs();
 		// ...and repaint them
-		if (BobVisible & 1)
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[0], BobTarget[0], 32, 32);
-		}
-		if (BobVisible & (1 << 1))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[1], BobTarget[1], 32, 32);
-		}
-		if (BobVisible & (1 << 2))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[2], BobTarget[2], 32, 32);
-		}
-		if (BobVisible & (1 << 3))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[3], BobTarget[3], 32, 32);
-		}
-		if (BobVisible & (1 << 4))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[4], BobTarget[4], 32, 32);
-		}
-		if (BobVisible & (1 << 5))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[5], BobTarget[5], 32, 32);
-		}
-		if (BobVisible & (1 << 6))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[6], BobTarget[6], 32, 32);
-		}
-		if (BobVisible & (1 << 7))
-		{
-			BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[7], BobTarget[7], 32, 32);
-		}
-
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[0], BobTarget[0], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[1], BobTarget[1], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[2], BobTarget[2], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[3], BobTarget[3], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[4], BobTarget[4], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[5], BobTarget[5], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[6], BobTarget[6], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[7], BobTarget[7], 32, 32);
 		// move sprites at last - they won't flicker anyways
 		MoveStarfield();
-		custom->color[0]=0xf00;
+		//custom->color[0] = 0xf00;
 	}
 }
 
@@ -228,24 +204,21 @@ void MoveBobs()
 	case 0: // left to right
 		for (int b = 0; b < BOBSN - 1; b++)
 		{
-			if ((BobTarget[b + 1].X - BobTarget[b].X) > 34 || BobTarget[b + 1].X >= 320 - 32)
+			if ((BobTarget[b + 1].X - BobTarget[b].X) > 34 || BobTarget[b + 1].X >= 320+32)
 			{
-				BobVisible |= (1 << b);
 				BobTarget[b].X += BobVecs[b].X;
-				if (BobTarget[b].X > 320 - 32)
+				if (BobTarget[b].X > 320+32)
 				{
-					BobTarget[b].X = 320 - 32;
-					BobVisible &= ~(1 << b);
+					BobTarget[b].X = 320+32;
 				}
 			}
 		}
 		BobTarget[BOBSN - 1].X += BobVecs[BOBSN - 1].X;
-		if (BobTarget[BOBSN - 1].X > 320 - 32)
+		if (BobTarget[BOBSN - 1].X > 320+32)
 		{
-			BobTarget[BOBSN - 1].X = 320 - 32;
-			BobVisible &= ~(1 << 7);
+			BobTarget[BOBSN - 1].X = 320+32;
 		}
-		if (BobTarget[0].X >= 320 - 32)
+		if (BobTarget[0].X >= 320+32)
 		{
 			BobVecs[0].X *= -1;
 			BobVecs[1].X *= -1;
@@ -254,8 +227,7 @@ void MoveBobs()
 			BobVecs[4].X *= -1;
 			BobVecs[5].X *= -1;
 			BobVecs[6].X *= -1;
-			BobVecs[7].X *= -1;
-			BobVisible = 1 << 7;
+			BobVecs[7].X *= -1;			
 			BobPhase = 1;
 			*copPF1BmpP = 0 << 6; // prio. in bplcon2: pf1 >> pf 2 >> sprites
 		}
@@ -266,12 +238,10 @@ void MoveBobs()
 		{
 			if ((BobTarget[b].X - BobTarget[b + 1].X) > 34 || BobTarget[b + 1].X <= 0)
 			{
-				BobVisible |= (1 << b);
 				BobTarget[b].X += BobVecs[b].X;
 				if (BobTarget[b].X < 0)
 				{
 					BobTarget[b].X = 0;
-					BobVisible &= ~(1 << b);
 				}
 			}
 		}
@@ -279,7 +249,6 @@ void MoveBobs()
 		if (BobTarget[BOBSN - 1].X < 0)
 		{
 			BobTarget[BOBSN - 1].X = 0;
-			BobVisible &= ~(1 << 7);
 		}
 		if (BobTarget[0].X <= 0)
 		{
@@ -291,7 +260,7 @@ void MoveBobs()
 			BobVecs[5].X *= -1;
 			BobVecs[6].X *= -1;
 			BobVecs[7].X *= -1;
-			BobVisible = 1 << 7;
+			
 			BobPhase = 0;
 			*copPF1BmpP = 1 << 6; // prio. in bplcon2: pf2 >> pf 1 >> sprites
 		}
@@ -312,7 +281,7 @@ void SetupCopper(USHORT *copPtr)
 	*copPtr++ = DDFSTOP;
 	*copPtr++ = 0xd0;
 	// set pf1/2 modulos
-	copPtr = copSetBplMod(0, copPtr, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl, BmpUpperPart_PF1.Bplt - BmpUpperPart_PF1.Bpl);
+	copPtr = copSetBplMod(0, copPtr, BmpUpperPart_PF1.Bplt - Screen.Bpl, BmpUpperPart_PF2.Bplt - Screen.Bpl);
 	*copPtr++ = BPLCON1; //scrolling
 	*copPtr++ = 0;
 	*copPtr++ = BPLCON2; //playfied priority
@@ -330,9 +299,9 @@ void SetupCopper(USHORT *copPtr)
 		copPtr = copSetColor(copPtr, a, CookiePaletteRGB4[a - 8]);
 	}
 	// set upper part, pf1, bitplane pointers
-	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF1.Planes[0], BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
 	// set upper part, pf2, bitplane pointers
-	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
+	copPtr = copSetPlanesInterleafedOddEven(0, copPtr, (UBYTE *)BmpUpperPart_PF2.Planes[0], BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
 	// set sprite pointers
 	*copPtr++ = SPR0PTH;
 	*copPtr++ = (LONG)StarSprite >> 16;
@@ -699,11 +668,11 @@ void FreeSystem()
 	Enable();
 }
 
-void InitImagePlanes(BmpDescriptor *img)
+void InitImagePlanes(BmpDescriptor *img, USHORT offs)
 {
 	for (int p = 0; p < img->Bpls; p++)
 	{
-		img->Planes[p] = (UBYTE *)img->ImageData + (p * (img->Bpl));
+		img->Planes[p] = ((UBYTE *)img->ImageData) + offs + (p * (img->Bpl));
 	}
 }
 
