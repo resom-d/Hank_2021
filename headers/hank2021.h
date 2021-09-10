@@ -84,7 +84,7 @@ USHORT *copMirrorBmpP;
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font_02.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
-INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2Mask.raw");
+INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2.msk.raw");
 BmpDescriptor Screen;
 BmpDescriptor BmpUpperPart_PF1;
 BmpDescriptor BmpUpperPart_PF2;
@@ -95,13 +95,21 @@ BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
 BmpDescriptor BmpCookieMask;
 // Bobs
-#define BOBSN (4)
+#define BOBSN (8)
 Point2D BobSource[BOBSN] = {
     {0, 0},
     {48, 0},
     {96, 0},
-    {144, 0}};
+    {144, 0},
+    {0, 32},
+    {48, 32},
+    {0, 32},
+    {96, 32}};
 Point2D BobTarget[BOBSN] = {
+    {0, 46},
+    {0, 46},
+    {0, 46},
+    {0, 46},
     {0, 46},
     {0, 46},
     {0, 46},
@@ -110,8 +118,13 @@ Point2D BobVecs[BOBSN] = {
     {4, 0},
     {4, 0},
     {4, 0},
+    {4, 0},
+    {4, 0},
+    {4, 0},
+    {4, 0},
     {4, 0}};
 USHORT BobPhase = 0;
+USHORT BobVisible =0b10000000;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
     0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
