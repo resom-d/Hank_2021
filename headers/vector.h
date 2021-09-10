@@ -143,5 +143,12 @@ Point2D Point2DRotate(Point2D pa, Point2D fixpoint, int alpha)
 
     return pr;
 }
-void Points2DRotate(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int alpha);
+void Points2DRotate(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int alpha)
+{
+	for (int i = 0; i < length; i++)
+	{
+		pointsB[i] = Point2DRotate(pointsA[i], origin, alpha);
+	}
+}
+
 #endif // VECTOR

@@ -116,7 +116,7 @@ void MainLoop()
 			custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG | DMAF_SPRITE;
 			ResetCopper = FALSE;
 		}
-		// clear upper half of screen, bob-bitplanes
+		// copy buffer to bob-bitplanes
 		CopyBitmap(BmpUpperPart_Buf1, BmpUpperPart_PF2);
 		// calculate bounce levels and check bounds
 		if (BounceEnabled)
@@ -148,7 +148,6 @@ void MainLoop()
 				ScrollerPause--;
 			}
 		}
-
 		if (ScrollerY >= ScrollerMax)
 		{
 			ScrollerY = ScrollerMax;
@@ -176,12 +175,13 @@ void MainLoop()
 		ClearBitmapPart(BmpUpperPart_Buf1, BobTarget[1].X, BobTarget[1].Y, 32, 32);
 		ClearBitmapPart(BmpUpperPart_Buf1, BobTarget[2].X, BobTarget[2].Y, 32, 32);
 		ClearBitmapPart(BmpUpperPart_Buf1, BobTarget[3].X, BobTarget[3].Y, 32, 32);
-		// ...and repaint them
+		// ...move bobs...
 		MoveBobs();
-		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, pBobSource[0], BobTarget[0], 32, 32);
-		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, pBobSource[1], BobTarget[1], 32, 32);
-		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, pBobSource[2], BobTarget[2], 32, 32);
-		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, pBobSource[3], BobTarget[3], 32, 32);
+		// ...and repaint them
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[0], BobTarget[0], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[1], BobTarget[1], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[2], BobTarget[2], 32, 32);
+		BetterBlit(BmpCookie, BmpUpperPart_Buf1, BmpCookieMask, BobSource[3], BobTarget[3], 32, 32);
 		// move sprites at last - they won't flicker anyways
 		MoveStarfield();
 		//custom->color[0]=0xf00;
@@ -218,43 +218,39 @@ void MoveBobs()
 			BobVecs[1].X *= -1;
 			BobVecs[2].X *= -1;
 			BobVecs[3].X *= -1;
-			copSetPlanesInterleafedOddEven(0, copPF1BmpP, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, TRUE);
-			copSetPlanesInterleafedOddEven(0, copPF2BmpP, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, FALSE);
 			BobPhase = 1;
-			
+			*copPF1BmpP = 0 << 6;
 		}
 		break;
 
 	case 1: // right to left
 		for (int b = 0; b < BOBSN - 1; b++)
 		{
-			if ((BobTarget[b].X - BobTarget[b + 1].X) > 34 || BobTarget[b + 1].X <= 32)
+			if ((BobTarget[b].X - BobTarget[b + 1].X) > 34 || BobTarget[b + 1].X <= 0)
 			{
 				BobTarget[b].X += BobVecs[b].X;
-				if (BobTarget[b].X < 32)
+				if (BobTarget[b].X < 0)
 				{
-					BobTarget[b].X = 32;
+					BobTarget[b].X = 0;
 				}
 			}
 		}
-		if (BobTarget[BOBSN - 1].X > 32)
+		if (BobTarget[BOBSN - 1].X > 0)
 		{
 			BobTarget[BOBSN - 1].X += BobVecs[BOBSN - 1].X;
 		}
-		if (BobTarget[BOBSN - 1].X < 32)
+		if (BobTarget[BOBSN - 1].X < 0)
 		{
-			BobTarget[BOBSN - 1].X = 32;
+			BobTarget[BOBSN - 1].X = 0;
 		}
-		if (BobTarget[0].X <= 32)
+		if (BobTarget[0].X <= 0)
 		{
 			BobVecs[0].X *= -1;
 			BobVecs[1].X *= -1;
 			BobVecs[2].X *= -1;
 			BobVecs[3].X *= -1;
 			BobPhase = 0;
-			copSetPlanesInterleafedOddEven(0, copPF1BmpP, (UBYTE *)BmpUpperPart_PF1.ImageData, BmpUpperPart_PF1.Bpls, BmpUpperPart_PF1.Bpl, 0, FALSE);
-			copSetPlanesInterleafedOddEven(0, copPF2BmpP, (UBYTE *)BmpUpperPart_PF2.ImageData, BmpUpperPart_PF2.Bpls, BmpUpperPart_PF2.Bpl, 0, TRUE);
-			
+			*copPF1BmpP = 1 << 6;	
 		}
 		break;
 	}
@@ -276,6 +272,7 @@ void SetupCopper(USHORT *copPtr)
 	*copPtr++ = BPLCON1; //scrolling
 	*copPtr++ = 0;
 	*copPtr++ = BPLCON2; //playfied priority
+	copPF1BmpP = copPtr;
 	*copPtr++ = 1 << 6;	 //0x24; pf1 >> pf 2 >> sprites
 	// set logo colors
 	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[0]);
@@ -668,16 +665,28 @@ void InitImagePlanes(BmpDescriptor *img)
 
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col)
 {
-	USHORT xb = (x) / 8;
-	UBYTE xo = 0x80 >> (x % 8);
-	USHORT yb = y * bitmap.Bplt;
+	USHORT xByteOffset = (x) / 8;
+	UBYTE xBitOffset = 0x80 >> (x % 8);
+	USHORT yByteOffset = y * bitmap.Bplt;
 	for (int pl = 0; pl < bitmap.Bpls; pl++)
 	{
-		bitmap.Planes[pl][yb + xb] &= ~xo;
+		bitmap.Planes[pl][yByteOffset + xByteOffset] &= ~xBitOffset;
 		if ((col >> pl) & (UBYTE)1)
 		{
-			bitmap.Planes[pl][yb + xb] |= xo;
+			bitmap.Planes[pl][yByteOffset + xByteOffset] |= xBitOffset;
 		}
+	}
+}
+
+void ClearPixel(BmpDescriptor bitmap, USHORT x, USHORT y)
+{
+	USHORT xByteOffset = (x) / 8;
+	UBYTE xBitOffset = 0x80 >> (x % 8);
+	USHORT yByteOffset = y * bitmap.Bplt;
+	for (int pl = 0; pl < bitmap.Bpls; pl++)
+	{
+		bitmap.Planes[pl][yByteOffset + xByteOffset] &= ~xBitOffset;
+		
 	}
 }
 
@@ -776,14 +785,6 @@ void EllipseDraw(BmpDescriptor bitmap, BYTE col, int xm, int ym, int a, int b)
 
 void MakePolys()
 {
-}
-
-void Points2DRotate(Point2D *pointsA, Point2D *pointsB, USHORT length, Point2D origin, int alpha)
-{
-	for (int i = 0; i < length; i++)
-	{
-		pointsB[i] = Point2DRotate(pointsA[i], origin, alpha);
-	}
 }
 
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD)
@@ -958,12 +959,10 @@ void InitStarfieldSprite()
 
 void MoveStarfield()
 {
-	int line = 1;
-	for (int l = 0; l < 31; l++)
+	for (int l = 1; l < 31 * 24; l += 24)
 	{
-		((volatile UBYTE *)StarSprite)[line] += 1;
-		((volatile UBYTE *)StarSprite)[line + 8] += 2;
-		((volatile UBYTE *)StarSprite)[line + 16] += 3;
-		line += 24;
+		((volatile UBYTE *)StarSprite)[l] += 1;
+		((volatile UBYTE *)StarSprite)[l + 8] += 2;
+		((volatile UBYTE *)StarSprite)[l + 16] += 3;	
 	}
 }

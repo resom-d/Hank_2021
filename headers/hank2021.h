@@ -71,10 +71,17 @@ static APTR SystemIrq;
 // active view
 struct View *ActiView;
 USHORT *copPtr;
-// interrupt handler
-
+// pointer to copperlist bitplane pointers for bouncing
+USHORT *copScrollerBmpP;
+// pointer to copperlist bitplane pointers for pf 1/2 pointers
+USHORT *copPF1BmpP;
+USHORT *copPF2BmpP;
+USHORT *copPF1ColP;
+USHORT *copPF2ColP;
+// pointer to (re)set mirror effect (change bplmod) in copperlist
+USHORT *copMirrorBmpP;
 // bitmaps
-INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")               // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font_02.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
 INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2Mask.raw");
@@ -84,24 +91,41 @@ BmpDescriptor BmpUpperPart_PF2;
 BmpDescriptor BmpUpperPart_Buf1;
 BmpDescriptor BmpLogo;
 BmpDescriptor BmpScroller;
-;
 BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
 BmpDescriptor BmpCookieMask;
+// Bobs
+#define BOBSN (4)
+Point2D BobSource[BOBSN] = {
+    {0, 0},
+    {48, 0},
+    {96, 0},
+    {144, 0}};
+Point2D BobTarget[BOBSN] = {
+    {0, 46},
+    {0, 46},
+    {0, 46},
+    {0, 46}};
+Point2D BobVecs[BOBSN] = {
+    {4, 0},
+    {4, 0},
+    {4, 0},
+    {4, 0}};
+USHORT BobPhase = 0;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
     0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
 UWORD FontPaletteRGB4[8] = {
-    0x0BF0,0x08F0,0x06F0,0x03F0,0x01F0,0x00F1,0x00F4,0x00F6};
+    0x0BF0, 0x08F0, 0x06F0, 0x03F0, 0x01F0, 0x00F1, 0x00F4, 0x00F6};
 UWORD CookiePaletteRGB4[8] = {
-    0x0000,0x0066,0x0077,0x0088,0x00A9,0x00BB,0x00CC,0x00DD};
+    0x0000, 0x0066, 0x0077, 0x0088, 0x00A9, 0x00BB, 0x00CC, 0x00DD};
 UWORD colgradbluePaletteRGB4[40] = {
-    0x0015,0x0016,0x0016,0x0016,0x0026,0x0027,0x0027,
-	0x0037,0x0037,0x0038,0x0038,0x0048,0x0048,0x0049,0x0049,
-	0x0059,0x0059,0x005A,0x005A,0x006A,0x006A,0x006B,0x006B,
-	0x007B,0x007B,0x007C,0x008C,0x008C,0x008C,0x008D,0x009D,
-	0x009D,0x009D,0x009E,0x00AE,0x00AE,0x00AE,0x00AF,0x00BF,
-	0x00BF};
+    0x0015, 0x0016, 0x0016, 0x0016, 0x0026, 0x0027, 0x0027,
+    0x0037, 0x0037, 0x0038, 0x0038, 0x0048, 0x0048, 0x0049, 0x0049,
+    0x0059, 0x0059, 0x005A, 0x005A, 0x006A, 0x006A, 0x006B, 0x006B,
+    0x007B, 0x007B, 0x007C, 0x008C, 0x008C, 0x008C, 0x008D, 0x009D,
+    0x009D, 0x009D, 0x009E, 0x00AE, 0x00AE, 0x00AE, 0x00AF, 0x00BF,
+    0x00BF};
 UWORD colScrollMirror[] = {0x111, 0x222};
 // scrolltext-stuff
 #define SCRT_MIN (0)
@@ -113,39 +137,36 @@ BYTE ScrollerDir = 1;
 USHORT ScrollCnt;
 USHORT NextPlot = 32;
 USHORT ScrolltextCnt;
-USHORT ScrollerPause =0;
+USHORT ScrollerPause = 0;
 BOOL BounceEnabled = FALSE;
 BOOL MirrorEnabled = FALSE;
 BOOL ResetCopper = FALSE;
-// pointer to copperlist bitplane pointers for bouncing
-USHORT *copScrollerBmpP;
-// pointer to (re)set mirror effect (change bplmod) in copperlist
-USHORT *copMirrorBmpP;
 CONST char Scrolltext[] = "      \
 HANK   s1VAN    s1BASTARD s1 PRESENTS: s1     #THE HANK VAN BASTARD SHOW#           \
-HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?  I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME. \
-OH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
-OFF WE GOb!s4        OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!     NEVERMIND - \
-BUT STILL NOT HAPPY?     LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!     \
+HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?     I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME.     \
+OOOOH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
+OFF WE GOb!s4        OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!        NEVERMIND - \
+BUT STILL NOT HAPPY?        LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!     \
 OK, OK... I'LL TRY MY BEST TO CLEAN IT UP....            \
-c m     YES! NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!  s2             \
+c m     YES, NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!  s4             \
 THIS PIECE OF CODE WOULDN'T HAVE BEEN POSSIBLE WITHOUT THE WORK OF LOTS OF PEOPLE \
 PROVIDING TOOLS AND PASSING ON KNOWLEDGE. SO I TAKE PLEASURE IN SAYING THANKS TO YOU ALL. \
 SPECIAL THANKS TO  PHOTON  s4 OF SCOOPEX FOR HIS LOVELY \
 AMIGA HARDWARE PROGRAMMING SERIES 'ASMSKOOL' s4 TO BE WATCHED ON YOUTUBE. THIS DEMO IS BASICALLY THE ATTEMPT TO \
 GET DONE WHAT HE SHOWS AND PORTING IT TO THE C PROGRAMMING LANGUAGE.  BUT MEANWHILE I STARTED \
-WRITING IN ASSEMBLER AS WELL WHICH I NEVER THOUGHT WOULD BE ENJOYABLE - BUT.. IT'S NEVER TOO EARLY \
-AND SELDOMLY TOO LATE :-)      \
-ALSO WEI-JU WU s4 FOR HIS SERIES ON YOUTUBE.      \
+WRITING IN ASSEMBLER AS WELL WHICH I NEVER THOUGHT COULD BE ENJOYABLE - BUT.. IT'S NEVER TOO EARLY \
+AND SELDOMLY TOO LATE :-)        \
+ALSO WEI-JU WU s4 FOR HIS SERIES ON YOUTUBE.         \
 HANK USES THE AMIGA VSCODE EXTENSION BY  BARTMAN s4OF ABYSS.    \
-THANKS FOR THE EXCELLENT WORK DUDES IT'S VERY MUCH APPRECIATED.          SEE YOU MY FRIENDS.                 \
-AND REMEMBER: A BASTARD'S WORK IS NEVER DONE.                    bm\0";
+THANKS FOR THE EXCELLENT WORK DUDES IT'S VERY MUCH APPRECIATED.          SEE YOU MY FRIENDS.                \
+AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.            bm                                                 \
+\0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
 INCBIN_CHIP(module, "Art/music/chipper.p61")
 // sprite data
-__attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[93*4+2];
-__attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[]= {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};
+__attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[93 * 4 + 2];
+__attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[] = {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};
 //proto
 void SetInterruptHandler(APTR interrupt);
 void WaitVbl(void);
@@ -267,7 +288,7 @@ inline USHORT *copSetColor(USHORT *copListCurrent, USHORT index, USHORT color)
 void SetupCopper(USHORT *copPtr);
 void MainLoop(void);
 void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed);
-void PlotChar(BmpDescriptor bmpFont, UBYTE *bmpFontP, BmpDescriptor bmpDest, UBYTE *bmpDestP, USHORT plotY, USHORT charW, USHORT charH);
+void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT charW, USHORT charH);
 void BounceScroller(USHORT pos);
 void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
 void InitImagePlanes(BmpDescriptor *img);
@@ -276,7 +297,9 @@ void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Poin
 void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
 void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width);
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
+void MoveBobs(void);
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
+void ClearPixel(BmpDescriptor bitmap, USHORT x, USHORT y);
 void LineDraw(BmpDescriptor bitmap, int x0, int y0, int x1, int y1, UBYTE col);
 void PolygonDraw(BmpDescriptor bitmap, Point2D *pointlist, USHORT length, BYTE col, BOOL closed);
 void EllipseDraw(BmpDescriptor bitmap, BYTE col, int xm, int ym, int a, int b);
@@ -289,7 +312,7 @@ void MoveStarfield(void);
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
-
+// interrupt handler
 static __attribute__((interrupt)) void interruptHandler()
 {
 
