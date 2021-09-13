@@ -124,7 +124,6 @@ Point2D BobVecs[BOBSN] = {
     {4, 0},
     {4, 0}};
 USHORT BobPhase = 0;
-USHORT BobVisible =0b10000000;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
     0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
@@ -176,7 +175,7 @@ AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.            bm                    
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
-INCBIN_CHIP(module, "Art/music/chipper.p61")
+INCBIN_CHIP(module, "Art/music/P61.DMODE")
 // sprite data
 __attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[93 * 4 + 2];
 __attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[] = {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};
@@ -304,7 +303,7 @@ void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT hei
 void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT charW, USHORT charH);
 void BounceScroller(USHORT pos);
 void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
-void InitImagePlanes(BmpDescriptor *img);
+void InitImagePlanes(BmpDescriptor *img, USHORT offs);
 void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Point2D startS, Point2D startD, USHORT height, USHORT width);
 void ClearBitmap(BmpDescriptor bmpD, USHORT lines);

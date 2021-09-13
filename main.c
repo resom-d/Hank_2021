@@ -342,34 +342,10 @@ void SetupCopper(USHORT *copPtr)
 	// enable bitplanes
 	*copPtr++ = BPLCON0;
 	*copPtr++ = ((BmpLogo.Bpls * 2) << 12) /*num bitplanes*/ | (1 << 10) /*dual pf*/ | (1 << 9) /*color*/;
-	// colors(1)
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[0]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[0]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[1]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[1]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[2]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[2]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[3]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[3]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[4]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[4]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[5]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[5]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[6]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[6]);
-	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[0]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[0]);
 	// wait till below logo
 	line = 0x2c + BmpUpperPart_PF1.Height;
 	copPtr = copWaitY(copPtr, line++);
+	// turn off bitplanes to waste 8 lines, giving the logo more bottom space
 	// turn off bitplanes to waste 8 lines, giving the logo more bottom space
 	*copPtr++ = BPLCON0;
 	*copPtr++ = (0) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
