@@ -95,14 +95,12 @@ BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
 BmpDescriptor BmpCookieMask;
 // Bobs
-#define BOBSN (8)
+#define BOBSN (6)
 Point2D BobSource[BOBSN] = {
     {0, 0},
     {48, 0},
     {96, 0},
     {144, 0},
-    {0, 32},
-    {48, 32},
     {0, 32},
     {96, 32}};
 Point2D BobTarget[BOBSN] = {
@@ -111,19 +109,16 @@ Point2D BobTarget[BOBSN] = {
     {0, 46},
     {0, 46},
     {0, 46},
-    {0, 46},
-    {0, 46},
     {0, 46}};
 Point2D BobVecs[BOBSN] = {
-    {4, 0},
-    {4, 0},
-    {4, 0},
-    {4, 0},
-    {4, 0},
-    {4, 0},
-    {4, 0},
-    {4, 0}};
+    {2, 0},
+    {2, 0},
+    {2, 0},
+    {2, 0},
+    {2, 0},
+    {2, 0}};
 USHORT BobPhase = 0;
+USHORT BobPause = 0;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
     0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
@@ -139,6 +134,10 @@ UWORD colgradbluePaletteRGB4[40] = {
     0x009D, 0x009D, 0x009E, 0x00AE, 0x00AE, 0x00AE, 0x00AF, 0x00BF,
     0x00BF};
 UWORD colScrollMirror[] = {0x111, 0x222};
+SHORT LogoShowY1 = 0;
+SHORT LogoShowY2 = 1;
+UBYTE LogoShowPhase = 0;
+USHORT LogoShowPause = 6*50;
 // scrolltext-stuff
 #define SCRT_MIN (0)
 #define SCRT_MAX (40)
@@ -155,12 +154,12 @@ BOOL MirrorEnabled = FALSE;
 BOOL ResetCopper = FALSE;
 CONST char Scrolltext[] = "      \
 HANK   s1VAN    s1BASTARD s1 PRESENTS: s1     #THE HANK VAN BASTARD SHOW#           \
-HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?     I WANT TO BOUNCE! ME IS A POOR SCROLLER NOBODY LOVES ME.     \
-OOOOH, DEAR SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
-OFF WE GOb!s4        OH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!        NEVERMIND - \
+HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?     I'M BORED! I WANT TO BOUNCE!       \
+OK SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
+OFF WE GOb!s4        MMHH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!        NEVERMIND - \
 BUT STILL NOT HAPPY?        LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!     \
-OK, OK... I'LL TRY MY BEST TO CLEAN IT UP....            \
-c m     YES, NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE MY HERO!  s4             \
+OK, OK...GODDA... I'LL TRY MY BEST TO CLEAN IT UP....            \
+c m     YES, NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE  MY HERO! s4             \
 THIS PIECE OF CODE WOULDN'T HAVE BEEN POSSIBLE WITHOUT THE WORK OF LOTS OF PEOPLE \
 PROVIDING TOOLS AND PASSING ON KNOWLEDGE. SO I TAKE PLEASURE IN SAYING THANKS TO YOU ALL. \
 SPECIAL THANKS TO  PHOTON  s4 OF SCOOPEX FOR HIS LOVELY \
@@ -321,6 +320,8 @@ void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
 void InitStarfieldSprite(void);
 void MoveStarfield(void);
+void BuildLogo(void);
+void DissolveLogo(void);
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
