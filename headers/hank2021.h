@@ -174,7 +174,7 @@ AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.            bm                    
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
-INCBIN_CHIP(module, "Art/music/P61.DMODE")
+INCBIN_CHIP(module, "Art/music/P61.Hank003")
 // sprite data
 __attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[93 * 4 + 2];
 __attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[] = {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};

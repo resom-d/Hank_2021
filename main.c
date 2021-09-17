@@ -103,6 +103,9 @@ int main()
 
 void MainLoop()
 {
+	static BOOL LogoShowEnabled = TRUE;
+	static BOOL BobsMoveEnabled = FALSE;
+
 	while (!MouseLeft())
 	{
 		// wait for vertical blank
