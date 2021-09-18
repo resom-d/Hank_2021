@@ -26,6 +26,7 @@ int main()
 
 	BitmapInit(&Screen, 320, 256, 3);
 	BitmapInit(&BmpLogo, 256, 130, 3);
+	BitmapInit(&BmpLogo2, 256, 130, 3);
 	BitmapInit(&BmpUpperPart_PF1, 320, 130, 3);
 	BitmapInit(&BmpUpperPart_PF2, 320 + 64, 130, 3);
 	BitmapInit(&BmpUpperPart_Buf1, 320 + 64, 130, 3);
@@ -40,10 +41,13 @@ int main()
 	BmpUpperPart_PF2.ImageData = (UWORD *)AllocMem(BmpUpperPart_PF2.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpUpperPart_Buf1.ImageData = (UWORD *)AllocMem(BmpUpperPart_Buf1.Btot, MEMF_CHIP | MEMF_CLEAR);
 	BmpLogo.ImageData = (UWORD *)BmpLogoP;
+	BmpLogo2.ImageData = (UWORD *)BmpLogo2P;
 	BmpFont32.ImageData = (UWORD *)BmpFont32P;
 	BmpCookie.ImageData = (UWORD *)BmpCookieP;
 	BmpCookieMask.ImageData = (UWORD *)BmpCookieMaskP;
 
+	InitImagePlanes(&BmpLogo, 0);
+	InitImagePlanes(&BmpLogo2, 0);
 	InitImagePlanes(&BmpUpperPart_PF1, 0);
 	InitImagePlanes(&BmpUpperPart_PF2, 32 / 8);
 	InitImagePlanes(&BmpUpperPart_Buf1, 32 / 8);
@@ -105,6 +109,9 @@ void MainLoop()
 {
 	static BOOL LogoShowEnabled = TRUE;
 	static BOOL BobsMoveEnabled = FALSE;
+	short bmpCnt = 0;
+	USHORT *colP;
+	BmpDescriptor bmd = BmpLogo;
 
 	while (!MouseLeft())
 	{
@@ -115,26 +122,50 @@ void MainLoop()
 		{
 			LogoShowPause--;
 		}
-		else if (LogoShowPhase == 0 && LogoShowPause == 0)
+		else if (LogoShowPhase % 2 == 0)
+		{	if(bmpCnt > 1)
 		{
-			BuildLogo();
+			bmpCnt=0;
+		}
 			if (LogoShowY1 > 128 && LogoShowY2 > 129)
 			{
 				LogoShowY1 = 128;
 				LogoShowY2 = 129;
-				LogoShowPhase = 1;
+				LogoShowPhase++;
 				LogoShowPause = 4 * 50;
+				bmpCnt++;
 			}
+			BuildLogo(bmd);
 		}
-		else if (LogoShowPhase == 1 && LogoShowPause == 0)
+		else if (LogoShowPhase % 2 == 1)
 		{
 			DissolveLogo();
 			if (LogoShowY1 < 0 && LogoShowY2 < 1)
 			{
 				LogoShowY1 = 0;
 				LogoShowY2 = 1;
-				LogoShowPhase = 0;
+				LogoShowPhase++;
 				LogoShowPause = 2 * 50;
+				if (bmpCnt % 2 == 0)
+				{
+					bmd = BmpLogo;
+					colP = copPF1ColP;
+					for (int a = 1; a < 8; a++)
+					{
+						ActPfCol = LogoPaletteRGB4;
+						colP = copSetColor(colP, a, LogoPaletteRGB4[a]);
+					}					
+				}
+				else
+				{
+					bmd = BmpLogo2;
+					colP = copPF1ColP;
+					for (int a = 1; a < 8; a++)
+					{
+						ActPfCol = BastardsPaletteRGB4;
+						colP = copSetColor(colP, a, BastardsPaletteRGB4[a]);
+					}
+				}
 			}
 		}
 		// needed for color change in lower half
@@ -155,11 +186,11 @@ void MainLoop()
 			if (ScrollerDir > 0)
 			{
 				ScrollerDir = ((ScrollerMax - ScrollerY) * 1000 / 12000);
-				if(ScrollerDir > 6)
+				if (ScrollerDir > 6)
 				{
 					ScrollerDir = 6;
 				}
-				if(ScrollerDir < 1)
+				if (ScrollerDir < 1)
 				{
 					ScrollerDir = 1;
 				}
@@ -323,12 +354,13 @@ void SetupCopper(USHORT *copPtr)
 	*copPtr++ = 1 << 6; //pf2 >> pf 1 >> sprites
 	// set logo colors
 	copPtr = copSetColor(copPtr, 0, colgradbluePaletteRGB4[0]);
-	copPtr = copSetColor(copPtr, 7, colgradbluePaletteRGB4[0]);
+	copPtr = copSetColor(copPtr, 8, colgradbluePaletteRGB4[0]);
+	copPF1ColP = copPtr;
 	for (int a = 1; a < 8; a++)
 	{
-		copPtr = copSetColor(copPtr, a, LogoPaletteRGB4[a]);
+		copPtr = copSetColor(copPtr, a, ActPfCol[a]);
 	}
-	for (int a = 8; a < 16; a++)
+	for (int a = 9; a < 16; a++)
 	{
 		copPtr = copSetColor(copPtr, a, CookiePaletteRGB4[a - 8]);
 	}
@@ -379,7 +411,6 @@ void SetupCopper(USHORT *copPtr)
 	// wait till below logo
 	line = 0x2c + BmpUpperPart_PF1.Height;
 	copPtr = copWaitY(copPtr, line++);
-	// turn off bitplanes to waste 8 lines, giving the logo more bottom space
 	// turn off bitplanes to waste 8 lines, giving the logo more bottom space
 	*copPtr++ = BPLCON0;
 	*copPtr++ = (0) /*num bitplanes*/ | (0 << 10) /*dual pf*/ | (1 << 9) /*color*/;
@@ -989,7 +1020,7 @@ void MoveStarfield()
 	}
 }
 
-void BuildLogo()
+void BuildLogo(BmpDescriptor d)
 {
 	Point2D ps;
 	Point2D pd;
@@ -1000,7 +1031,7 @@ void BuildLogo()
 		ps.Y = LogoShowY1;
 		pd.X = 32;
 		pd.Y = LogoShowY1;
-		SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 1, 256);
+		SimpleBlit(d, BmpUpperPart_PF1, ps, pd, 1, 256);
 		LogoShowY1 += 2;
 	}
 	else if (LogoShowY2 <= 129)
@@ -1009,7 +1040,7 @@ void BuildLogo()
 		ps.Y = LogoShowY2;
 		pd.X = 32;
 		pd.Y = LogoShowY2;
-		SimpleBlit(BmpLogo, BmpUpperPart_PF1, ps, pd, 1, 256);
+		SimpleBlit(d, BmpUpperPart_PF1, ps, pd, 1, 256);
 		LogoShowY2 += 2;
 	}
 }

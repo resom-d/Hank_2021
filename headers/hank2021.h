@@ -82,6 +82,7 @@ USHORT *copPF2ColP;
 USHORT *copMirrorBmpP;
 // bitmaps
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")        // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpLogo2P, "Art/grfx/Bastards.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font_02.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
 INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2.msk.raw");
@@ -90,6 +91,7 @@ BmpDescriptor BmpUpperPart_PF1;
 BmpDescriptor BmpUpperPart_PF2;
 BmpDescriptor BmpUpperPart_Buf1;
 BmpDescriptor BmpLogo;
+BmpDescriptor BmpLogo2;
 BmpDescriptor BmpScroller;
 BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
@@ -122,6 +124,10 @@ USHORT BobPause = 0;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
     0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
+UWORD BastardsPaletteRGB4[8] ={
+	0x0CCC,0x0FFF,0x0A20,0x0B30,0x0B30,0x0C40,0x0C40,0x0D50
+};
+UWORD *ActPfCol = LogoPaletteRGB4;
 UWORD FontPaletteRGB4[8] = {
     0x0BF0, 0x08F0, 0x06F0, 0x03F0, 0x01F0, 0x00F1, 0x00F4, 0x00F6};
 UWORD CookiePaletteRGB4[8] = {
@@ -137,7 +143,7 @@ UWORD colScrollMirror[] = {0x111, 0x222};
 SHORT LogoShowY1 = 0;
 SHORT LogoShowY2 = 1;
 UBYTE LogoShowPhase = 0;
-USHORT LogoShowPause = 6*50;
+USHORT LogoShowPause = 1*50;
 // scrolltext-stuff
 #define SCRT_MIN (0)
 #define SCRT_MAX (40)
@@ -320,7 +326,7 @@ void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
 void InitStarfieldSprite(void);
 void MoveStarfield(void);
-void BuildLogo(void);
+void BuildLogo(BmpDescriptor d);
 void DissolveLogo(void);
 int p61Init(const void *module);
 void p61Music(void);
