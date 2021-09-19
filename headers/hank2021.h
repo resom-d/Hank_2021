@@ -83,6 +83,8 @@ USHORT *copMirrorBmpP;
 // bitmaps
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpLogo2P, "Art/grfx/Bastards.raw")        // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpLogo3P, "Art/grfx/bastard_too.raw")        // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpLogo4P, "Art/grfx/bastard_three.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font_02.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
 INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2.msk.raw");
@@ -92,20 +94,26 @@ BmpDescriptor BmpUpperPart_PF2;
 BmpDescriptor BmpUpperPart_Buf1;
 BmpDescriptor BmpLogo;
 BmpDescriptor BmpLogo2;
+BmpDescriptor BmpLogo3;
+BmpDescriptor BmpLogo4;
 BmpDescriptor BmpScroller;
 BmpDescriptor BmpFont32;
 BmpDescriptor BmpCookie;
 BmpDescriptor BmpCookieMask;
 // Bobs
-#define BOBSN (6)
+#define BOBSN (8)
 Point2D BobSource[BOBSN] = {
     {0, 0},
     {48, 0},
     {96, 0},
     {144, 0},
     {0, 32},
+    {48, 32},
+    {0, 32},
     {96, 32}};
 Point2D BobTarget[BOBSN] = {
+    {0, 46},
+    {0, 46},
     {0, 46},
     {0, 46},
     {0, 46},
@@ -118,18 +126,26 @@ Point2D BobVecs[BOBSN] = {
     {2, 0},
     {2, 0},
     {2, 0},
+    {2, 0},
+    {2, 0},
     {2, 0}};
 USHORT BobPhase = 0;
 USHORT BobPause = 0;
 // palettes
 UWORD LogoPaletteRGB4[8] = {
-    0x0000, 0x0556, 0x0C95, 0x0EA6, 0x0432, 0x0531, 0x0212, 0x0881};
+    0x0000,0x0C95,0x0C95,0x0EA6,0x0432,0x0542,0x0430,0x0B81};
 UWORD BastardsPaletteRGB4[8] ={
 	0x0CCC,0x0FFF,0x0A20,0x0B30,0x0B30,0x0C40,0x0C40,0x0D50
 };
+UWORD bastard_tooPaletteRGB4[8] ={
+	0x0CCC,0x0FFF,0x007C,0x007C,0x006B,0x006B,0x005B,0x005A
+};
+UWORD bastard_threePaletteRGB4[8] ={
+	0x0CCC,0x0FFF,0x0F50,0x0F60,0x0F80,0x0E90,0x0EA0,0x0EB0
+};
 UWORD *ActPfCol = LogoPaletteRGB4;
 UWORD FontPaletteRGB4[8] = {
-    0x0BF0, 0x08F0, 0x06F0, 0x03F0, 0x01F0, 0x00F1, 0x00F4, 0x00F6};
+    0x0000,0x0e80,0x0fc0,0x0080,0x04f4,0x0050,0x03C3,0x04F4};
 UWORD CookiePaletteRGB4[8] = {
     0x0000, 0x0066, 0x0077, 0x0088, 0x00A9, 0x00BB, 0x00CC, 0x00DD};
 UWORD colgradbluePaletteRGB4[40] = {
@@ -144,6 +160,8 @@ SHORT LogoShowY1 = 0;
 SHORT LogoShowY2 = 1;
 UBYTE LogoShowPhase = 0;
 USHORT LogoShowPause = 1*50;
+BOOL LogoShowDone = FALSE;
+BOOL LogoDissolveDone = FALSE;
 // scrolltext-stuff
 #define SCRT_MIN (0)
 #define SCRT_MAX (40)
@@ -158,7 +176,7 @@ USHORT ScrollerPause = 0;
 BOOL BounceEnabled = FALSE;
 BOOL MirrorEnabled = FALSE;
 BOOL ResetCopper = FALSE;
-CONST char Scrolltext[] = "      \
+CONST char Scrolltext[] = "           \
 HANK   s1VAN    s1BASTARD s1 PRESENTS: s1     #THE HANK VAN BASTARD SHOW#           \
 HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?     I'M BORED! I WANT TO BOUNCE!       \
 OK SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
@@ -176,7 +194,13 @@ AND SELDOMLY TOO LATE :-)        \
 ALSO WEI-JU WU s4 FOR HIS SERIES ON YOUTUBE.         \
 HANK USES THE AMIGA VSCODE EXTENSION BY  BARTMAN s4OF ABYSS.    \
 THANKS FOR THE EXCELLENT WORK DUDES IT'S VERY MUCH APPRECIATED.          SEE YOU MY FRIENDS.                \
-AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.            bm                                                 \
+IF YOU LIKE WHAT YOU'VE SEEN AND THINK: YES THAT'S THE KIND OF STUFF I WANT TO DO AND YOU WANT TO JOIN FORCES \
+FEEL FREE TO CONTACT THE WORLD'S GREATEST BASTARD VIA 'HANKVANBASTARD(A)GMAIL.COM'    \
+YES - RIGHT NOW THIS IS A ONE MAN SHOW AND THAT ISN'T ALWAYS THE BEST FUN, SO...              \
+BYE THE WAY: I USED THE (A) INSTEAD OF MY UGLY       NOW IT'S COMING      @     s4     WHOA! WHAT A SHAME!      \
+HEY! STOP LAUGHING YOU LOUSY BASTARD! BETTER DESIGN ME A NICER '@'.      YOU SEE I REALLY NEED HELP. \
+SO CONTACT ME VIA 'HANKVANBASTARD@GMAIL.COM'      \
+AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.                m b                   \
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
@@ -212,6 +236,7 @@ inline USHORT *screenScanDefault(USHORT *copListEnd)
     *copListEnd++ = x + (y << 8);
     *copListEnd++ = DIWSTOP;
     *copListEnd++ = (xstop - 256) + ((ystop - 256) << 8);
+BOOL LogoShowDone = FALSE;
     return copListEnd;
 }
 inline int powerOf(int b, int e)
@@ -314,6 +339,7 @@ void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Poin
 void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
 void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width);
 void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
+void CopyBitmapPart(BmpDescriptor bmpS, BmpDescriptor bmpD, USHORT start, USHORT stop);
 void MoveBobs(void);
 void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
 void ClearPixel(BmpDescriptor bitmap, USHORT x, USHORT y);
@@ -326,8 +352,8 @@ void EnableMirrorEffect(void);
 void DisableMirrorEffect(void);
 void InitStarfieldSprite(void);
 void MoveStarfield(void);
-void BuildLogo(BmpDescriptor d);
-void DissolveLogo(void);
+void BuildLogo(BmpDescriptor d, short mode);
+void DissolveLogo(short mode);
 int p61Init(const void *module);
 void p61Music(void);
 void p61End(void);
