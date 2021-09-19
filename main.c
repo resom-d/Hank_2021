@@ -230,7 +230,7 @@ void MainLoop()
 					logoMode = 3;
 					LogoShowY1 = 0;
 					LogoShowY2 = 129;
-				}
+				}				
 				else if (logoMode == 3)
 				{
 					logoMode = 0;
@@ -1210,6 +1210,7 @@ void BuildLogo(BmpDescriptor d, short mode)
 		}
 		LogoShowDone = LogoShowY2 < 1;
 		break;
+		
 	}
 }
 
@@ -1272,5 +1273,7 @@ void DissolveLogo(short mode)
 		}
 		LogoDissolveDone = LogoShowY2 > 129;
 		break;
+	
+	
 	}
 }

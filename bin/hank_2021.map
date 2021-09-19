@@ -7,9 +7,9 @@ Name             Origin             Length             Attributes
 Linker script and memory map
 
 Address of section .text set to 0x0
-LOAD C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
-LOAD C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
-LOAD C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+LOAD C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+LOAD C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+LOAD C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
 LOAD obj/gcc8_a_support.o
 LOAD obj/depacker_doynax.o
                 [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x80000000))
@@ -73,14 +73,14 @@ LOAD obj/depacker_doynax.o
 .text           0x0000000000000000     0x3862
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  .text.unlikely
-                0x0000000000000000       0x8c C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+                0x0000000000000000       0x8c C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
                 0x0000000000000000                _start
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
  *(.text.hot .text.hot.*)
  *(SORT_BY_NAME(.text.sorted.*))
  *(.text .stub .text.* .gnu.linkonce.t.*)
- .text          0x000000000000008c     0x35f6 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .text          0x000000000000008c     0x35f6 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
                 0x00000000000031cc                main
                 0x00000000000035ec                strlen
                 0x00000000000035fc                memset
@@ -107,7 +107,7 @@ LOAD obj/depacker_doynax.o
 
 .rodata         0x0000000000003862     0x226a
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata        0x0000000000003862     0x226a C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .rodata        0x0000000000003862     0x226a C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
                 0x0000000000003862                incbin_P61_Player_start
                 0x00000000000051c8                incbin_P61_Player_end
 
@@ -130,7 +130,7 @@ LOAD obj/depacker_doynax.o
 
 .exception_ranges
  *(.exception_ranges*)
-                0x0000000000007acc                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+                0x0000000000006000                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
 
 .eh_frame
  *(.eh_frame)
@@ -145,7 +145,7 @@ LOAD obj/depacker_doynax.o
 .exception_ranges
  *(.exception_ranges*)
 
-.tdata          0x0000000000007acc        0x0
+.tdata          0x0000000000006000        0x0
                 [!provide]                        PROVIDE (__tdata_start = .)
  *(.tdata .tdata.* .gnu.linkonce.td.*)
 
@@ -153,22 +153,22 @@ LOAD obj/depacker_doynax.o
  *(.tbss .tbss.* .gnu.linkonce.tb.*)
  *(.tcommon)
 
-.preinit_array  0x0000000000007acc        0x0
-                0x0000000000007acc                PROVIDE (__preinit_array_start = .)
+.preinit_array  0x0000000000006000        0x0
+                0x0000000000006000                PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
-                0x0000000000007acc                PROVIDE (__preinit_array_end = .)
+                0x0000000000006000                PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000000007acc        0x0
-                0x0000000000007acc                PROVIDE (__init_array_start = .)
+.init_array     0x0000000000006000        0x0
+                0x0000000000006000                PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
-                0x0000000000007acc                PROVIDE (__init_array_end = .)
+                0x0000000000006000                PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000000007acc        0x0
-                0x0000000000007acc                PROVIDE (__fini_array_start = .)
+.fini_array     0x0000000000006000        0x0
+                0x0000000000006000                PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
-                0x0000000000007acc                PROVIDE (__fini_array_end = .)
+                0x0000000000006000                PROVIDE (__fini_array_end = .)
 
 .ctors
  *crtbegin.o(.ctors)
@@ -193,7 +193,7 @@ LOAD obj/depacker_doynax.o
 
 .dynamic
  *(.dynamic)
-                0x0000000000007acc                . = DATA_SEGMENT_RELRO_END (., 0x0)
+                0x0000000000006000                . = DATA_SEGMENT_RELRO_END (., 0x0)
 
 .got
  *(.got.plt)
@@ -201,58 +201,58 @@ LOAD obj/depacker_doynax.o
  *(.got)
  *(.igot)
 
-.data           0x0000000000007acc       0xd0
+.data           0x0000000000006000       0xd0
  *(.data .data.* .gnu.linkonce.d.*)
- .data          0x0000000000007acc       0xd0 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- .data          0x0000000000007b9c        0x0 obj/gcc8_a_support.o
- .data          0x0000000000007b9c        0x0 obj/depacker_doynax.o
+ .data          0x0000000000006000       0xd0 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ .data          0x00000000000060d0        0x0 obj/gcc8_a_support.o
+ .data          0x00000000000060d0        0x0 obj/depacker_doynax.o
 
 .INCBIN.MEMF_CHIP
-                0x0000000000007b9c    0x2fe8b
+                0x00000000000060d0    0x2ff7f
  .INCBIN.MEMF_CHIP
-                0x0000000000007b9c    0x2fe8b C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
-                0x0000000000007b9c                incbin_BmpLogoP_start
-                0x000000000000ac5c                incbin_BmpLogoP_end
-                0x000000000000ac5e                incbin_BmpLogo2P_start
-                0x000000000000dd1e                incbin_BmpLogo2P_end
-                0x000000000000dd20                incbin_BmpLogo3P_start
-                0x0000000000010de0                incbin_BmpLogo3P_end
-                0x0000000000010de2                incbin_BmpLogo4P_start
-                0x0000000000013ea2                incbin_BmpLogo4P_end
-                0x0000000000013ea4                incbin_BmpFont32P_start
-                0x000000000001b6a4                incbin_BmpFont32P_end
-                0x000000000001b6a6                incbin_BmpCookieP_start
-                0x0000000000022ea6                incbin_BmpCookieP_end
-                0x0000000000022ea8                incbin_BmpCookieMaskP_start
-                0x000000000002a6a8                incbin_BmpCookieMaskP_end
-                0x000000000002a6aa                incbin_module_start
-                0x0000000000037a26                incbin_module_end
+                0x00000000000060d0    0x2ff7f C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+                0x00000000000060d0                incbin_BmpLogoP_start
+                0x0000000000009190                incbin_BmpLogoP_end
+                0x0000000000009192                incbin_BmpLogo2P_start
+                0x000000000000c252                incbin_BmpLogo2P_end
+                0x000000000000c254                incbin_BmpLogo3P_start
+                0x000000000000f314                incbin_BmpLogo3P_end
+                0x000000000000f316                incbin_BmpLogo4P_start
+                0x00000000000123d6                incbin_BmpLogo4P_end
+                0x00000000000123d8                incbin_BmpFont32P_start
+                0x0000000000019bd8                incbin_BmpFont32P_end
+                0x0000000000019bda                incbin_BmpCookieP_start
+                0x00000000000213da                incbin_BmpCookieP_end
+                0x00000000000213dc                incbin_BmpCookieMaskP_start
+                0x0000000000028bdc                incbin_BmpCookieMaskP_end
+                0x0000000000028bde                incbin_module_start
+                0x000000000003604e                incbin_module_end
 
-tut.MEMF_CHIP   0x0000000000037a28      0x2f8
- tut.MEMF_CHIP  0x0000000000037a28      0x2f8 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+tut.MEMF_CHIP   0x0000000000036050      0x2f8
+ tut.MEMF_CHIP  0x0000000000036050      0x2f8 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
 
 .data1
  *(.data1)
-                0x0000000000037d20                _edata = .
+                0x0000000000036348                _edata = .
                 [!provide]                        PROVIDE (edata = .)
-                0x0000000000037d20                . = .
-                0x0000000000037d20                __bss_start = .
+                0x0000000000036348                . = .
+                0x0000000000036348                __bss_start = .
 
-.bss            0x0000000000037d20      0x2ac
+.bss            0x0000000000036348      0x2ac
  *(.dynbss)
  *(.bss .bss.* .gnu.linkonce.b.*)
- .bss           0x0000000000037d20      0x2aa C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- *fill*         0x0000000000037fca        0x2 
- .bss           0x0000000000037fcc        0x0 obj/gcc8_a_support.o
- .bss           0x0000000000037fcc        0x0 obj/depacker_doynax.o
+ .bss           0x0000000000036348      0x2aa C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ *fill*         0x00000000000365f2        0x2 
+ .bss           0x00000000000365f4        0x0 obj/gcc8_a_support.o
+ .bss           0x00000000000365f4        0x0 obj/depacker_doynax.o
  *(COMMON)
-                0x0000000000037fcc                . = ALIGN ((. != 0x0)?0x4:0x1)
-                0x0000000000037fcc                . = ALIGN (0x4)
-                0x0000000000037fcc                . = SEGMENT_START ("ldata-segment", .)
-                0x0000000000037fcc                . = ALIGN (0x4)
-                0x0000000000037fcc                _end = .
+                0x00000000000365f4                . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x00000000000365f4                . = ALIGN (0x4)
+                0x00000000000365f4                . = SEGMENT_START ("ldata-segment", .)
+                0x00000000000365f4                . = ALIGN (0x4)
+                0x00000000000365f4                _end = .
                 [!provide]                        PROVIDE (end = .)
-                0x0000000000037fcc                . = DATA_SEGMENT_END (.)
+                0x00000000000365f4                . = DATA_SEGMENT_END (.)
 
 .stab
  *(.stab)
@@ -274,10 +274,10 @@ tut.MEMF_CHIP   0x0000000000037a28      0x2f8
 
 .comment        0x0000000000000000       0x12
  *(.comment)
- .comment       0x0000000000000000       0x12 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .comment       0x0000000000000000       0x12 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
                                          0x13 (size before relaxing)
- .comment       0x0000000000000012       0x13 C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
- .comment       0x0000000000000012       0x13 C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+ .comment       0x0000000000000012       0x13 C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+ .comment       0x0000000000000012       0x13 C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
 
 .gnu.build.attributes
  *(.gnu.build.attributes .gnu.build.attributes.*)
@@ -297,7 +297,7 @@ tut.MEMF_CHIP   0x0000000000037a28      0x2f8
 .debug_aranges  0x0000000000000000       0x68
  *(.debug_aranges)
  .debug_aranges
-                0x0000000000000000       0x28 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+                0x0000000000000000       0x28 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
  .debug_aranges
                 0x0000000000000028       0x20 obj/gcc8_a_support.o
  .debug_aranges
@@ -308,47 +308,47 @@ tut.MEMF_CHIP   0x0000000000037a28      0x2f8
 
 .debug_info     0x0000000000000000     0x8ce7
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x0000000000000000     0x24a8 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- .debug_info    0x00000000000024a8     0x5b40 C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
-                0x00000000000024a8                main.c.6befe1e7
- .debug_info    0x0000000000007fe8      0xcb3 C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+ .debug_info    0x0000000000000000     0x24a8 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ .debug_info    0x00000000000024a8     0x5b40 C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+                0x00000000000024a8                main.c.b696de0d
+ .debug_info    0x0000000000007fe8      0xcb3 C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
                 0x0000000000007fe8                gcc8_c_support.c.cf7a2c2b
  .debug_info    0x0000000000008c9b       0x26 obj/gcc8_a_support.o
  .debug_info    0x0000000000008cc1       0x26 obj/depacker_doynax.o
 
 .debug_abbrev   0x0000000000000000      0x665
  *(.debug_abbrev)
- .debug_abbrev  0x0000000000000000      0x14d C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- .debug_abbrev  0x000000000000014d      0x321 C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
- .debug_abbrev  0x000000000000046e      0x1cf C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+ .debug_abbrev  0x0000000000000000      0x14d C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ .debug_abbrev  0x000000000000014d      0x321 C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+ .debug_abbrev  0x000000000000046e      0x1cf C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
  .debug_abbrev  0x000000000000063d       0x14 obj/gcc8_a_support.o
  .debug_abbrev  0x0000000000000651       0x14 obj/depacker_doynax.o
 
 .debug_line     0x0000000000000000     0x6dfb
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x0000000000000000     0x6617 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- .debug_line    0x0000000000006617      0x4e5 C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
- .debug_line    0x0000000000006afc      0x15f C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+ .debug_line    0x0000000000000000     0x6617 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ .debug_line    0x0000000000006617      0x4e5 C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+ .debug_line    0x0000000000006afc      0x15f C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
  .debug_line    0x0000000000006c5b       0xe1 obj/gcc8_a_support.o
  .debug_line    0x0000000000006d3c       0xbf obj/depacker_doynax.o
 
 .debug_frame    0x0000000000000000     0x15f0
  *(.debug_frame)
- .debug_frame   0x0000000000000000     0x1524 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .debug_frame   0x0000000000000000     0x1524 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
  .debug_frame   0x0000000000001524       0xcc obj/gcc8_a_support.o
 
 .debug_str      0x0000000000000000      0x33e
  *(.debug_str)
- .debug_str     0x0000000000000000       0x12 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
- .debug_str     0x0000000000000012      0x1ef C:\Users\dirkm\AppData\Local\Temp\ccbXO1Ji.debug.temp.o
- .debug_str     0x0000000000000201       0x80 C:\Users\dirkm\AppData\Local\Temp\ccO8ttZ7.debug.temp.o
+ .debug_str     0x0000000000000000       0x12 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
+ .debug_str     0x0000000000000012      0x1ef C:\Users\dirkm\AppData\Local\Temp\ccoJkZrt.debug.temp.o
+ .debug_str     0x0000000000000201       0x80 C:\Users\dirkm\AppData\Local\Temp\ccqw9Hzk.debug.temp.o
  .debug_str     0x0000000000000281       0x7a obj/gcc8_a_support.o
  .debug_str     0x00000000000002fb       0x43 obj/depacker_doynax.o
                                          0x7b (size before relaxing)
 
 .debug_loc      0x0000000000000000     0x25d0
  *(.debug_loc)
- .debug_loc     0x0000000000000000     0x25d0 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .debug_loc     0x0000000000000000     0x25d0 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -370,7 +370,7 @@ tut.MEMF_CHIP   0x0000000000037a28      0x2f8
 
 .debug_ranges   0x0000000000000000      0x260
  *(.debug_ranges)
- .debug_ranges  0x0000000000000000      0x260 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.d305TO.ltrans0.ltrans.o
+ .debug_ranges  0x0000000000000000      0x260 C:\Users\dirkm\AppData\Local\Temp\hank_2021.elf.Ixp9lT.ltrans0.ltrans.o
 
 .debug_macro
  *(.debug_macro)
