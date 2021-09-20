@@ -70,7 +70,8 @@ static volatile APTR VBR = 0;
 static APTR SystemIrq;
 // active view
 struct View *ActiView;
-USHORT *copPtr;
+USHORT *copPtrMain;
+USHORT *copPtrIntro;
 // pointer to copperlist bitplane pointers for bouncing
 USHORT *copScrollerBmpP;
 // pointer to copperlist bitplane pointers for pf 1/2 pointers
@@ -81,14 +82,16 @@ USHORT *copPF2ColP;
 // pointer to (re)set mirror effect (change bplmod) in copperlist
 USHORT *copMirrorBmpP;
 // bitmaps
+INCBIN_CHIP(BmpMuerteP, "Art/grfx/muerte.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpLogoP, "Art/grfx/hank_002.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpLogo2P, "Art/grfx/Bastards.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpLogo3P, "Art/grfx/bastard_too.raw")        // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpLogo4P, "Art/grfx/bastard_three.raw")        // load image into chipmem so we can use it without copying
-INCBIN_CHIP(BmpFont32P, "Art/grfx/32x32_font_02.raw") // load image into chipmem so we can use it without copying
+INCBIN_CHIP(BmpFont32P, "Art/grfx/font_hank.raw") // load image into chipmem so we can use it without copying
 INCBIN_CHIP(BmpCookieP, "Art/grfx/cookie2.raw");
 INCBIN_CHIP(BmpCookieMaskP, "Art/grfx/cookie2.msk.raw");
 BmpDescriptor Screen;
+BmpDescriptor BmpMuerte;
 BmpDescriptor BmpUpperPart_PF1;
 BmpDescriptor BmpUpperPart_PF2;
 BmpDescriptor BmpUpperPart_Buf1;
@@ -132,6 +135,12 @@ Point2D BobVecs[BOBSN] = {
 USHORT BobPhase = 0;
 USHORT BobPause = 0;
 // palettes
+UWORD muertePaletteRGB4[32] ={
+	0x0000,0x0844,0x0777,0x099A,0x0D57,0x0BBC,0x0DEE,0x0D1A,
+	0x05B8,0x0FF0,0x0474,0x09A7,0x0254,0x0C00,0x0141,0x07DC,
+	0x0111,0x0944,0x0A95,0x06B9,0x05F3,0x0133,0x0599,0x0333,
+	0x0554,0x0273,0x0645,0x0992,0x06B7,0x0377,0x0996,0x038B
+};
 UWORD LogoPaletteRGB4[8] = {
     0x0000,0x0C95,0x0C95,0x0EA6,0x0432,0x0542,0x0430,0x0B81};
 UWORD BastardsPaletteRGB4[8] ={
@@ -166,7 +175,7 @@ BOOL LogoDissolveDone = FALSE;
 #define SCRT_MIN (0)
 #define SCRT_MAX (40)
 USHORT ScrollerMin = SCRT_MIN;
-USHORT ScrollerMax = SCRT_MAX;
+USHORT ScrollerMax = 4;
 SHORT ScrollerY = SCRT_MIN;
 BYTE ScrollerDir = 1;
 USHORT ScrollCnt;
@@ -176,44 +185,84 @@ USHORT ScrollerPause = 0;
 BOOL BounceEnabled = FALSE;
 BOOL MirrorEnabled = FALSE;
 BOOL ResetCopper = FALSE;
-CONST char Scrolltext[] = "           \
+CONST char Scrolltext[] = "            \
 HANK   s1VAN    s1BASTARD s1 PRESENTS: s1     #THE HANK VAN BASTARD SHOW#           \
 HEY SCROLLER! YOU DON'T LOOK TOO HAPPY - WHAT'S UP?     I'M BORED! I WANT TO BOUNCE!       \
 OK SCROLLER I'LL TRY TO HELP US OUT - WHERE DID I PUT THAT BOUNCE-FLAG? JUST A SECOND....SH..AH THERE.... \
-OFF WE GOb!s4        MMHH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!        NEVERMIND - \
+OFF WE GO!bs4        MMHH, THAT'S MUCH BETTER. THANK YOU VERY MUCH!        NEVERMIND - \
 BUT STILL NOT HAPPY?        LOOK AT ALL THAT DIRT BELOW ME. WHAT A MESS!     \
 OK, OK...GODDA... I'LL TRY MY BEST TO CLEAN IT UP....            \
-c m     YES, NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE  MY HERO! s4             \
+c m     YES, NICE! I CAN SEE MYSELF IN A MIRROR. CODER, YOU ARE  MY HERO! s6            \
 THIS PIECE OF CODE WOULDN'T HAVE BEEN POSSIBLE WITHOUT THE WORK OF LOTS OF PEOPLE \
 PROVIDING TOOLS AND PASSING ON KNOWLEDGE. SO I TAKE PLEASURE IN SAYING THANKS TO YOU ALL. \
 SPECIAL THANKS TO  PHOTON  s4 OF SCOOPEX FOR HIS LOVELY \
 AMIGA HARDWARE PROGRAMMING SERIES 'ASMSKOOL' s4 TO BE WATCHED ON YOUTUBE. THIS DEMO IS BASICALLY THE ATTEMPT TO \
 GET DONE WHAT HE SHOWS AND PORTING IT TO THE C PROGRAMMING LANGUAGE.  BUT MEANWHILE I STARTED \
-WRITING IN ASSEMBLER AS WELL WHICH I NEVER THOUGHT COULD BE ENJOYABLE - BUT.. IT'S NEVER TOO EARLY \
+WRITING IN ASSEMBLER AS WELL WHICH I NEVER THOUGHT COULD BE ENJOYABLE - BUT IT'S NEVER TOO EARLY \
 AND SELDOMLY TOO LATE :-)        \
 ALSO WEI-JU WU s4 FOR HIS SERIES ON YOUTUBE.         \
-HANK USES THE AMIGA VSCODE EXTENSION BY  BARTMAN s4OF ABYSS.    \
+HANK USES THE AMIGA VSCODE EXTENSION BY BARTMAN  s4OF ABYSS.    \
 THANKS FOR THE EXCELLENT WORK DUDES IT'S VERY MUCH APPRECIATED.          SEE YOU MY FRIENDS.                \
-IF YOU LIKE WHAT YOU'VE SEEN AND THINK: YES THAT'S THE KIND OF STUFF I WANT TO DO AND YOU WANT TO JOIN FORCES \
+IF YOU LIKE WHAT YOU'VE SEEN AND THINK: YES, THAT'S THE KIND OF STUFF I WANT TO MAKE (OR BEYOND) AND YOU'D LIKE TO JOIN FORCES \
 FEEL FREE TO CONTACT THE WORLD'S GREATEST BASTARD VIA 'HANKVANBASTARD(A)GMAIL.COM'    \
 YES - RIGHT NOW THIS IS A ONE MAN SHOW AND THAT ISN'T ALWAYS THE BEST FUN, SO...              \
-BYE THE WAY: I USED THE (A) INSTEAD OF MY UGLY       NOW IT'S COMING      @     s4     WHOA! WHAT A SHAME!      \
-HEY! STOP LAUGHING YOU LOUSY BASTARD! BETTER DESIGN ME A NICER '@'.      YOU SEE I REALLY NEED HELP. \
-SO CONTACT ME VIA 'HANKVANBASTARD@GMAIL.COM'      \
-AND REMEMBER:  A BASTARD'S WORK IS NEVER DONE.                m b                   \
+BY THE WAY: I USED THE (A) TO INDICATE AN AT INSTEAD OF MY UGLY       NOW IT'S COMING      @     s4     WHOA! WHAT A SHAME!      \
+HEY! STOP LAUGHING YOU LOUSY BASTARD! BETTER DESIGN ME A NICER @.       ANY CONTACTS WELCOME.   \
+SEND A HELLO TO 'HANKVANBASTARD@GMAIL.COM'          \
+REMEMBER: s4      A BASTARD'S WORK IS NEVER DONE.                m b                   \
 \0";
 // music bin
 INCBIN(P61_Player, "Art/music/player610.6.no_cia.bin")
 INCBIN_CHIP(module, "Art/music/P61.Hank003")
 // sprite data
 __attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite[93 * 4 + 2];
+__attribute__((section("tut.MEMF_CHIP"))) UWORD StarSprite2[93 * 4 + 2];
 __attribute__((section("tut.MEMF_CHIP"))) UWORD NullSprite[] = {0x1c07, 0x1d00, 0x0000, 0x0000, 0x0000, 0x0000};
+// misc
+BOOL ONSMousClick;
+
 //proto
 void SetInterruptHandler(APTR interrupt);
 void WaitVbl(void);
 inline void WaitBlt();
 void TakeSystem(void);
 void FreeSystem(void);
+
+void SetupCopper(USHORT *copPtr);
+void SetupCopperIntro(USHORT *copPtr);
+void MainLoop(void);
+void IntroLoop(void);
+void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed);
+void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT charW, USHORT charH);
+void BounceScroller(USHORT pos);
+void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
+void InitImagePlanes(BmpDescriptor *img, USHORT offs);
+USHORT *copSetPlanesInterleafedOddEven(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *bitmap, int numPlanes, int Bpl, int offsY, BOOL odd);
+USHORT *copSetPlanesInterleafed(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *bitmap, int numPlanes, int Bpl, int offsY);
+void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
+void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Point2D startS, Point2D startD, USHORT height, USHORT width);
+void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
+void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width);
+void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
+void CopyBitmapPart(BmpDescriptor bmpS, BmpDescriptor bmpD, USHORT start, USHORT stop);
+void MoveBobs(void);
+void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
+void ClearPixel(BmpDescriptor bitmap, USHORT x, USHORT y);
+void LineDraw(BmpDescriptor bitmap, int x0, int y0, int x1, int y1, UBYTE col);
+void PolygonDraw(BmpDescriptor bitmap, Point2D *pointlist, USHORT length, BYTE col, BOOL closed);
+void EllipseDraw(BmpDescriptor bitmap, BYTE col, int xm, int ym, int a, int b);
+void SinusDraw(Point2D *targetList, USHORT sinstart, USHORT x, USHORT y, int amp, int width);
+void MakePolys();
+void EnableMirrorEffect(void);
+void DisableMirrorEffect(void);
+void InitStarfieldSprite(void);
+void MoveStarfield(void);
+void BuildLogo(BmpDescriptor d, short mode);
+void DissolveLogo(short mode);
+int p61Init(const void *module);
+void p61Music(void);
+void p61End(void);
+
 inline short MouseLeft() { return !((*(volatile UBYTE *)0xbfe001) & 64); }
 inline short MouseRight() { return !((*(volatile UWORD *)0xdff016) & (1 << 10)); }
 // set up a 320x256 lowres display
@@ -260,34 +309,7 @@ inline USHORT *copSetPlanes(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *
     }
     return copListEnd;
 }
-inline USHORT *copSetPlanesInterleafed(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *bitmap, int numPlanes, int Bpl, int offsY)
-{
-    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-    for (USHORT i = 0; i < numPlanes; i++)
-    {
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]);
-        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-        *copListEnd++ = offsetof(struct Custom, bplpt[i + bplPtrStart]) + 2;
-        *copListEnd++ = (UWORD)addr; // high-word of adress
-        addr += Bpl;
-    }
-    return copListEnd;
-}
-inline USHORT *copSetPlanesInterleafedOddEven(UBYTE bplPtrStart, USHORT *copListEnd, const UBYTE *bitmap, int numPlanes, int Bpl, int offsY, BOOL odd)
-{
-    ULONG addr = (ULONG)bitmap + (offsY * Bpl * numPlanes);
-    BYTE plane = odd ? 1 : 0;
-    for (USHORT i = 0; i < numPlanes; i++)
-    {
-        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]);
-        *copListEnd++ = (UWORD)(addr >> 16); // low-word of adress
-        *copListEnd++ = offsetof(struct Custom, bplpt[plane + bplPtrStart]) + 2;
-        *copListEnd++ = (UWORD)addr; // high-word of adress
-        addr += Bpl;
-        plane += 2;
-    }
-    return copListEnd;
-}
+
 inline USHORT *copSetBplMod(UBYTE bplPtrStart, USHORT *copListEnd, USHORT modOdd, USHORT modEven)
 {
     //set bitplane modulo
@@ -327,36 +349,6 @@ inline USHORT *copSetColor(USHORT *copListCurrent, USHORT index, USHORT color)
     *copListCurrent++ = color;
     return copListCurrent;
 }
-void SetupCopper(USHORT *copPtr);
-void MainLoop(void);
-void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed);
-void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT charW, USHORT charH);
-void BounceScroller(USHORT pos);
-void BitmapInit(BmpDescriptor *bmp, USHORT w, USHORT h, USHORT bpls);
-void InitImagePlanes(BmpDescriptor *img, USHORT offs);
-void SimpleBlit(BmpDescriptor imgS, BmpDescriptor imgD, Point2D startS, Point2D startD, USHORT height, USHORT width);
-void BetterBlit(BmpDescriptor imgS, BmpDescriptor imgD, BmpDescriptor imgM, Point2D startS, Point2D startD, USHORT height, USHORT width);
-void ClearBitmap(BmpDescriptor bmpD, USHORT lines);
-void ClearBitmapPart(BmpDescriptor bmp, int x, int y, int height, int width);
-void CopyBitmap(BmpDescriptor bmpS, BmpDescriptor bmpD);
-void CopyBitmapPart(BmpDescriptor bmpS, BmpDescriptor bmpD, USHORT start, USHORT stop);
-void MoveBobs(void);
-void SetPixel(BmpDescriptor bitmap, USHORT x, USHORT y, UBYTE col);
-void ClearPixel(BmpDescriptor bitmap, USHORT x, USHORT y);
-void LineDraw(BmpDescriptor bitmap, int x0, int y0, int x1, int y1, UBYTE col);
-void PolygonDraw(BmpDescriptor bitmap, Point2D *pointlist, USHORT length, BYTE col, BOOL closed);
-void EllipseDraw(BmpDescriptor bitmap, BYTE col, int xm, int ym, int a, int b);
-void SinusDraw(Point2D *targetList, USHORT sinstart, USHORT x, USHORT y, int amp, int width);
-void MakePolys();
-void EnableMirrorEffect(void);
-void DisableMirrorEffect(void);
-void InitStarfieldSprite(void);
-void MoveStarfield(void);
-void BuildLogo(BmpDescriptor d, short mode);
-void DissolveLogo(short mode);
-int p61Init(const void *module);
-void p61Music(void);
-void p61End(void);
 // interrupt handler
 static __attribute__((interrupt)) void interruptHandler()
 {
