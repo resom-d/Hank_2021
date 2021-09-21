@@ -66,12 +66,13 @@ int main()
 
 	// setup the sprite's pixels
 	InitStarfieldSprite();
+	// prepare copperlists
 	SetupCopper(copPtrMain);
 	SetupCopperIntro(copPtrIntro);
-
+	// system off
 	TakeSystem();
 	WaitVbl();
-
+	// set 1st copperlist and activate dma
 	custom->cop1lc = (ULONG)copPtrIntro;
 	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
 	custom->copjmp1 = 0x7fff;	   //start coppper
@@ -80,14 +81,16 @@ int main()
 	SetInterruptHandler((APTR)interruptHandler);
 	custom->intena = INTF_SETCLR | INTF_INTEN | INTF_VERTB;
 	custom->intreq = 1 << INTB_VERTB; //reset vbl req
-
+	// start intro
 	IntroLoop();
+	// wait for mouse button released
 	while (MouseLeft())
 	{
 		;
 	}
 
 	WaitVbl();
+	// set 2nd copperlist and restart dma
 	custom->cop1lc = (ULONG)copPtrMain;
 	custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
 	custom->copjmp1 = 0x7fff;	   //start coppper
@@ -137,6 +140,7 @@ void MainLoop()
 
 		// wait for vertical blank
 		WaitVbl();
+		LightsUp(&LightsUpPhase);
 		// logo show && dissolve
 		if (LogoShowPause > 0)
 		{
@@ -252,16 +256,6 @@ void MainLoop()
 				}
 			}
 			DissolveLogo(dissolveMode);
-		}
-		// needed for color change in lower half
-		if (ResetCopper)
-		{
-			SetupCopper(copPtrMain);
-			custom->cop1lc = (ULONG)copPtrMain;
-			custom->dmacon = DMAF_BLITTER; //disable blitter dma for copjmp bug
-			custom->copjmp1 = 0x7fff;	   //start coppper
-			custom->dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER | DMAF_BLITTER | DMAF_BLITHOG | DMAF_SPRITE;
-			ResetCopper = FALSE;
 		}
 		// copy buffer to bob-bitplanes
 		CopyBitmapPart(BmpUpperPart_Buf1, BmpUpperPart_PF2, 46, 78);
@@ -385,11 +379,11 @@ void MoveBobs()
 			}
 		}
 		BobTarget[BOBSN - 1].X += BobVecs[BOBSN - 1].X;
-		if (BobTarget[BOBSN - 1].X > 320+32)
+		if (BobTarget[BOBSN - 1].X > 320 + 32)
 		{
-			BobTarget[BOBSN - 1].X = 320+32;
+			BobTarget[BOBSN - 1].X = 320 + 32;
 		}
-		if (BobTarget[0].X >= 320+32)
+		if (BobTarget[0].X >= 320 + 32)
 		{
 			BobVecs[0].X *= -1;
 			BobVecs[1].X *= -1;
@@ -545,14 +539,18 @@ void SetupCopper(USHORT *copPtr)
 		line += 2;
 	}
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[0]);
+	copLightUp[0] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x111);
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[1]);
+	copLightUp[1] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x222);
 	line += 7;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[0]);
+	copLightUp[2] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x111);
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[1]);
+	copLightUp[3] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x222);
 
 	line = 0x2c + BmpLogo.Height + 72 + 7; // 209
 	copPtr = copWaitY(copPtr, line++);
@@ -564,14 +562,18 @@ void SetupCopper(USHORT *copPtr)
 	// give lower part color and some stripes
 	line = 0x05;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[0]);
+	copLightUp[4] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x111);
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[1]);
+	copLightUp[5] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x222);
 	line = 0x2c;
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[0]);
+	copLightUp[6] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x111);
 	copPtr = copWaitY(copPtr, line++);
-	copPtr = copSetColor(copPtr, 0, colScrollMirror[1]);
+	copLightUp[7] = copPtr;
+	copPtr = copSetColor(copPtr, 0, 0x222);
 	// copper end
 	copPtr = copWaitXY(copPtr, 0xff, 0xff);
 }
@@ -593,7 +595,7 @@ void SetupCopperIntro(USHORT *copPtr)
 	*copPtr++ = BPLCON1; //scrolling
 	*copPtr++ = 0;
 	*copPtr++ = BPLCON2; //playfied priority
-	*copPtr++ = 0 << 6; //pf2 >> pf 1 >> sprites
+	*copPtr++ = 0 << 6;	 //pf2 >> pf 1 >> sprites
 	// set logo colors
 	for (int a = 0; a < 32; a++)
 	{
@@ -651,6 +653,61 @@ void DisableMirrorEffect()
 	copSetBplMod(0, copMirrorBmpP,
 				 BmpScroller.Bplt - Screen.Bpl,
 				 BmpScroller.Bplt - Screen.Bpl);
+}
+
+void LightsUp(BYTE *phase)
+{
+	static USHORT pause = 0;
+
+	if (pause > 0)
+	{
+		pause--;
+		return;
+	}
+	switch (*phase)
+	{
+	case 0:
+		copSetColor(copLightUp[0], 0, 0x111);
+		copSetColor(copLightUp[1], 0, 0x222);
+		copSetColor(copLightUp[2], 0, 0x111);
+		copSetColor(copLightUp[3], 0, 0x222);
+		copSetColor(copLightUp[4], 0, 0x111);
+		copSetColor(copLightUp[5], 0, 0x222);
+		copSetColor(copLightUp[6], 0, 0x111);
+		copSetColor(copLightUp[7], 0, 0x222);
+		break;
+
+	case 1:
+		copSetColor(copLightUp[0], 0, 0x6bf);
+		copSetColor(copLightUp[1], 0, 0x49b);
+		pause = 35;
+		*phase = 2;
+		break;
+
+	case 2:
+		copSetColor(copLightUp[2], 0, 0x6bf);
+		copSetColor(copLightUp[3], 0, 0x49b);
+		pause = 35;
+		*phase = 3;
+		break;
+
+	case 3:
+		copSetColor(copLightUp[4], 0, 0x6bf);
+		copSetColor(copLightUp[5], 0, 0x49b);
+		pause = 35;
+		*phase= 4;
+		break;
+
+	case 4:
+		copSetColor(copLightUp[6], 0, 0x6bf);
+		copSetColor(copLightUp[7], 0, 0x49b);
+		pause = 35;
+		*phase = 5;
+		break;
+
+	default:
+		break;
+	}
 }
 
 void Scrollit(BmpDescriptor theDesc, UBYTE *theBitmap, USHORT startY, USHORT height, UBYTE speed)
@@ -717,12 +774,19 @@ void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT
 	{
 		ScrollerPause = BounceEnabled ? (Scrolltext[ScrolltextCnt++] - 48) : (Scrolltext[ScrolltextCnt++] - 48) * 50;
 		chr = Scrolltext[ScrolltextCnt++];
-	}		
+	}
 	if (chr == 'c')
 	{
-		colScrollMirror[0] = 0x6bf;
-		colScrollMirror[1] = 0x49b;
-		ResetCopper = TRUE;
+		if (LightsUpEnabled)
+		{
+			LightsUpPhase = 0;
+			LightsUpEnabled = FALSE;
+		}
+		else
+		{
+			LightsUpPhase = 1;
+			LightsUpEnabled = TRUE;
+		}
 	}
 	// select character for different spacing
 	if (chr == '!' || chr == 'I' || chr == '.' || chr == ',' || chr == ':' || chr == ';' || chr == '\'')
@@ -737,10 +801,7 @@ void PlotChar(BmpDescriptor bmpFont, BmpDescriptor bmpDest, USHORT plotY, USHORT
 	if (chr == 0)
 	{
 		ScrolltextCnt = 0;
-		chr = Scrolltext[ScrolltextCnt++];
-		colScrollMirror[0] = 0x111;
-		colScrollMirror[1] = 0x222;
-		ResetCopper = TRUE;
+		chr = Scrolltext[ScrolltextCnt++];		
 	}
 	// check legal values
 	if (chr < 32 || chr > (32 + 80))
